@@ -1,0 +1,11 @@
+@font-face {
+    font-family: "Oxygen";
+    src: url("/fonts/Oxygen-Regular.ttf")
+}
+
+* {
+    font-family: "Oxygen", sans-serif;
+    --main-color: #203e60;
+    --main-color-dark: #172c46;
+    --white: #fff;
+}

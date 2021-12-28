@@ -17,12 +17,24 @@ function switchIcon(type) {
     })
 }
 
-function handleMessage(request) {
+function pageFetch(page) {
+    fetch(page).then(response => response.text())
+    .then(data => pageInner = data);
+
+    return pageInner;
+}
+
+function handleMessage(request, sender, sendResponse) {
     switch (request.action) {
         case "switchIcon":
             switchIcon(request.value);
             break;
+        case "fetch":
+            pageInner = pageFetch(request.page);
+            sendResponse({data: pageInner});
+            break;
     }
+    return true;
 }
 
 function setInactive(request) {

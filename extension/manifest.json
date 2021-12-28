@@ -1,6 +1,6 @@
 {
 
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "mectio",
     "version": "1.0",
   
@@ -9,25 +9,34 @@
     "icons": {
       "48": "icons/icon-48.png"
     },
-    "permissions": ["cookies", "webRequest", "tabs"],
+
+    "background": {
+      "service_worker": "background.js"
+    },
+
+    "permissions": ["storage", "cookies", "webRequest", "tabs"],
+
+    "host_permissions": ["*://*.lectio.dk/"],
 
     "content_scripts": [
       {
         "matches": ["*://*.lectio.dk/*"],
-        "js": ["main.js"]
+        "run_at": "document_start",
+        "js": ["scripts/catchPhrases.js", "scripts/windowManager.js", "main.js"]
       }
     ],
 
-    "background": {
-        "scripts": ["background.js"]
-    },
-  
+    "web_accessible_resources": [{
+      "resources": ["pages/*", "styles/*", "icons/*", "fonts/*"],
+      "matches": ["<all_urls>"]
+    }],
 
-    "browser_action": {
+    "action": {
         "default_icon": {
             "48": "icons/icon-48-inactive.png"
         },
-        "default_title": "mectio"
-      }
+        "default_title": "mectio",
+        "default_popup": "pages/popup.html"
+    }
   
   }
