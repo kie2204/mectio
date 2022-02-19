@@ -20,18 +20,18 @@ header {
     background-color: var(--main-color);
     display: flex;
     top: 0;
-    height: 56px;
+    height: 3.5rem;
     align-items: center;
     padding: 8px 16px;
 }
 
 #mectio-logo-wrapper {
     background-color: white;
-    border-radius: 16px;
-    height: 36px;
+    border-radius: 1rem;
+    height: 2rem;
     display: flex;
     align-items: center;
-    padding: 8px;
+    padding: .5rem;
 }
 
 #mectio-logo {
@@ -57,4 +57,9 @@ header {
     margin: 0;
     padding: 0px;
     font-size: 10px;
+}
+
+.mectio-window {
+    min-width: 100vw;
+    min-height: 100vh;
 }

@@ -1,0 +1,67 @@
+<div id="login-outer">
+    <div id="login-container">
+        <div id="login-left">
+            <div id="login-text">
+                <h3>Velkommen til</h3>
+                <img src="icons/logo-text-white.svg">
+                <p>Log ind for at fortsætte.</p>
+            </div>
+        </div>
+        <div id="login-right">
+            <div id="login-box">
+                
+            </div>
+        </div>
+    </div>
+    <footer>
+        <a href="">Om mectio</a>
+        <a href="">GitHub</a>
+    </footer>
+</div>
+
+<style>
+#login-outer {
+    background-color: var(--main-color);
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#login-container {
+    display: flex;
+}
+
+#login-left {
+    width: 50rem;
+    align-items: center;
+    display: flex;
+}
+
+#login-box {
+    width: 28rem;
+    height: 36rem;
+    background-color: white;
+}
+
+#login-text {
+    color: white;
+}
+
+#login-text h3 {
+    font-size: 1.5rem;
+}
+
+#login-outer footer {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    padding: 1rem;
+}
+
+#login-outer footer * {
+    color: white;
+    padding: 0 .5rem;
+}
+</style>
