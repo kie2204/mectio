@@ -21,18 +21,6 @@ document.getElementsByTagName('head')[0].appendChild(link);
 
 link.href = browser.runtime.getURL('/') + 'icons/icon-48.ico';
 
-// Construct DOM then pass to windowManager
-document.addEventListener("DOMContentLoaded", async function() {
-    // Log it
-    console.log("mectio: starter init")
-    document.documentElement.innerHTML = ""
-    await windowManager.init();
-
-    var test = new wmWindow();
-    test.element.innerHTML = await getLocalPage("/pages/login.html");
-    
-})
-
 var getLocalPage = async function(page) {
     return new Promise(resolve => {
         fetch(browser.runtime.getURL(page)).then(r => r.text()).then(html => {
@@ -50,3 +38,17 @@ var getLocalPage = async function(page) {
         });
     });
 }
+
+// Construct DOM then pass to windowManager
+document.addEventListener("DOMContentLoaded", async function() {
+    // Log it
+    console.log("mectio: starter init")
+    document.documentElement.innerHTML = ""
+    await windowManager.init();
+
+    var test = new wmWindow();
+    test.element.innerHTML = await getLocalPage("/pages/login.html");
+    windowManager.setHeaderState(0)
+
+    test.element.addEventListener("click", test.close)
+})

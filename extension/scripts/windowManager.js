@@ -1,3 +1,5 @@
+var defaultTransitionCurve = "transform 0.2s cubic-bezier(0, 0, 0.2, 1) "
+
 windowManager = {
     initStatus: 0,
     init: async() => {
@@ -31,12 +33,23 @@ windowManager = {
         });
     },
     setHeaderState: function(state) { // state 0: skjul, 1: vis
+        var mectioHeader = document.getElementsByTagName("header")[0]
+        var prevTransition = mectioHeader.style.transition;
+
+        mectioHeader.style.transition = defaultTransitionCurve;
+
         switch(state) {
             case 0:
+                mectioHeader.style.transform = "translateY(-100%)";
+                break;
             case 1:
+                mectioHeader.style.transform = "";
+                break;
             default:
                 console.log("Ugyldig argument, forventer 0 eller 1")    
         }
+
+        // mectioHeader.style.transition = prevTransition;
     }
 }
 
@@ -53,5 +66,14 @@ class wmWindow {
         console.log("mectio: nyt vindue med id " + this.id + " åbnet.")
 
         this.element = windowElement;
+    }
+
+    close() {
+        var closeElement = document.getElementById(this.id)
+        // Luk-animation
+        console.log("Lukker vindue " + this.id)
+        closeElement.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
+        closeElement.style.transform = "scale(0.95)";
+        closeElement.style.opacity = "0";        
     }
 }

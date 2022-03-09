@@ -1,18 +1,27 @@
 var browser = browser || chrome;
 
+// Load api
+try {
+    importScripts('/lectio-api/parse5.bundle.js', '/lectio-api/api.js');
+} catch (e) {
+    console.error(e);
+}
+
 function switchIcon(type) {
     // Skifter ikon.
     // 0 = inaktiv, 1 = aktiv
+    var path;
 
     switch (type) {
         case 0:
-            path = "icons/icon-48-inactive.png"
+            path = "icons/icon-48-inactive.png";
+            break;
         case 1:
             path = "icons/icon-48.png";
             break;
     }
 
-    browser.browserAction.setIcon({
+    browser.action.setIcon({
         "path": path
     })
 }
