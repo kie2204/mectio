@@ -36,6 +36,9 @@ var lectioAPI = {
             }
         }
     },
+    getUserData: async function(id, userID) {
+        
+    },
     login: async function(id, username, password) { // Logger ind på Lectio
         // Get VIEWSTATE og EVENTVALIDATION (lectio sikkerhedskrav nederen)
         var rawData = await this.getParseData(`lectio/${id}/login.aspx`);
@@ -76,7 +79,7 @@ var lectioAPI = {
 
         return await this.getLoginStatus(id);
     },
-    logout: async function() { //Logger ud fra Lectio
+    logout: async function() { // Logger ud fra Lectio
         fetch(lectioURL + "lectio/1/logout.aspx")
         return await this.getLoginStatus();
     }

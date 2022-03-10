@@ -9,6 +9,10 @@ browser.runtime.sendMessage({
     value: 1
 });
 
+//
+window.SessionHelper = ""
+
+
 console.log("mectio er i ALPHA. Der kan være fejl og mangler")
 console.log("mectio: " + catchPhrases.get("loading"))
 
@@ -52,15 +56,8 @@ document.addEventListener("DOMContentLoaded", async function() {
         args: [680]
     });
 
-    console.log(loginStatus)
-
     if (loginStatus.loginStatus == 1) {
-        var test = new wmWindow();
-        var frame = document.createElement("iframe")
-        frame.setAttribute("src", window.location.href)
-        frame.style.width = "100%";
-        frame.style.height = "100vh";
-        test.element.appendChild(frame)
+        loadSitePage();
     } else {
         showLoginPage();
     }
@@ -72,4 +69,20 @@ var showLoginPage = async function() {
     windowManager.setHeaderState(0)
 
     test.element.addEventListener("click", test.close)
+}
+
+var loadSitePage = async function() {
+    var test = new wmWindow();
+    var frame = document.createElement("iframe")
+    frame.setAttribute("src", window.location.href)
+    frame.style.paddingTop = "4rem";
+    frame.style.width = "100vw";
+    frame.style.height = "100vh";
+    test.element.appendChild(frame)
+    frame.contentWindow.addEventListener("load", function(){
+        var doc = frame.contentWindow.document;
+
+        doc.getElementsByTagName("header")[0].style.display = "none";
+        doc.getElementById("s_m_HeaderContent_subnav_div").style.display = "none";
+    })
 }

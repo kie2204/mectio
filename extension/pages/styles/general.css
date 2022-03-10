@@ -14,9 +14,13 @@ body {
     margin: 0;
 }
 
+#header-container {
+    position: fixed;
+    width: 100%;
+}
+
 header {
     width: 100%;
-    position: fixed;
     background-color: var(--main-color);
     display: flex;
     top: 0;
@@ -62,4 +66,23 @@ header {
 .mectio-window {
     min-width: 100vw;
     min-height: 100vh;
+}
+
+/* Nav styles */
+
+nav {
+    background-color: #80b2f0;
+    height: 2rem;
+    display: flex;
+    padding: 0 2rem;
+}
+
+nav * {
+    height: 100%;
+    align-items: center;
+}
+
+#mectio-nav-title {
+    background-color: #5c8ac2;
+    font-weight: bold;
 }
