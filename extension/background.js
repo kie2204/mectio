@@ -42,8 +42,18 @@ function handleMessage(request, sender, sendResponse) {
             pageInner = pageFetch(request.page);
             sendResponse({data: pageInner});
             break;
+        case "api":
+            doApiRequest(request.call, request.args).then(r => sendResponse(r))
     }
     return true;
+}
+
+async function doApiRequest(call, args) {
+    switch (call) {
+        case "getLoginStatus":
+            data = await lectioAPI.getLoginStatus(args[0])
+            return data;
+    }
 }
 
 function setInactive(request) {

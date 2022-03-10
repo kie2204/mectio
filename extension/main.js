@@ -46,9 +46,30 @@ document.addEventListener("DOMContentLoaded", async function() {
     document.documentElement.innerHTML = ""
     await windowManager.init();
 
+    loginStatus = await browser.runtime.sendMessage({
+        action: "api",
+        call: "getLoginStatus",
+        args: [680]
+    });
+
+    console.log(loginStatus)
+
+    if (loginStatus.loginStatus == 1) {
+        var test = new wmWindow();
+        var frame = document.createElement("iframe")
+        frame.setAttribute("src", window.location.href)
+        frame.style.width = "100%";
+        frame.style.height = "100vh";
+        test.element.appendChild(frame)
+    } else {
+        showLoginPage();
+    }
+})
+
+var showLoginPage = async function() {
     var test = new wmWindow();
     test.element.innerHTML = await getLocalPage("/pages/login.html");
     windowManager.setHeaderState(0)
 
     test.element.addEventListener("click", test.close)
-})
+}

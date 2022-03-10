@@ -44,9 +44,7 @@ var lectioAPI = {
         var aspNet_VSX = findKey(parsedInstData, "value", "__VIEWSTATEX").prevObject[0][0][3].value
         var aspNet_EVV = findKey(parsedInstData, "value", "__EVENTVALIDATION").prevObject[0][0][3].value
 
-        console.log(aspNet_EVV + " " + aspNet_VSX)
-
-        var data = {
+        var data = { // ALLE felter her skal sendes til Lectio
             '__EVENTTARGET': 'm$Content$submitbtn2',
             '__EVENTARGUMENT': "",
             '__SCROLLPOSITION': "",
@@ -68,7 +66,7 @@ var lectioAPI = {
         }
         formBody = formBody.join("&");
 
-        fetch(`${lectioURL}lectio/${id}/login.aspx`, {
+        fetch(`${lectioURL}lectio/${id}/login.aspx`, { // Send post request med data
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -79,7 +77,7 @@ var lectioAPI = {
         return await this.getLoginStatus(id);
     },
     logout: async function() { //Logger ud fra Lectio
-        fetch(lectioAPI + "1/logout.aspx")
+        fetch(lectioURL + "lectio/1/logout.aspx")
         return await this.getLoginStatus();
     }
 }
