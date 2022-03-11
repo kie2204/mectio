@@ -96,9 +96,11 @@ nav {
 nav * {
     height: 100%;
     align-items: center;
+    display: flex;
 }
 
 #mectio-nav-title {
     background-color: #5c8ac2;
     font-weight: bold;
+    padding: 0 1rem;
 }

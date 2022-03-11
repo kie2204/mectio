@@ -36,8 +36,21 @@ var lectioAPI = {
             }
         }
     },
-    getUserData: async function(id, userID) {
-        
+    getUserData: async function(id, userID, type) { // id: instID, userID: brugerens id, type: (0 = elev, 1 = lærer)
+        var rawData;
+        switch (type) {
+            case 0:
+                rawData = await this.getParseData(`lectio/${id}/SkemaNy.aspx?type=elev&elevid=${userID}`);
+                break;
+            case 1:
+                rawData = await this.getParseData(`lectio/${id}/SkemaNy.aspx?type=laerer&laererid=${userID}`);
+                break;
+            default:
+                return {error: "Bruger ikke fundet"}
+        }
+        var parsedData = parse5.parse(rawData);
+
+        return parsedData;
     },
     login: async function(id, username, password) { // Logger ind på Lectio
         // Get VIEWSTATE og EVENTVALIDATION (lectio sikkerhedskrav nederen)
