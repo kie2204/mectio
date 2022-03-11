@@ -32,40 +32,83 @@ windowManager = {
             });
         });
     },
-    setHeaderState: function(state) { // state 0: skjul, 1: vis
-        var mectioHeader = document.getElementsByTagName("header")[0]
+    setHeaderState: function(state) { // state 0: skjul, 1: vis, 2: vis header + nav
+        var mectioHeader = document.getElementById("header-container")
+        var nav = document.getElementsByTagName("nav")[0]
+        var main = document.getElementsByTagName("main")[0]
         var prevTransition = mectioHeader.style.transition;
 
         mectioHeader.style.transition = defaultTransitionCurve;
+        nav.style.transition = defaultTransitionCurve;
 
         switch(state) {
             case 0:
                 mectioHeader.style.transform = "translateY(-100%)";
+                nav.style.transform = "translateY(-100%)";
+
+                main.classList.remove("collapse1")
+                main.classList.remove("collapse2")
                 break;
             case 1:
                 mectioHeader.style.transform = "";
+                nav.style.transform = "translateY(-100%)";
+                main.classList.add("collapse1")
+                main.classList.remove("collapse2")
+                break;
+            case 2:
+                mectioHeader.style.transform = "";
+                nav.style.transform = "";
+
+                main.classList.remove("collapse1")
+                main.classList.add("collapse2")
                 break;
             default:
-                console.log("Ugyldig argument, forventer 0 eller 1")    
+                console.log("Ugyldig argument, forventer 0, 1 eller 2")    
         }
 
         // mectioHeader.style.transition = prevTransition;
-    }
+    },
+    registeredWindows: [],
+    registerWindow: function(id, window) {
+        this.registeredWindows.push({
+            id: id,
+            window: window
+        })
+    },
+    getWindow: function(id) {
+        return this.registeredWindows.find(x => x.id === id).window;
+    },
+    close: function(id) {
+        this.getWindow(id).close();
+    },
 }
 
 class wmWindow {
-    constructor() {
-        this.id = (Math.random() + 1).toString(36).substring(2);
+    constructor(setId) {
+        if (setId == "") {
+            this.id = (Math.random() + 1).toString(36).substring(2);
+        } else {
+            this.id = setId;
+        }
         var main = document.getElementsByTagName("main")[0];
 
         var windowElement = document.createElement("div");
         windowElement.setAttribute("id", this.id)
         windowElement.setAttribute("class", "mectio-window")
+        windowElement.style.transform = "scale(0.95)";
+        windowElement.style.opacity = "0";  
         
         main.appendChild(windowElement);
         console.log("mectio: nyt vindue med id " + this.id + " åbnet.")
 
         this.element = windowElement;
+        windowManager.registerWindow(this.id, this)
+
+        setTimeout(function(){
+            windowElement.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
+            windowElement.style.transform = "scale(1)";
+            windowElement.style.opacity = "1";
+        }, 10)
     }
 
     close() {
@@ -74,6 +117,14 @@ class wmWindow {
         console.log("Lukker vindue " + this.id)
         closeElement.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
         closeElement.style.transform = "scale(0.95)";
-        closeElement.style.opacity = "0";        
+        closeElement.style.opacity = "0";     
+        
+        setTimeout(function(){
+            closeElement.remove();
+        }, 500)
+    }
+
+    show() {
+
     }
 }

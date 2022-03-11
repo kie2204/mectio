@@ -53,6 +53,9 @@ async function doApiRequest(call, args) {
         case "getLoginStatus":
             data = await lectioAPI.getLoginStatus(args[0])
             return data;
+        case "login":
+            data = await lectioAPI.login(args[0], args[1], args[2])
+            return data;
     }
 }
 

@@ -17,6 +17,11 @@ body {
 #header-container {
     position: fixed;
     width: 100%;
+    z-index: 69696969;
+}
+
+#header-container * {
+    position: relative;
 }
 
 header {
@@ -27,6 +32,7 @@ header {
     height: 3.5rem;
     align-items: center;
     padding: 8px 16px;
+    z-index: 6969;
 }
 
 #mectio-logo-wrapper {
@@ -66,6 +72,16 @@ header {
 .mectio-window {
     min-width: 100vw;
     min-height: 100vh;
+    box-sizing: border-box;
+    transition: padding-top 0.2s;
+}
+
+main.collapse1 .mectio-window {
+    padding-top: 4rem;
+}
+
+main.collapse2 .mectio-window {
+    padding-top: 6rem;
 }
 
 /* Nav styles */

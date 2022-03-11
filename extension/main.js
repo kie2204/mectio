@@ -9,9 +9,6 @@ browser.runtime.sendMessage({
     value: 1
 });
 
-//
-window.SessionHelper = ""
-
 
 console.log("mectio er i ALPHA. Der kan være fejl og mangler")
 console.log("mectio: " + catchPhrases.get("loading"))
@@ -64,25 +61,76 @@ document.addEventListener("DOMContentLoaded", async function() {
 })
 
 var showLoginPage = async function() {
-    var test = new wmWindow();
-    test.element.innerHTML = await getLocalPage("/pages/login.html");
+    var loginPage = new wmWindow("mectio-login");
+    loginPage.element.innerHTML = await getLocalPage("/pages/login.html");
     windowManager.setHeaderState(0)
 
-    test.element.addEventListener("click", test.close)
+    document.getElementById("mf-submit").addEventListener("click", submitLoginForm);
 }
 
-var loadSitePage = async function() {
+var submitLoginForm = async function() {
+    var theForm = document.getElementById("mectio-login-form")
+
+    var inst = document.getElementById("mf-inst").value
+    var uname = document.getElementById("mf-uname").value
+    var pword = document.getElementById("mf-pword").value
+
+    loginStatus = await browser.runtime.sendMessage({
+        action: "api",
+        call: "login",
+        args: [inst, uname, pword]
+    });
+
+    if (loginStatus.loginStatus == 1) {
+        windowManager.close("mectio-login");
+        loadSitePage(inst, "forside");
+    } else {
+        alert("Bruh")
+    }
+}
+
+var loadSitePage = async function(instId, page) {
+    windowManager.setHeaderState(2)
+
     var test = new wmWindow();
     var frame = document.createElement("iframe")
-    frame.setAttribute("src", window.location.href)
-    frame.style.paddingTop = "4rem";
+    var src = "";
+    
+    switch (page) {
+        case "forside":
+            src = "https://www.lectio.dk/lectio/" + instId + "/forside.aspx"
+            break;
+        default:
+            src = window.location.href;
+    }
+
+    frame.setAttribute("src", src)
+    frame.setAttribute("scrolling", "no")
+    window.history.pushState({}, "", src)
+    
+    frame.style.transition = "filter 0.2s";
     frame.style.width = "100vw";
-    frame.style.height = "100vh";
+    frame.style.height = "100vw";
+    frame.style.border = "none";
+    frame.style.backgroundColor = "#aaa";
+    frame.style.filter = "invert(0.5)";
+
     test.element.appendChild(frame)
     frame.contentWindow.addEventListener("load", function(){
         var doc = frame.contentWindow.document;
 
         doc.getElementsByTagName("header")[0].style.display = "none";
         doc.getElementById("s_m_HeaderContent_subnav_div").style.display = "none";
+        
+        frame.style.height = `${frame.contentWindow.document.documentElement.scrollHeight}px`;
+        frame.style.filter = "";
     })
+}
+
+window.addEventListener("load", removeLectioScripts)
+
+var removeLectioScripts = function() {
+    console.log(window.SessionHelper)
+    // Fjern lectio SessionHelper (den kører i baggrunden og logger en ud)
+    window.SessionHelper = "";
 }
