@@ -93,6 +93,7 @@ nav {
     height: 2rem;
     display: flex;
     padding: 0 2rem;
+    font-size: 0.9rem;
 }
 
 nav * {
@@ -109,7 +110,7 @@ nav * {
 }
 
 #mectio-nav-links a {
-    padding: 0 .6rem;
+    padding: 0 .5rem;
     color: #222;
     text-decoration: none;
     transition: 0.2s;
