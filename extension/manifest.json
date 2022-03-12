@@ -27,7 +27,7 @@
     ],
 
     "web_accessible_resources": [{
-      "resources": ["pages/*", "styles/*", "icons/*", "fonts/*"],
+      "resources": ["pages/*", "styles/*", "icons/*", "fonts/*", "https://fonts.googleapis.com/*"],
       "matches": ["<all_urls>"]
     }],
 

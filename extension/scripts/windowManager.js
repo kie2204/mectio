@@ -76,16 +76,31 @@ windowManager = {
         })
     },
     getWindow: function(id) {
-        return this.registeredWindows.find(x => x.id === id).window;
+        try {
+            return this.registeredWindows.find(x => x.id === id).window;
+        } catch (e) {
+            return false;
+        }
     },
     close: function(id) {
-        this.getWindow(id).close();
+        try {
+            this.getWindow(id).close();
+        } catch (e) {console.log("Could not close window "+ id)}
     },
+    activeWindow: "",
+    setActiveWindow: function(id) {
+        this.activeWindow = id;
+        for (var x of this.registeredWindows) {
+            x.window.element.style.zIndex = "1";
+        }
+        document.getElementById(id).style.zIndex = "1000";
+        console.log(`Active window set to ${id}`)
+    }
 }
 
 class wmWindow {
     constructor(setId) {
-        if (setId == "") {
+        if (typeof(setId) != "string") {
             this.id = (Math.random() + 1).toString(36).substring(2);
         } else {
             this.id = setId;
@@ -103,9 +118,10 @@ class wmWindow {
 
         this.element = windowElement;
         windowManager.registerWindow(this.id, this)
+        windowManager.setActiveWindow(this.id)
 
         setTimeout(function(){
-            windowElement.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
+            // windowElement.style.transition += `, ${defaultTransitionCurve}, opacity 0.2s`;
             windowElement.style.transform = "scale(1)";
             windowElement.style.opacity = "1";
         }, 10)
@@ -116,7 +132,7 @@ class wmWindow {
         // Luk-animation
         console.log("Lukker vindue " + this.id)
         closeElement.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
-        closeElement.style.transform = "scale(0.95)";
+        closeElement.style.transform = "scale(1.0)";
         closeElement.style.opacity = "0";     
         
         setTimeout(function(){

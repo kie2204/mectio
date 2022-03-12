@@ -83,49 +83,117 @@ var submitLoginForm = async function() {
 
     if (loginStatus.loginStatus == 1) {
         windowManager.close("mectio-login");
-        loadSitePage(inst, "forside");
+        loadSitePage(inst, "forside", 1)
     } else {
         alert("Bruh")
     }
 }
 
-var loadSitePage = async function(instId, page) {
+var loadSitePage = async function(instId, page, push) {
+    windowManager.close(windowManager.activeWindow)
     windowManager.setHeaderState(2)
 
     var test = new wmWindow();
     var frame = document.createElement("iframe")
     var src = "";
     
-    switch (page) {
-        case "forside":
-            src = "https://www.lectio.dk/lectio/" + instId + "/forside.aspx"
-            break;
-        default:
-            src = window.location.href;
+    if (typeof(page) == "string") {
+        switch (page) {
+            case "forside":
+                src = "https://www.lectio.dk/lectio/" + instId + "/forside.aspx"
+                break;
+            default:
+                src = page;
+        }
+    } else {
+        src = window.location.href;
+    }
+
+    loadNavLinks(src)
+    instName = await browser.runtime.sendMessage({
+        action: "api",
+        call: "getInstData",
+        args: [getInstFromLink(src)]
+    });
+
+    document.getElementById("mectio-inst-text").innerText = instName.name; 
+
+    if (push == 1) {
+        window.history.pushState({}, "", src)
     }
 
     frame.setAttribute("src", src)
     frame.setAttribute("scrolling", "no")
-    window.history.pushState({}, "", src)
     
     frame.style.transition = "filter 0.2s";
     frame.style.width = "100vw";
     frame.style.height = "100vw";
     frame.style.border = "none";
-    frame.style.backgroundColor = "#aaa";
+    frame.style.backgroundColor = "#ccc";
     frame.style.filter = "invert(0.5)";
 
     test.element.appendChild(frame)
     frame.contentWindow.addEventListener("load", function(){
         var doc = frame.contentWindow.document;
 
-        doc.getElementsByTagName("header")[0].style.display = "none";
-        doc.getElementById("s_m_HeaderContent_subnav_div").style.display = "none";
+        try {
+            doc.getElementsByTagName("header")[0].style.display = "none";
+            doc.getElementById("s_m_HeaderContent_subnav_div").style.display = "none";
+        } catch (e) {
+            console.log("Error: " + e)
+        }
         
         frame.style.height = `${frame.contentWindow.document.documentElement.scrollHeight}px`;
         frame.style.filter = "";
+
+        for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
+            x.addEventListener("click", function(e){
+                e.preventDefault();
+                loadSitePage("", frame.contentWindow.document.activeElement.href, 1)
+            })
+        }
     })
 }
+
+var loadNavLinks = async function(url) {
+    windowManager.setHeaderState(1)
+
+    navLinks = await browser.runtime.sendMessage({
+        action: "api",
+        call: "getNavLinks",
+        args: [url]
+    });
+
+    document.getElementById("mectio-nav-links").innerHTML = "";
+
+    for (var x of navLinks.links) {
+        var navLink = document.createElement("a")
+        navLink.appendChild(document.createTextNode(x.name))
+        navLink.setAttribute("href", x.href)
+
+        document.getElementById("mectio-nav-links").appendChild(navLink);
+
+        navLink.addEventListener("click", function(e){
+            e.preventDefault();
+
+            loadSitePage("", document.activeElement.href, 1);
+        })
+    }
+
+    if (navLinks.links.length == 0) {
+        windowManager.setHeaderState(1)
+    } else {
+        windowManager.setHeaderState(2)
+    }
+}
+
+window.addEventListener("popstate", function(){
+    console.log("State pop")
+    loadSitePage(
+        getInstFromLink(window.location.href), // Very clunky but it works
+        window.location.href
+    )
+})
 
 window.addEventListener("load", removeLectioScripts)
 
@@ -133,4 +201,8 @@ var removeLectioScripts = function() {
     console.log(window.SessionHelper)
     // Fjern lectio SessionHelper (den kører i baggrunden og logger en ud)
     window.SessionHelper = "";
+}
+
+var getInstFromLink = function(link) {
+    return parseInt(link.substr(link.indexOf("/lectio/")+8).substr(0,link.substr(link.indexOf("/lectio/")+8).indexOf("/")))
 }

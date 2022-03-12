@@ -73,7 +73,9 @@ header {
     min-width: 100vw;
     min-height: 100vh;
     box-sizing: border-box;
-    transition: padding-top 0.2s;
+    transition: 0.2s;
+    position: absolute;
+    padding-top: 0rem;
 }
 
 main.collapse1 .mectio-window {
@@ -100,7 +102,20 @@ nav * {
 }
 
 #mectio-nav-title {
-    background-color: #5c8ac2;
+    background-color: #6c9ad2;
     font-weight: bold;
     padding: 0 1rem;
+    margin-right: .5rem;
+}
+
+#mectio-nav-links a {
+    padding: 0 .6rem;
+    color: #222;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+#mectio-nav-links a:hover {
+    color: #000;
+    background-color: #6897d1;
 }

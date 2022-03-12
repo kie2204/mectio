@@ -56,6 +56,15 @@ async function doApiRequest(call, args) {
         case "login":
             data = await lectioAPI.login(args[0], args[1], args[2])
             return data;
+        case "getUserData":
+            data = await lectioAPI.getUserData(args[0], args[1], args[2])
+            return data;
+        case "getNavLinks":
+            data = await lectioAPI.getNavLinks(args[0])
+            return data;
+        case "getInstData":
+            data = await lectioAPI.getInstData(args[0])
+            return data;
     }
 }
 
