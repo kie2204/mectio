@@ -14,7 +14,7 @@
       "service_worker": "background.js"
     },
 
-    "permissions": ["storage", "cookies", "webRequest", "tabs"],
+    "permissions": ["storage", "cookies", "webRequest", "tabs", "scripting"],
 
     "host_permissions": ["*://*.lectio.dk/"],
 

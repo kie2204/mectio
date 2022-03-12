@@ -195,12 +195,16 @@ window.addEventListener("popstate", function(){
     )
 })
 
-window.addEventListener("load", removeLectioScripts)
+window.addEventListener("load", function(){
+    console.log("Event fire")
+    removeLectioScripts();
+})
 
 var removeLectioScripts = function() {
-    console.log(window.SessionHelper)
-    // Fjern lectio SessionHelper (den kører i baggrunden og logger en ud)
-    window.SessionHelper = "";
+    console.log("Sending")
+    browser.runtime.sendMessage({
+        action: "startKill",
+    });
 }
 
 var getInstFromLink = function(link) {

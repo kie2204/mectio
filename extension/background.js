@@ -44,6 +44,9 @@ function handleMessage(request, sender, sendResponse) {
             break;
         case "api":
             doApiRequest(request.call, request.args).then(r => sendResponse(r))
+            break;
+        case "startKill":
+            startKill();
     }
     return true;
 }
@@ -70,6 +73,17 @@ async function doApiRequest(call, args) {
 
 function setInactive(request) {
     switchIcon(0);
+}
+
+function startKill() {
+    browser.tabs.query({active: true, currentWindow: true}).then(([tab]) => {
+        browser.scripting.executeScript({
+            target: {tabId: tab.id},
+            files: ['scripts/lectioKILLER.js'],
+            world: 'MAIN'
+            // function: () => {}, // files or function, both do not work.
+        })
+    })
 }
   
 browser.runtime.onMessage.addListener(handleMessage);
