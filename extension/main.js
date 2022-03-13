@@ -121,6 +121,8 @@ var submitLoginForm = async function(e) {
     var uname = document.getElementById("mf-uname").value
     var pword = document.getElementById("mf-pword").value
 
+    console.log(`Logger ind på inst. id ${inst} med brugernavn ${uname}`)
+
     loginStatus = await browser.runtime.sendMessage({
         action: "api",
         call: "login",
