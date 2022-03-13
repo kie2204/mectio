@@ -29,9 +29,11 @@ header {
     background-color: var(--main-color);
     display: flex;
     top: 0;
-    height: 3.5rem;
+    height: 4.2rem;
     align-items: center;
+    justify-content: space-between;
     padding: 8px 16px;
+    box-sizing: border-box;
     z-index: 6969;
 }
 
@@ -50,6 +52,11 @@ header {
     padding: 4px;
 }
 
+#mectio-right-wrapper a {
+    color: white;
+    flex-direction: row-reverse;
+}
+
 #mectio-text-wrapper {
     padding: 8px 8px 10px 8px;
     display: flex;
@@ -57,16 +64,27 @@ header {
     align-items: baseline;
 }
 
+#mectio-text-wrapper.show-instname #mectio-logo-text {
+    height: 20px;
+}
+
+#mectio-text-wrapper.show-instname #mectio-inst-text {
+    font-size: .6rem;
+}
+
+
 #mectio-logo-text {
     height: 22px;
     margin: 0;
+    transition: height 0.2s;
 }
 
 #mectio-inst-text {
     color: var(--main-color);
     margin: 0;
     padding: 0px;
-    font-size: 10px;
+    font-size: 0px;
+    transition: font-size 0.2s;
 }
 
 .mectio-window {
@@ -94,6 +112,7 @@ nav {
     display: flex;
     padding: 0 2rem;
     font-size: 0.9rem;
+    box-sizing: border-box;
 }
 
 nav * {

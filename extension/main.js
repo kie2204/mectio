@@ -29,9 +29,16 @@ var getLocalPage = async function(page) {
             parsedText = parser.parseFromString(html, "text/html");
 
             links = parsedText.querySelectorAll("*"); // Probably bad for performance
-            for (i = 0, le = links.length; i < le; i++) {
-                links[i].href = browser.runtime.getURL('/') + links[i].getAttribute('href');
-                links[i].src = browser.runtime.getURL('/') + links[i].getAttribute('src');
+            for (var x of links) {
+                var href = x.getAttribute("href");
+                var src = x.getAttribute('src');
+
+                if (typeof(href) == "string" && href.substr(0,4) != "http") {
+                    x.href = browser.runtime.getURL('/') + href;
+                }
+                if (typeof(src) == "string" && src.substr(0,4) != "http") {
+                    x.src = browser.runtime.getURL('/') + src;
+                }
             }
 
             result = parsedText.getRootNode().body.innerHTML;
@@ -93,7 +100,7 @@ var loadSitePage = async function(instId, page, push) {
     windowManager.close(windowManager.activeWindow)
     windowManager.setHeaderState(2)
 
-    var test = new wmWindow();
+    var wmwindow = new wmWindow();
     var frame = document.createElement("iframe")
     var src = "";
     
@@ -110,13 +117,13 @@ var loadSitePage = async function(instId, page, push) {
     }
 
     loadNavLinks(src)
+
     instName = await browser.runtime.sendMessage({
         action: "api",
         call: "getInstData",
         args: [getInstFromLink(src)]
     });
-
-    document.getElementById("mectio-inst-text").innerText = instName.name; 
+    windowManager.toggleInstName(1, instName.name)
 
     if (push == 1) {
         window.history.pushState({}, "", src)
@@ -124,7 +131,8 @@ var loadSitePage = async function(instId, page, push) {
 
     frame.setAttribute("src", src)
     frame.setAttribute("scrolling", "no")
-    
+
+    // Decorate iframe
     frame.style.transition = "filter 0.2s";
     frame.style.width = "100vw";
     frame.style.height = "100vw";
@@ -132,9 +140,17 @@ var loadSitePage = async function(instId, page, push) {
     frame.style.backgroundColor = "#ccc";
     frame.style.filter = "invert(0.5)";
 
-    test.element.appendChild(frame)
+    // Append frame to window
+    wmwindow.element.appendChild(frame)
     frame.contentWindow.addEventListener("load", function(){
         var doc = frame.contentWindow.document;
+
+        // Inject CSS with link
+        var injCSS = doc.createElement("link");
+        var injCSSHref = `${browser.runtime.getURL('/')}pages/styles/lectioCompatibilityInject.css`
+        injCSS.setAttribute("rel", "stylesheet")
+        injCSS.setAttribute("href", injCSSHref)
+        doc.head.appendChild(injCSS)
 
         try {
             doc.getElementsByTagName("header")[0].style.display = "none";

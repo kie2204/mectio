@@ -13,9 +13,16 @@ windowManager = {
                 // not using innerHTML as it would break js event listeners of the page // comment from stackoverflow
         
                 links = document.querySelectorAll("*"); // Probably bad for performance
-                for (i = 0, le = links.length; i < le; i++) {
-                    links[i].href = browser.runtime.getURL('/') + links[i].getAttribute('href');
-                    links[i].src = browser.runtime.getURL('/') + links[i].getAttribute('src');
+                for (var x of links) {
+                    var href = x.getAttribute("href");
+                    var src = x.getAttribute('src');
+
+                    if (typeof(href) == "string" && href.substr(0,4) != "http") {
+                        x.href = browser.runtime.getURL('/') + href;
+                    }
+                    if (typeof(src) == "string" && src.substr(0,4) != "http") {
+                        x.src = browser.runtime.getURL('/') + src;
+                    }
                 }
         
                 // Set page icon
@@ -95,6 +102,20 @@ windowManager = {
         }
         document.getElementById(id).style.zIndex = "1000";
         console.log(`Active window set to ${id}`)
+    },
+    toggleInstName: function(toggle, name) {
+        switch (toggle) {
+            case 0:
+                document.getElementById("mectio-text-wrapper").classList.remove("show-instname")
+                document.getElementById("mectio-inst-text").innerText = ""; 
+                break;
+            case 1:
+                document.getElementById("mectio-text-wrapper").classList.add("show-instname")
+                document.getElementById("mectio-inst-text").innerText = instName.name; 
+                break;
+            default:
+                document.getElementById("mectio-text-wrapper").classList.toggle("show-instname")
+        }
     }
 }
 
