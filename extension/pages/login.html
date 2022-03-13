@@ -10,10 +10,16 @@
         <div id="login-right">
             <div id="login-box">
                 <form action="" id="mectio-login-form">
-                    <input type="text" name="" id="mf-inst">
+                    <p>Institution</p>
+                    <select name="" id="mf-inst">
+                        <option value="">Vælg institution...</option>
+                    </select>
+                    <p>Brugernavn</p>
                     <input type="text" name="" id="mf-uname">
+                    <p>Adgangskode</p>
                     <input type="password" name="" id="mf-pword">
-                    <input type="button" value="" id="mf-submit">
+                    <p>Knap (WOW)</p>
+                    <input type="submit" value="Log ind" id="mf-submit">
                 </form>
             </div>
         </div>
@@ -48,6 +54,9 @@
     width: 28rem;
     height: 36rem;
     background-color: white;
+    border-radius: .5rem;
+    padding: 1rem;
+    box-sizing: border-box;
 }
 
 #login-text {

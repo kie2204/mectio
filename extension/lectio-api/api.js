@@ -13,6 +13,35 @@ var lectioAPI = {
         var response = await fetch(reqLink)
         return response.text();
     },
+    getInstList: async function() {
+        var rawData = await this.getParseData(`lectio/login_list.aspx`);
+        var parsedInstData = parse5.parse(rawData);
+
+        var instsUnparsed = findKey(parsedInstData, "nodeName", "div").objects[0].childNodes
+
+        var count = 0;
+        var instList = []
+
+        for (var x of instsUnparsed) {
+            try {
+                var instURL = x.childNodes[0].attrs[0].value
+                var instName = x.childNodes[0].childNodes[0].value
+
+                var chop1 = instURL.substr(instURL.indexOf("/lectio/")+8)
+                var instId = chop1.substr(0, chop1.indexOf("/"))
+
+                instList.push({
+                    id: instId,
+                    name: instName
+                })
+            } catch (e) {}
+        }
+
+        return {
+            count: instList.length,
+            instList: instList
+        }
+    },
     getInstData: async function(id) { // Giver JSON info om inst ud fra nummer
         var rawData = await this.getParseData(`lectio/${id}/`);
         var parsedInstData = parse5.parse(rawData);

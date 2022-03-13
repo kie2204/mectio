@@ -78,10 +78,31 @@ var showLoginPage = async function() {
     loginPage.element.innerHTML = await getLocalPage("/pages/login.html");
     windowManager.setHeaderState(0)
 
-    document.getElementById("mf-submit").addEventListener("click", submitLoginForm);
+    // Tilføj institutioner til dropdown
+    var selectMenu = document.getElementById("mf-inst")
+    var instList = await browser.runtime.sendMessage({
+        action: "api",
+        call: "getInstList",
+        args: []
+    });
+
+    console.log(instList)
+
+    for (var x of instList.instList) {
+        var el = document.createElement("option");
+        var text = document.createTextNode(x.name);
+        el.setAttribute("value", x.id)
+        el.appendChild(text)
+        selectMenu.appendChild(el);
+    }
+
+    selectMenu.value = getInstFromLink(window.location.href);
+
+    document.getElementById("mectio-login-form").addEventListener("submit", submitLoginForm);
 }
 
-var submitLoginForm = async function() {
+var submitLoginForm = async function(e) {
+    e.preventDefault();
     var theForm = document.getElementById("mectio-login-form")
 
     var inst = document.getElementById("mf-inst").value

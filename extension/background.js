@@ -52,7 +52,10 @@ function handleMessage(request, sender, sendResponse) {
 }
 
 async function doApiRequest(call, args) {
-    switch (call) {
+    data = await lectioAPI[call](args[0], args[1], args[2])
+    return data;
+
+    /*switch (call) {
         case "getLoginStatus":
             data = await lectioAPI.getLoginStatus(args[0])
             return data;
@@ -68,7 +71,7 @@ async function doApiRequest(call, args) {
         case "getInstData":
             data = await lectioAPI.getInstData(args[0])
             return data;
-    }
+    }*/
 }
 
 function setInactive(request) {
