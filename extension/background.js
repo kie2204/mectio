@@ -47,6 +47,7 @@ function handleMessage(request, sender, sendResponse) {
             break;
         case "startKill":
             startKill();
+            break;
     }
     return true;
 }

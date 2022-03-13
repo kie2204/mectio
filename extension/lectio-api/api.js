@@ -182,7 +182,7 @@ var lectioAPI = {
         }
         formBody = formBody.join("&");
 
-        fetch(`${lectioURL}lectio/${id}/login.aspx`, { // Send post request med data
+        await fetch(`${lectioURL}lectio/${id}/login.aspx`, { // Send post request med data
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
