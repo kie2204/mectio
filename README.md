@@ -6,10 +6,12 @@ Browser-udvidelse der transformerer din Lectio-oplevelse!
 Lectio er et solidt program der bruges af næsten alle gymnasier i Danmark. Dog ligner det noget fra 90'erne. Hvordan et firma ikke har kunne opdatere deres design i over 20 år, er noget jeg tænker over hver eneste dag. Nu har vi løsningen: mectio.
 
 ## Hvordan?
-Idk det virker ikke endnu
+Ved hjælp af magi (kode) trækker mectio data ud fra Lectio's forældede layout og lægger det ind i et nyt moderne "User Interface". Da mectio kun downloader tekstdata (i teorien), burde indlæsning af de optimerede sider gå hurtigere*. 
+
+*Første indlæsning tager stadig noget tid, da mectio venter på Lectio er indlæst
 
 ## Er gratis?
-Ja, selvfølgelig
+Ja, selvfølgelig, helt gratis og open-source (hvis du er god til kode, kan du lave din egen version af mectio! Bemærk dog licenser)
 
 ## Hvor download?
-Her
+Releases til højre
