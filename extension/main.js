@@ -103,7 +103,7 @@ var submitLoginForm = async function() {
             call: "getUserData",
             args: [loginStatus.inst, loginStatus.userId, loginStatus.userType]
         });
-        document.getElementById("mectio-profile-picture").setAttribute("src", userPfpLink.userPfpUrl)
+        document.getElementById("mectio-profile-picture").style.backgroundImage = `url(${userPfpLink.userPfpUrl})`
     } else {
         alert("Bruh")
     }
