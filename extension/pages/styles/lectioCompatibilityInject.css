@@ -8,6 +8,7 @@
     --main-color: #203e60;
     --main-color-dark: #172c46;
     --nav-color: #80b2f0;
+    --nav-color-light: #bad1ec;
     --white: #fff;
 }
 
@@ -17,5 +18,9 @@ SECTION.island .islandHeader {
 
 .islandHeaderContainer {
     background-image: none;
-    background-color:
+    background-color: #bad1ec;
+}
+
+.ls-island4 {
+    background-color: var(--nav-color-light);
 }

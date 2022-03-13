@@ -61,6 +61,12 @@ document.addEventListener("DOMContentLoaded", async function() {
     });
 
     if (loginStatus.loginStatus == 1) {
+        userPfpLink = await browser.runtime.sendMessage({
+            action: "api",
+            call: "getUserData",
+            args: [loginStatus.inst, loginStatus.userId, loginStatus.userType]
+        });
+        document.getElementById("mectio-profile-picture").style.backgroundImage = `url(${userPfpLink.userPfpUrl})`
         loadSitePage();
     } else {
         showLoginPage();
@@ -90,7 +96,14 @@ var submitLoginForm = async function() {
 
     if (loginStatus.loginStatus == 1) {
         windowManager.close("mectio-login");
-        loadSitePage(inst, "forside", 1)
+        loadSitePage(inst, "forside", 1);
+
+        userPfpLink = await browser.runtime.sendMessage({
+            action: "api",
+            call: "getUserData",
+            args: [loginStatus.inst, loginStatus.userId, loginStatus.userType]
+        });
+        document.getElementById("mectio-profile-picture").setAttribute("src", userPfpLink.userPfpUrl)
     } else {
         alert("Bruh")
     }
@@ -144,7 +157,7 @@ var loadSitePage = async function(instId, page, push) {
     wmwindow.element.appendChild(frame)
     frame.contentWindow.addEventListener("load", function(){
         var doc = frame.contentWindow.document;
-
+        
         // Inject CSS with link
         var injCSS = doc.createElement("link");
         var injCSSHref = `${browser.runtime.getURL('/')}pages/styles/lectioCompatibilityInject.css`

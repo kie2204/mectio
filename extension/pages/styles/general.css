@@ -7,6 +7,9 @@
     font-family: "Oxygen", sans-serif;
     --main-color: #203e60;
     --main-color-dark: #172c46;
+    --main-color-light: #426897;
+    --nav-color: #80b2f0;
+    --nav-color-light: #bad1ec;
     --white: #fff;
 }
 
@@ -52,10 +55,51 @@ header {
     padding: 4px;
 }
 
-#mectio-right-wrapper a {
-    color: white;
+/* Right wrapper */
+
+#mectio-right-wrapper {
     flex-direction: row-reverse;
+    display: flex;
+    align-items: center;
 }
+
+#mectio-right-wrapper a {
+    font-size: 1rem;
+    color: white;
+    text-decoration: none;
+    padding: .25rem;
+    margin: .5rem;
+    display: flex;
+    align-items: center;
+    border-radius: 100rem;
+    transition: 0.2s;
+}
+
+#mectio-right-wrapper a:hover {
+    background-color: var(--main-color-light);
+}
+
+#mectio-right-wrapper #mectio-profile {
+    height: 2.5rem;
+    width: 2.5rem;
+    background-color: var(--nav-color);
+    border-radius: 100rem;
+    padding: 0;
+    margin: .75rem;
+    box-sizing: border-box;
+}
+
+#mectio-profile-picture {
+    width: 100%;
+    height: 100%;
+    border-radius: 100rem;
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: 0 25%;
+    display: block;
+}
+
+/* Text wrapper */
 
 #mectio-text-wrapper {
     padding: 8px 8px 10px 8px;
