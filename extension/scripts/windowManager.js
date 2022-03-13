@@ -48,30 +48,32 @@ windowManager = {
         mectioHeader.style.transition = defaultTransitionCurve;
         nav.style.transition = defaultTransitionCurve;
 
-        switch(state) {
-            case 0:
-                mectioHeader.style.transform = "translateY(-100%)";
-                nav.style.transform = "translateY(-100%)";
-
-                main.classList.remove("collapse1")
-                main.classList.remove("collapse2")
-                break;
-            case 1:
-                mectioHeader.style.transform = "";
-                nav.style.transform = "translateY(-100%)";
-                main.classList.add("collapse1")
-                main.classList.remove("collapse2")
-                break;
-            case 2:
-                mectioHeader.style.transform = "";
-                nav.style.transform = "";
-
-                main.classList.remove("collapse1")
-                main.classList.add("collapse2")
-                break;
-            default:
-                console.log("Ugyldig argument, forventer 0, 1 eller 2")    
-        }
+        requestAnimationFrame(function(){
+            switch(state) {
+                case 0:
+                    mectioHeader.style.transform = "translateY(-100%)";
+                    nav.style.transform = "translateY(-100%)";
+    
+                    main.classList.remove("collapse1")
+                    main.classList.remove("collapse2")
+                    break;
+                case 1:
+                    mectioHeader.style.transform = "";
+                    nav.style.transform = "translateY(-100%)";
+                    main.classList.add("collapse1")
+                    main.classList.remove("collapse2")
+                    break;
+                case 2:
+                    mectioHeader.style.transform = "";
+                    nav.style.transform = "";
+    
+                    main.classList.remove("collapse1")
+                    main.classList.add("collapse2")
+                    break;
+                default:
+                    console.log("Ugyldig argument, forventer 0, 1 eller 2")    
+            }
+        })
 
         // mectioHeader.style.transition = prevTransition;
     },
@@ -104,18 +106,20 @@ windowManager = {
         console.log(`Active window set to ${id}`)
     },
     toggleInstName: function(toggle, name) {
-        switch (toggle) {
-            case 0:
-                document.getElementById("mectio-text-wrapper").classList.remove("show-instname")
-                document.getElementById("mectio-inst-text").innerText = ""; 
-                break;
-            case 1:
-                document.getElementById("mectio-text-wrapper").classList.add("show-instname")
-                document.getElementById("mectio-inst-text").innerText = instName.name; 
-                break;
-            default:
-                document.getElementById("mectio-text-wrapper").classList.toggle("show-instname")
-        }
+        requestAnimationFrame(function(){
+            switch (toggle) {
+                case 0:
+                    document.getElementById("mectio-text-wrapper").classList.remove("show-instname")
+                    document.getElementById("mectio-inst-text").innerText = ""; 
+                    break;
+                case 1:
+                    document.getElementById("mectio-text-wrapper").classList.add("show-instname")
+                    document.getElementById("mectio-inst-text").innerText = instName.name; 
+                    break;
+                default:
+                    document.getElementById("mectio-text-wrapper").classList.toggle("show-instname")
+            }
+        })
     }
 }
 
@@ -141,11 +145,13 @@ class wmWindow {
         windowManager.registerWindow(this.id, this)
         windowManager.setActiveWindow(this.id)
 
-        setTimeout(function(){
-            // windowElement.style.transition += `, ${defaultTransitionCurve}, opacity 0.2s`;
-            windowElement.style.transform = "scale(1)";
-            windowElement.style.opacity = "1";
-        }, 10)
+        requestAnimationFrame(function(){
+            setTimeout(function(){
+                // windowElement.style.transition += `, ${defaultTransitionCurve}, opacity 0.2s`;
+                windowElement.style.transform = "scale(1)";
+                windowElement.style.opacity = "1";
+            })
+        })
     }
 
     close() {
