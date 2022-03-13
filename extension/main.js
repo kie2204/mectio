@@ -61,17 +61,29 @@ document.addEventListener("DOMContentLoaded", async function() {
     });
 
     if (loginStatus.loginStatus == 1) {
-        userPfpLink = await browser.runtime.sendMessage({
-            action: "api",
-            call: "getUserData",
-            args: [loginStatus.inst, loginStatus.userId, loginStatus.userType]
-        });
-        document.getElementById("mectio-profile-picture").style.backgroundImage = `url(${userPfpLink.userPfpUrl})`
+        doUserInit();
         loadSitePage();
     } else {
         showLoginPage();
     }
 })
+
+var doUserInit = async function() {
+    loginStatus = await browser.runtime.sendMessage({
+        action: "api",
+        call: "getLoginStatus",
+        args: [680]
+    });
+
+    userPfpLink = await browser.runtime.sendMessage({
+        action: "api",
+        call: "getUserData",
+        args: [loginStatus.inst, loginStatus.userId, loginStatus.userType]
+    });
+
+    document.getElementById("mectio-profile").href = `https://www.lectio.dk/lectio/${loginStatus.inst}/logout.aspx`
+    document.getElementById("mectio-profile-picture").style.backgroundImage = `url(${userPfpLink.userPfpUrl})`
+}
 
 var showLoginPage = async function() {
     var loginPage = new wmWindow("mectio-login");
@@ -117,14 +129,9 @@ var submitLoginForm = async function(e) {
 
     if (loginStatus.loginStatus == 1) {
         windowManager.close("mectio-login");
-        loadSitePage(inst, "forside", 1);
 
-        userPfpLink = await browser.runtime.sendMessage({
-            action: "api",
-            call: "getUserData",
-            args: [loginStatus.inst, loginStatus.userId, loginStatus.userType]
-        });
-        document.getElementById("mectio-profile-picture").style.backgroundImage = `url(${userPfpLink.userPfpUrl})`
+        doUserInit();
+        loadSitePage(inst, "forside", 1);
     } else {
         alert("Bruh")
     }
