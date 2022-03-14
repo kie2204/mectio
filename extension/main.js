@@ -180,7 +180,12 @@ var loadSitePage = async function(instId, page, push) {
     frame.style.height = "100vw";
     frame.style.border = "none";
     frame.style.backgroundColor = "#ccc";
-    frame.style.filter = "invert(0.5)";
+
+    var config = await chrome.storage.local.get(['config']);
+
+    if (config.config.compatHideUntilLoad == 1) {
+        frame.style.filter = "invert(0.5)";
+    }
 
     // Append frame to window
     wmwindow.element.appendChild(frame)
@@ -211,8 +216,9 @@ var loadCompatibilityScripts = function(frame){
 
     for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
         var onclick = x.getAttribute("onclick");
+        
 
-        if (typeof(onclick) != "string") {
+        if (typeof(onclick) != "string" && x.href.includes("https://www.lectio.dk/")) {
             x.addEventListener("click", function(e){
                 e.preventDefault();
                 loadSitePage("", frame.contentWindow.document.activeElement.href, 1)

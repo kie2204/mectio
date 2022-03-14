@@ -1,4 +1,5 @@
 {
     "enabled": 1,
+    "compatHideUntilLoad": 1,
     "theme": "default"
 }

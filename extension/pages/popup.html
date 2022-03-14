@@ -1,5 +1,6 @@
 <html>
     <head>
+        <meta charset="UTF-8">
         <link rel="stylesheet" id="style-general" href="styles/general.css">
         <link rel="stylesheet" id="style-general" href="styles/popup.css">
         <script src="/popup.js"></script>
@@ -10,11 +11,31 @@
             <p>Indstillinger</p>
         </header>
         <main>
-            <h1>The box</h1>
-            <textarea name="" id="config-text" cols="30" rows="10"></textarea>
-            <br>
-            <button id="save-config">Gem config</button>
-            <button id="reset-config">Nulstil config</button>
+            <div id="settings">
+                <h2>Generel</h2>
+                <div class="settings-option" value="enabled">
+                    <span>Aktiver mectio</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <h2>Kompatibilitetstilstand</h2>
+                <div class="settings-option" value="compatHideUntilLoad">
+                    <span>Skjul side indtil indlæst</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div id="dev">
+                <h2>DEV-box</h2>
+                <textarea name="" id="config-text" cols="30" rows="10"></textarea>
+                <br>
+                <button id="save-config">Gem config</button>
+                <button id="reset-config">Nulstil config</button>
+            </div>
         </main>
     </body>
 </html>

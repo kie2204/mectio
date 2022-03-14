@@ -2,7 +2,8 @@
 
     "manifest_version": 3,
     "name": "mectio",
-    "version": "1.0.1",
+    "version": "1.0.2",
+    "author": "kie2204",
   
     "description": "Transformerer din Lectio-oplevelse.",
   

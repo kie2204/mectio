@@ -24,8 +24,8 @@ var setDefaultConfig = async function(){
 }
 
 window.addEventListener("load", async function(){
-    x = await loadConfig();
-    document.getElementById("config-text").value = JSON.stringify(x);
+    currentConfig = await loadConfig();
+    document.getElementById("config-text").value = JSON.stringify(currentConfig);
 
     document.getElementById("save-config").addEventListener("click", function(){
         var config = JSON.parse(document.getElementById("config-text").value)
@@ -35,7 +35,30 @@ window.addEventListener("load", async function(){
     document.getElementById("reset-config").addEventListener("click", async function(){
         await setDefaultConfig();
 
-        x = await loadConfig();
-        document.getElementById("config-text").value = JSON.stringify(x);
+        currentConfig = await loadConfig();
+        document.getElementById("config-text").value = JSON.stringify(currentConfig);
     })
+
+    var settings = document.getElementsByClassName("settings-option")
+
+    for (var x of settings) {
+        value = x.getAttribute("value")
+
+        if (currentConfig[value] == 1) {
+            x.querySelector("input").checked = true;
+        }
+
+        x.querySelector("input").addEventListener("change", async function(){
+            value = x.getAttribute("value")
+
+            if (this.checked) {
+                currentConfig[value] = 1;
+            } else {
+                currentConfig[value] = 0;
+            }
+
+            await saveConfig(currentConfig)
+            document.getElementById("config-text").value = JSON.stringify(currentConfig);
+        })
+    }
 })
