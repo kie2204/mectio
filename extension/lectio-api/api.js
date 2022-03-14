@@ -237,7 +237,7 @@ var lectioAPI = {
     setAspNetSID: async function(sid, expiry) { // Sætter ASP.NET SessionId. SessionId er forbundet til dit login, og bliver normalt slettet efter session.
         await chrome.cookies.set(
             {
-                url: "https://www.lectio.dk",
+                url: lectioURL,
                 name: "ASP.NET_SessionId",
                 value: sid,
                 httpOnly: true,
@@ -249,10 +249,35 @@ var lectioAPI = {
         )
         return await chrome.cookies.get(
             {
-                url: "https://www.lectio.dk",
+                url: lectioURL,
                 name: "ASP.NET_SessionId"
             }
         )
+    },
+    data: {
+        getFrontPage: async function(id) {
+            var loginStatus = await lectioAPI.getLoginStatus(id);
+
+            if (loginStatus.loginStatus == 0) {
+                return {error: "Ikke logget ind"}
+            }
+
+            var rawData = await lectioAPI.getParseData(`lectio/${id}/forside.aspx`);
+            var parsedData = parse5.parse(rawData);
+
+            var aktuelt = findKey(parsedData, "value", "s_m_Content_Content_aktueltIsland_pa")
+            var undervisning = findKey(parsedData, "value", "s_m_Content_Content_undervisningIsland_pa")
+            var komm = findKey(parsedData, "value", "s_m_Content_Content_kommIsland_pa")
+            var skema = findKey(parsedData, "value", "s_m_Content_Content_skemaIsland_pa")
+
+            return {
+                notices: {},
+                dashboard: aktuelt,
+                education: undervisning,
+                comms: komm,
+                schedule: skema
+            }
+        }
     }
 }
 
@@ -265,7 +290,7 @@ function findKey(obj, key, value) {
 		var objects = []
 		var unpackedObjects = []
 		var filteredObjects = []
-        var os
+        var os // o(bject)s
 
         for (var xxx of obj) {
 			if(Array.isArray(xxx)) {

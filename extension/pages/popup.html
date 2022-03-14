@@ -1,43 +1,20 @@
 <html>
     <head>
         <link rel="stylesheet" id="style-general" href="styles/general.css">
+        <link rel="stylesheet" id="style-general" href="styles/popup.css">
+        <script src="/popup.js"></script>
     </head>
     <body>
         <header>
-            <img id="mectio-logo" src="/icons/logo-text-dark.svg" alt="mectio" height="24px">
+            <img id="mectio-logo" src="/icons/logo-dark.svg" alt="mectio" height="24px">
             <p>Indstillinger</p>
         </header>
         <main>
-            <p>fungerer ikke</p>
+            <h1>The box</h1>
+            <textarea name="" id="config-text" cols="30" rows="10"></textarea>
+            <br>
+            <button id="save-config">Gem config</button>
+            <button id="reset-config">Nulstil config</button>
         </main>
     </body>
-    <style>
-        body {
-            height: 420px;
-            width: 420px;
-            background: whitesmoke;
-            margin: 0;
-        }
-        header {
-            width: 100%;
-            background-color: var(--main-color);
-            color: white;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-        }
-        header p {
-            font-size: 20px;
-            margin: 4px;
-        }
-        #mectio-logo {
-            background-color: white;
-            border-radius: 12px;
-            padding: 8px 12px;
-            margin-right: 8px;
-        }
-        main {
-            margin: 8px;
-        }
-    </style>
 </html>

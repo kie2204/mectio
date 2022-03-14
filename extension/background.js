@@ -4,6 +4,7 @@ var browser = browser || chrome;
 try {
     importScripts('/lectio-api/parse5.bundle.js', '/lectio-api/api.js');
 } catch (e) {
+    console.error("FEJL: Kan ikke indlæse lectio api scripts")
     console.error(e);
 }
 

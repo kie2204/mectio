@@ -1,0 +1,27 @@
+body {
+    height: 420px;
+    width: 420px;
+    background: whitesmoke;
+    margin: 0;
+}
+header {
+    width: 100%;
+    background-color: var(--main-color);
+    color: white;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+}
+header p {
+    font-size: 20px;
+    margin: 4px;
+}
+#mectio-logo {
+    background-color: white;
+    border-radius: 12px;
+    padding: 8px 10px;
+    margin-right: 8px;
+}
+main {
+    margin: 8px;
+}

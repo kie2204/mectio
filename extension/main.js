@@ -47,8 +47,7 @@ var getLocalPage = async function(page) {
     });
 }
 
-// Construct DOM then pass to windowManager
-document.addEventListener("DOMContentLoaded", async function() {
+var startInit = async function() {
     // Log it
     console.log("mectio: starter init")
     document.documentElement.innerHTML = ""
@@ -66,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     } else {
         showLoginPage();
     }
-})
+}
 
 var doUserInit = async function(inst) {
     loginStatus = await browser.runtime.sendMessage({
@@ -254,26 +253,37 @@ var loadNavLinks = async function(url) {
     }
 }
 
-window.addEventListener("popstate", function(){
-    console.log("State pop")
-    loadSitePage(
-        getInstFromLink(window.location.href), // Very clunky but it works
-        window.location.href
-    )
-})
-
-window.addEventListener("load", function(){
-    console.log("Event fire")
-    removeLectioScripts();
-})
-
-var removeLectioScripts = function() {
-    console.log("Sending")
-    browser.runtime.sendMessage({
-        action: "startKill",
-    });
-}
-
 var getInstFromLink = function(link) {
     return parseInt(link.substr(link.indexOf("/lectio/")+8).substr(0,link.substr(link.indexOf("/lectio/")+8).indexOf("/")))
+}
+
+// Construct DOM then pass to windowManager
+chrome.storage.local.get(['config'], function(config) {
+    if (config.config.enabled == 1) {
+        setListeners();
+    }
+});
+
+var setListeners = function() {
+    document.addEventListener("DOMContentLoaded", startInit)
+
+    window.addEventListener("popstate", function(){
+        console.log("State pop")
+        loadSitePage(
+            getInstFromLink(window.location.href), // Very clunky but it works
+            window.location.href
+        )
+    })
+
+    window.addEventListener("load", function(){
+        console.log("Event fire")
+        removeLectioScripts();
+    })
+
+    var removeLectioScripts = function() {
+        console.log("Sending")
+        browser.runtime.sendMessage({
+            action: "startKill",
+        });
+    }
 }

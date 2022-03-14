@@ -7,18 +7,20 @@
     font-family: "Oxygen", sans-serif;
     --main-color: #203e60;
     --main-color-dark: #172c46;
+    --main-color-light: #426897;
     --nav-color: #80b2f0;
     --nav-color-light: #bad1ec;
     --white: #fff;
 }
 
-SECTION.island .islandHeader {
-    font-family: "Oxygen", sans-serif;
+SECTION.island {
+    background-image: none;
+    background-color: var(--main-color-light);
 }
 
-.islandHeaderContainer {
-    background-image: none;
-    background-color: #bad1ec;
+SECTION.island .islandHeader {
+    font-family: "Oxygen", sans-serif;
+    color: white;
 }
 
 .ls-island4 {
