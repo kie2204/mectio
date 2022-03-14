@@ -186,32 +186,40 @@ var loadSitePage = async function(instId, page, push) {
     // Append frame to window
     wmwindow.element.appendChild(frame)
     frame.contentWindow.addEventListener("load", function(){
-        var doc = frame.contentWindow.document;
-        
-        // Inject CSS with link
-        var injCSS = doc.createElement("link");
-        var injCSSHref = `${browser.runtime.getURL('/')}pages/styles/lectioCompatibilityInject.css`
-        injCSS.setAttribute("rel", "stylesheet")
-        injCSS.setAttribute("href", injCSSHref)
-        doc.head.appendChild(injCSS)
+        loadCompatibilityScripts(frame)
+    })
+}
 
-        try {
-            doc.getElementsByTagName("header")[0].style.display = "none";
-            doc.getElementById("s_m_HeaderContent_subnav_div").style.display = "none";
-        } catch (e) {
-            console.log("Error: " + e)
-        }
-        
-        frame.style.height = `${frame.contentWindow.document.documentElement.scrollHeight}px`;
-        frame.style.filter = "";
+var loadCompatibilityScripts = function(frame){
+    var doc = frame.contentWindow.document;
+    
+    // Inject CSS with link
+    var injCSS = doc.createElement("link");
+    var injCSSHref = `${browser.runtime.getURL('/')}pages/styles/lectioCompatibilityInject.css`
+    injCSS.setAttribute("rel", "stylesheet")
+    injCSS.setAttribute("href", injCSSHref)
+    doc.head.appendChild(injCSS)
 
-        for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
+    try {
+        doc.getElementsByTagName("header")[0].style.display = "none";
+        doc.getElementById("s_m_HeaderContent_subnav_div").style.display = "none";
+    } catch (e) {
+        console.log("Error: " + e)
+    }
+    
+    frame.style.height = `${frame.contentWindow.document.documentElement.scrollHeight}px`;
+    frame.style.filter = "";
+
+    for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
+        var onclick = x.getAttribute("onclick");
+
+        if (typeof(onclick) != "string") {
             x.addEventListener("click", function(e){
                 e.preventDefault();
                 loadSitePage("", frame.contentWindow.document.activeElement.href, 1)
             })
         }
-    })
+    }
 }
 
 var loadNavLinks = async function(url) {
