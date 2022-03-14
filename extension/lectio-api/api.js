@@ -233,6 +233,26 @@ var lectioAPI = {
         return {
             links: navLinks
         };
+    },
+    setAspNetSID: async function(sid, expiry) { // Sætter ASP.NET SessionId. SessionId er forbundet til dit login, og bliver normalt slettet efter session.
+        await chrome.cookies.set(
+            {
+                url: "https://www.lectio.dk",
+                name: "ASP.NET_SessionId",
+                value: sid,
+                httpOnly: true,
+                path: "/",
+                sameSite: "lax",
+                secure: true,
+                expirationDate: expiry
+            }
+        )
+        return await chrome.cookies.get(
+            {
+                url: "https://www.lectio.dk",
+                name: "ASP.NET_SessionId"
+            }
+        )
     }
 }
 

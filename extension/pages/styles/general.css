@@ -8,8 +8,9 @@
     --main-color: #203e60;
     --main-color-dark: #172c46;
     --main-color-light: #426897;
-    --nav-color: #80b2f0;
+    --nav-color: #b3d0ff;
     --nav-color-light: #bad1ec;
+    --nav-color-dark: #8db9ec;
     --white: #fff;
 }
 
@@ -153,7 +154,7 @@ main.collapse2 .mectio-window {
 /* Nav styles */
 
 nav {
-    background-color: #80b2f0;
+    background-color: var(--nav-color);
     height: 2rem;
     display: flex;
     padding: 0 2rem;
@@ -168,7 +169,7 @@ nav * {
 }
 
 #mectio-nav-title {
-    background-color: #6c9ad2;
+    background-color: var(--nav-color-dark);
     font-weight: bold;
     padding: 0 1rem;
     margin-right: .5rem;
