@@ -1,0 +1,178 @@
+body {
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#header-container {
+    position: fixed;
+    width: 100%;
+    z-index: 69696969;
+}
+
+#header-container * {
+    position: relative;
+}
+
+header {
+    width: 100%;
+    background-color: var(--main-color);
+    display: flex;
+    top: 0;
+    height: 4.2rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    box-sizing: border-box;
+    z-index: 6969;
+}
+
+#mectio-logo-wrapper {
+    background-color: white;
+    border-radius: 1rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    padding: .5rem;
+    text-decoration: none;
+    color: var(--main-color)
+}
+
+#mectio-logo-wrapper:hover {
+    text-decoration: underline;
+}
+
+#mectio-logo {
+    align-self: center;
+    height: 24px;
+    padding: 4px;
+}
+
+/* Right wrapper */
+
+#mectio-right-wrapper {
+    flex-direction: row-reverse;
+    display: flex;
+    align-items: center;
+}
+
+#mectio-right-wrapper a {
+    font-size: 1rem;
+    color: white;
+    text-decoration: none;
+    padding: .25rem;
+    margin: .5rem;
+    display: flex;
+    align-items: center;
+    border-radius: 100rem;
+    transition: 0.2s;
+}
+
+#mectio-right-wrapper a:hover {
+    background-color: var(--main-color-light);
+}
+
+#mectio-right-wrapper #mectio-profile {
+    height: 2.5rem;
+    width: 2.5rem;
+    background-color: var(--nav-color);
+    border-radius: 100rem;
+    padding: 0;
+    margin: .75rem;
+    box-sizing: border-box;
+}
+
+#mectio-profile-picture {
+    width: 100%;
+    height: 100%;
+    border-radius: 100rem;
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: 0 25%;
+    display: block;
+}
+
+/* Text wrapper */
+
+#mectio-text-wrapper {
+    padding: 0px 8px 2px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+}
+
+#mectio-text-wrapper.show-instname #mectio-logo-text {
+    height: 20px;
+}
+
+#mectio-text-wrapper.show-instname #mectio-inst-text {
+    font-size: .6rem;
+}
+
+
+#mectio-logo-text {
+    height: 22px;
+    margin: 0;
+    transition: height 0.2s;
+}
+
+#mectio-inst-text {
+    color: var(--main-color);
+    margin: 0;
+    padding: 0px;
+    font-size: 0px;
+    transition: font-size 0.2s;
+}
+
+.mectio-window {
+    min-width: 100vw;
+    min-height: 100vh;
+    box-sizing: border-box;
+    transition: 0.2s;
+    position: absolute;
+    padding-top: 0rem;
+}
+
+main.collapse1 .mectio-window {
+    padding-top: 4rem;
+}
+
+main.collapse2 .mectio-window {
+    padding-top: 6rem;
+}
+
+/* Nav styles */
+
+nav {
+    background-color: var(--nav-color);
+    height: 2rem;
+    display: flex;
+    padding: 0 2rem;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+
+nav * {
+    height: 100%;
+    align-items: center;
+    display: flex;
+}
+
+#mectio-nav-title {
+    background-color: var(--nav-color-dark);
+    font-weight: bold;
+    padding: 0 1rem;
+    margin-right: .5rem;
+}
+
+#mectio-nav-links a {
+    padding: 0 .5rem;
+    color: #222;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+#mectio-nav-links a:hover {
+    color: #000;
+    background-color: #6897d1;
+}

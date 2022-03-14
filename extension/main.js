@@ -57,22 +57,22 @@ document.addEventListener("DOMContentLoaded", async function() {
     loginStatus = await browser.runtime.sendMessage({
         action: "api",
         call: "getLoginStatus",
-        args: [680]
+        args: [getInstFromLink(window.location.href)]
     });
 
     if (loginStatus.loginStatus == 1) {
-        doUserInit();
+        doUserInit(loginStatus.inst);
         loadSitePage();
     } else {
         showLoginPage();
     }
 })
 
-var doUserInit = async function() {
+var doUserInit = async function(inst) {
     loginStatus = await browser.runtime.sendMessage({
         action: "api",
         call: "getLoginStatus",
-        args: [680]
+        args: [inst]
     });
 
     userPfpLink = await browser.runtime.sendMessage({
@@ -132,7 +132,7 @@ var submitLoginForm = async function(e) {
     if (loginStatus.loginStatus == 1) {
         windowManager.close("mectio-login");
 
-        doUserInit();
+        doUserInit(inst);
         loadSitePage(inst, "forside", 1);
     } else {
         alert("Bruh")
