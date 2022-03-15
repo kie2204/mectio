@@ -8,7 +8,7 @@ Lectio er et solidt program der bruges af næsten alle gymnasier i Danmark. Dog 
 ## Hvordan?
 Ved hjælp af magi (kode) trækker mectio data ud fra Lectio's forældede layout og lægger det ind i et nyt moderne "User Interface". Da mectio kun downloader tekstdata (i teorien), burde indlæsning af de optimerede sider gå hurtigere*. 
 
-*Første indlæsning tager stadig noget tid, da mectio venter på Lectio er indlæst
+*Ikke for sider i kompatibilitetstilstand (dem alle indtil videre)
 
 ## Er gratis?
 Ja, selvfølgelig, helt gratis og open-source (hvis du er god til kode, kan du lave din egen version af mectio! Bemærk dog licenser)

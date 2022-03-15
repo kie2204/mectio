@@ -159,7 +159,7 @@ class wmWindow {
         // Luk-animation
         console.log("Lukker vindue " + this.id)
         closeElement.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
-        closeElement.style.transform = "scale(1.0)";
+        closeElement.style.transform = "scale(1.005)";
         closeElement.style.opacity = "0";     
         
         setTimeout(function(){

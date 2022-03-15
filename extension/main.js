@@ -187,7 +187,7 @@ var loadSitePage = async function(instId, page, push) {
     var config = await chrome.storage.local.get(['config']);
 
     if (config.config.compatHideUntilLoad == 1) {
-        frame.style.filter = "invert(0.5)";
+        frame.style.filter = "invert(0.5) brightness(1.75)";
     }
 
     // Append frame to window
@@ -231,8 +231,6 @@ var loadCompatibilityScripts = function(frame){
 }
 
 var loadNavLinks = async function(url) {
-    windowManager.setHeaderState(1)
-
     navLinks = await browser.runtime.sendMessage({
         action: "api",
         call: "getNavLinks",
@@ -254,6 +252,8 @@ var loadNavLinks = async function(url) {
             loadSitePage("", document.activeElement.href, 1);
         })
     }
+
+    console.log(navLinks.links.length)
 
     if (navLinks.links.length == 0) {
         windowManager.setHeaderState(1)
