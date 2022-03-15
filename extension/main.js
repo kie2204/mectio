@@ -3,28 +3,6 @@
 // Define browser API for Firefox/Chrome compatibility
 var browser = browser || chrome;
 
-// Call on background.js to switch extension icon
-browser.runtime.sendMessage({
-    action: "switchIcon",
-    value: 1
-});
-
-
-console.log("mectio er i ALPHA. Der kan være fejl og mangler")
-console.log("mectio: " + catchPhrases.get("loading"))
-
-// Set tab icon
-document.open();
-document.close();
-
-document.documentElement.innerHTML = "";
-
-link = document.createElement('link');
-link.rel = 'shortcut icon';
-document.getElementsByTagName('head')[0].appendChild(link);
-
-link.href = browser.runtime.getURL('/') + 'icons/icon-48.ico';
-
 var getLocalPage = async function(page) {
     return new Promise(resolve => {
         fetch(browser.runtime.getURL(page)).then(r => r.text()).then(html => {
@@ -51,6 +29,28 @@ var getLocalPage = async function(page) {
 }
 
 var startInit = async function() {
+    // Call on background.js to switch extension icon
+    browser.runtime.sendMessage({
+        action: "switchIcon",
+        value: 1
+    });
+
+    console.log("mectio er i ALPHA. Der kan være fejl og mangler")
+    console.log("mectio: " + catchPhrases.get("loading"))
+
+    // Interrupt loading
+    document.open();
+    document.close();
+
+    document.documentElement.innerHTML = "";
+
+    // Set tab icon
+    link = document.createElement('link');
+    link.rel = 'shortcut icon';
+    document.getElementsByTagName('head')[0].appendChild(link);
+
+    link.href = browser.runtime.getURL('/') + 'icons/icon-48.ico';
+
     // Log it
     console.log("mectio: starter init")
     document.documentElement.innerHTML = ""
