@@ -143,7 +143,6 @@ var submitLoginForm = async function(e) {
 
 var loadSitePage = async function(instId, page, push) {
     windowManager.close(windowManager.activeWindow)
-    windowManager.setHeaderState(2)
 
     var wmwindow = new wmWindow();
     var frame = document.createElement("iframe")
@@ -239,6 +238,13 @@ var loadNavLinks = async function(url) {
 
     document.getElementById("mectio-nav-links").innerHTML = "";
 
+    if (Array.isArray(navLinks.links) == false || navLinks.links.length == 0) {
+        windowManager.setHeaderState(1)
+        return;
+    } else {
+        windowManager.setHeaderState(2)
+    }
+
     for (var x of navLinks.links) {
         var navLink = document.createElement("a")
         navLink.appendChild(document.createTextNode(x.name))
@@ -254,12 +260,6 @@ var loadNavLinks = async function(url) {
     }
 
     console.log(navLinks.links.length)
-
-    if (navLinks.links.length == 0) {
-        windowManager.setHeaderState(1)
-    } else {
-        windowManager.setHeaderState(2)
-    }
 }
 
 var getInstFromLink = function(link) {
@@ -276,14 +276,6 @@ chrome.storage.local.get(['config'], function(config) {
 var setListeners = function() {
     //document.addEventListener("load", startInit)
 
-    window.addEventListener("popstate", function(){
-        console.log("State pop")
-        loadSitePage(
-            getInstFromLink(window.location.href), // Very clunky but it works
-            window.location.href
-        )
-    })
-
     //window.addEventListener("load", function(){
     //    console.log("Event fire")
     //    removeLectioScripts();
@@ -297,4 +289,12 @@ var setListeners = function() {
     }
 
     startInit();
+
+    window.addEventListener("popstate", function(){
+        console.log("State pop")
+        loadSitePage(
+            getInstFromLink(window.location.href), // Very clunky but it works
+            window.location.href
+        )
+    })
 }
