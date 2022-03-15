@@ -14,7 +14,10 @@ console.log("mectio er i ALPHA. Der kan være fejl og mangler")
 console.log("mectio: " + catchPhrases.get("loading"))
 
 // Set tab icon
-document.documentElement.innerHTML = ""
+document.open();
+document.close();
+
+document.documentElement.innerHTML = "";
 
 link = document.createElement('link');
 link.rel = 'shortcut icon';
@@ -271,7 +274,7 @@ chrome.storage.local.get(['config'], function(config) {
 });
 
 var setListeners = function() {
-    document.addEventListener("DOMContentLoaded", startInit)
+    //document.addEventListener("load", startInit)
 
     window.addEventListener("popstate", function(){
         console.log("State pop")
@@ -281,10 +284,10 @@ var setListeners = function() {
         )
     })
 
-    window.addEventListener("load", function(){
-        console.log("Event fire")
-        removeLectioScripts();
-    })
+    //window.addEventListener("load", function(){
+    //    console.log("Event fire")
+    //    removeLectioScripts();
+    //})
 
     var removeLectioScripts = function() {
         console.log("Sending")
@@ -292,4 +295,6 @@ var setListeners = function() {
             action: "startKill",
         });
     }
+
+    startInit();
 }

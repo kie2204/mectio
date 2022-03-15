@@ -49,7 +49,7 @@ window.addEventListener("load", async function(){
         }
 
         x.querySelector("input").addEventListener("change", async function(){
-            value = x.getAttribute("value")
+            value = this.parentNode.parentNode.getAttribute("value")
 
             if (this.checked) {
                 currentConfig[value] = 1;
