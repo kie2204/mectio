@@ -53,6 +53,16 @@ var lectioAPI = {
         };
     },
     getLoginStatus: async function(id) { // Giver JSON info om login ud fra inst. nummer
+        if (typeof id == 'undefined') {
+            var x = await browser.cookies.get(
+                {
+                    url: "https://www.lectio.dk/",
+                    name: "LastLoginExamno"
+                }
+            )
+            id = parseInt(x.value);
+        }
+
         var rawData = await this.getParseData(`lectio/${id}/forside.aspx`);
         var parsedData = parse5.parse(rawData);
 

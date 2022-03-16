@@ -4,6 +4,7 @@ var loadConfig = async function(){
     if (typeof(config.config) != "object") {
         console.log("Config invalid, resetting to default")
         await setDefaultConfig();
+        config = await chrome.storage.local.get(['config']);
     }
 
     return config.config;

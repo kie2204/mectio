@@ -124,7 +124,7 @@ windowManager = {
 }
 
 class wmWindow {
-    constructor(setId) {
+    constructor(setId, appearWait) {
         if (typeof(setId) != "string") {
             this.id = (Math.random() + 1).toString(36).substring(2);
         } else {
@@ -145,11 +145,22 @@ class wmWindow {
         windowManager.registerWindow(this.id, this)
         windowManager.setActiveWindow(this.id)
 
+        if (appearWait != 1) {
+            this.appear();
+        } 
+    }
+
+    appear() {
+        var el = document.getElementById(this.id)
+
         requestAnimationFrame(function(){
             setTimeout(function(){
+                el.style.height = "100%";
                 // windowElement.style.transition += `, ${defaultTransitionCurve}, opacity 0.2s`;
-                windowElement.style.transform = "scale(1)";
-                windowElement.style.opacity = "1";
+                el.style.transform = "scale(1)";
+                el.style.opacity = "1";
+
+                el.style.height = "";
             })
         })
     }

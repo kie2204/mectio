@@ -141,11 +141,11 @@ header {
 }
 
 main.collapse1 .mectio-window {
-    padding-top: 4rem;
+    padding: 4rem 0;
 }
 
 main.collapse2 .mectio-window {
-    padding-top: 6rem;
+    padding: 6rem 0;
 }
 
 /* Nav styles */

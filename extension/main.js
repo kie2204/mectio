@@ -42,8 +42,6 @@ var startInit = async function() {
     document.open();
     document.close();
 
-    document.documentElement.innerHTML = "";
-
     // Set tab icon
     link = document.createElement('link');
     link.rel = 'shortcut icon';
@@ -63,19 +61,31 @@ var startInit = async function() {
     });
 
     if (loginStatus.loginStatus == 1) {
-        doUserInit(loginStatus.inst);
-        loadSitePage();
+        await doUserInit(loginStatus.inst);
+        loadPage(getPageFromLink(window.location.href));
     } else {
         showLoginPage();
     }
 }
 
+var defaultInst = 0;
+
 var doUserInit = async function(inst) {
+    defaultInst = inst;
+    windowManager.setHeaderState(1)
+
     loginStatus = await browser.runtime.sendMessage({
         action: "api",
         call: "getLoginStatus",
         args: [inst]
     });
+
+    instName = await browser.runtime.sendMessage({
+        action: "api",
+        call: "getInstData",
+        args: [inst]
+    });
+    windowManager.toggleInstName(1, instName.name)
 
     userPfpLink = await browser.runtime.sendMessage({
         action: "api",
@@ -134,40 +144,69 @@ var submitLoginForm = async function(e) {
     if (loginStatus.loginStatus == 1) {
         windowManager.close("mectio-login");
 
-        doUserInit(inst);
-        loadSitePage(inst, "forside", 1);
+        await doUserInit(inst);
+        loadPage({page: "forside"}, 1);
     } else {
         alert("Bruh")
     }
 }
 
-var loadSitePage = async function(instId, page, push) {
+var loadPage = async function(page, push) {
     windowManager.close(windowManager.activeWindow)
 
-    var wmwindow = new wmWindow();
-    var frame = document.createElement("iframe")
     var src = "";
     
-    if (typeof(page) == "string") {
-        switch (page) {
+    if (typeof(page.page) == "string") {
+        switch (page.page) {
             case "forside":
-                src = "https://www.lectio.dk/lectio/" + instId + "/forside.aspx"
+                await pageLoaders.forside(page.link);
                 break;
             default:
-                src = page;
+                return;
         }
     } else {
-        src = window.location.href;
+        src = page.link;
+        loadCompatibilityPage(src, push)
+    }
+}
+
+var pageLoaders = {
+    forside: async function(link) {
+        if (typeof link == "undefined") {
+            link = `${window.location.origin}/lectio/${defaultInst}/forside.aspx`
+        }
+        window.history.pushState({}, "", link);
+
+        var wmwindow = new wmWindow(0, 1);
+        var page = await getLocalPage("/pages/mectio/forside.html")
+
+        await loadNavLinks(link);
+        wmwindow.element.innerHTML = page;
+        wmwindow.appear();
+    },
+    skema: async function() {
+        var src = `/lectio/${defaultInst}/SkemaNy.aspx`
+        loadNavLinks(window.location.origin + src)
+
+        var wmwindow = new wmWindow();
+        var page = await getLocalPage("/pages/mectio/forside.html")
+        wmwindow.element.innerHTML = page;
+
+        window.history.pushState({}, "", src)
+    }
+}
+
+var loadCompatibilityPage = async function(src, push) {
+    var unhide = 0;
+    var config = await chrome.storage.local.get(['config']);
+    if (config.config.compatHideUntilLoad == 1) {
+        unhide = 1;
     }
 
-    loadNavLinks(src)
+    var wmwindow = new wmWindow(0, unhide);
 
-    instName = await browser.runtime.sendMessage({
-        action: "api",
-        call: "getInstData",
-        args: [getInstFromLink(src)]
-    });
-    windowManager.toggleInstName(1, instName.name)
+    var frame = document.createElement("iframe")
+    loadNavLinks(src)
 
     if (push == 1) {
         window.history.pushState({}, "", src)
@@ -183,16 +222,11 @@ var loadSitePage = async function(instId, page, push) {
     frame.style.border = "none";
     frame.style.backgroundColor = "#ccc";
 
-    var config = await chrome.storage.local.get(['config']);
-
-    if (config.config.compatHideUntilLoad == 1) {
-        frame.style.filter = "invert(0.5) brightness(1.75)";
-    }
-
     // Append frame to window
     wmwindow.element.appendChild(frame)
     frame.contentWindow.addEventListener("load", function(){
         loadCompatibilityScripts(frame)
+        wmwindow.appear();
     })
 }
 
@@ -223,7 +257,7 @@ var loadCompatibilityScripts = function(frame){
         if (typeof(onclick) != "string" && x.href.includes("https://www.lectio.dk/")) {
             x.addEventListener("click", function(e){
                 e.preventDefault();
-                loadSitePage("", frame.contentWindow.document.activeElement.href, 1)
+                loadPage(getPageFromLink(frame.contentWindow.document.activeElement.href), 1)
             })
         }
     }
@@ -255,46 +289,61 @@ var loadNavLinks = async function(url) {
         navLink.addEventListener("click", function(e){
             e.preventDefault();
 
-            loadSitePage("", document.activeElement.href, 1);
+            loadPage(getPageFromLink(document.activeElement.href), 1);
         })
     }
-
-    console.log(navLinks.links.length)
 }
 
 var getInstFromLink = function(link) {
     return parseInt(link.substr(link.indexOf("/lectio/")+8).substr(0,link.substr(link.indexOf("/lectio/")+8).indexOf("/")))
 }
 
-// Construct DOM then pass to windowManager
-chrome.storage.local.get(['config'], function(config) {
-    if (config.config.enabled == 1) {
+var getPageFromLink = function(link) {
+    var instId = getInstFromLink(link)
+    var page;
+
+    if (link.includes(`https://www.lectio.dk/lectio/${instId}/forside.aspx`)) {
+        page = "forside"   
+    }
+
+    console.log({
+        link: link,
+        page: page
+    })
+
+    return {
+        link: link,
+        page: page
+    };
+}
+
+
+chrome.storage.local.get(['config'], async function(config) {
+    var x = config.config;
+
+    // Check if config valid
+    if (typeof(x) != "object") {
+        console.log("Config invalid, resetting to default")
+        var fetched = await fetch(`${browser.runtime.getURL('/')}config.mectio`)
+        var defaultConfig = await fetched.json()
+
+        await chrome.storage.local.set({config: defaultConfig});
+        x = (await chrome.storage.local.get(['config'])).config;
+    }
+
+    // check if enabled
+    if (x.enabled == 1) {
         setListeners();
     }
 });
 
 var setListeners = function() {
-    //document.addEventListener("load", startInit)
-
-    //window.addEventListener("load", function(){
-    //    console.log("Event fire")
-    //    removeLectioScripts();
-    //})
-
-    var removeLectioScripts = function() {
-        console.log("Sending")
-        browser.runtime.sendMessage({
-            action: "startKill",
-        });
-    }
-
     startInit();
 
     window.addEventListener("popstate", function(){
         console.log("State pop")
-        loadSitePage(
-            getInstFromLink(window.location.href), // Very clunky but it works
-            window.location.href
+        loadPage( // Very clunky but it works
+            getPageFromLink(window.location.href)
         )
     })
 }
