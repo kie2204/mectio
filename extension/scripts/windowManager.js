@@ -160,8 +160,11 @@ class wmWindow {
                 el.style.transform = "scale(1)";
                 el.style.opacity = "1";
 
-                el.style.height = "";
+                
             })
+            setTimeout(function(){
+                el.style.height = "";
+            }, 500)
         })
     }
 
