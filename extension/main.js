@@ -152,8 +152,6 @@ var submitLoginForm = async function(e) {
 }
 
 var loadPage = async function(page, push) {
-    windowManager.close(windowManager.activeWindow)
-
     var src = "";
     
     if (typeof(page.page) == "string") {
@@ -177,11 +175,13 @@ var pageLoaders = {
         }
         window.history.pushState({}, "", link);
 
+        var prevWindow = windowManager.activeWindow;
         var wmwindow = new wmWindow(0, 1);
         var page = await getLocalPage("/pages/mectio/forside.html")
 
         await loadNavLinks(link);
         wmwindow.element.innerHTML = page;
+        windowManager.close(prevWindow)
         wmwindow.appear();
     },
     skema: async function() {
@@ -192,6 +192,7 @@ var pageLoaders = {
         var page = await getLocalPage("/pages/mectio/forside.html")
         wmwindow.element.innerHTML = page;
 
+        windowManager.close(prevWindow)
         window.history.pushState({}, "", src)
     }
 }
@@ -202,8 +203,6 @@ var loadCompatibilityPage = async function(src, push) {
     if (config.config.compatHideUntilLoad == 1) {
         unhide = 1;
     }
-
-    var wmwindow = new wmWindow(0, unhide);
 
     var frame = document.createElement("iframe")
     loadNavLinks(src)
@@ -222,10 +221,14 @@ var loadCompatibilityPage = async function(src, push) {
     frame.style.border = "none";
     frame.style.backgroundColor = "#ccc";
 
+    var prevWindow = windowManager.activeWindow;
+    var wmwindow = new wmWindow(0, unhide);
+
     // Append frame to window
     wmwindow.element.appendChild(frame)
     frame.contentWindow.addEventListener("load", function(){
         loadCompatibilityScripts(frame)
+        windowManager.close(prevWindow)
         wmwindow.appear();
     })
 }

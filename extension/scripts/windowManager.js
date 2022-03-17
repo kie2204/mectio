@@ -143,7 +143,6 @@ class wmWindow {
 
         this.element = windowElement;
         windowManager.registerWindow(this.id, this)
-        windowManager.setActiveWindow(this.id)
 
         if (appearWait != 1) {
             this.appear();
@@ -152,6 +151,7 @@ class wmWindow {
 
     appear() {
         var el = document.getElementById(this.id)
+        windowManager.setActiveWindow(this.id)
 
         requestAnimationFrame(function(){
             setTimeout(function(){
@@ -169,15 +169,16 @@ class wmWindow {
     }
 
     close() {
-        var closeElement = document.getElementById(this.id)
+        var el = document.getElementById(this.id)
         // Luk-animation
         console.log("Lukker vindue " + this.id)
-        closeElement.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
-        closeElement.style.transform = "scale(1.005)";
-        closeElement.style.opacity = "0";     
+        el.style.height = "100%";
+        el.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
+        el.style.transform = "scale(1.02)";
+        el.style.opacity = "0";     
         
         setTimeout(function(){
-            closeElement.remove();
+            el.remove();
         }, 500)
     }
 
