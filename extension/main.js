@@ -3,6 +3,9 @@
 // Define browser API for Firefox/Chrome compatibility
 var browser = browser || chrome;
 
+var defaultInst = 0;
+var loginStatus;
+
 var getLocalPage = async function(page) {
     return new Promise(resolve => {
         fetch(browser.runtime.getURL(page)).then(r => r.text()).then(html => {
@@ -66,9 +69,23 @@ var startInit = async function() {
     } else {
         showLoginPage();
     }
-}
 
-var defaultInst = 0;
+    document.getElementById("mectio-profile").addEventListener("click", async function(e){
+        e.preventDefault();
+
+        for (var prop of windowManager.registeredWindows) {
+            windowManager.close(prop.id)
+        }
+
+        await browser.runtime.sendMessage({
+            action: "api",
+            call: "logout",
+            args: []
+        });
+
+        showLoginPage();
+    })
+}
 
 var doUserInit = async function(inst) {
     defaultInst = inst;
@@ -177,11 +194,21 @@ var pageLoaders = {
 
         var prevWindow = windowManager.activeWindow;
         var wmwindow = new wmWindow(0, 1);
-        var page = await getLocalPage("/pages/mectio/forside.html")
+        var page = await getLocalPage("/pages/mectio/forside/forside.html")
 
         await loadNavLinks(link);
         wmwindow.element.innerHTML = page;
         windowManager.close(prevWindow)
+
+        userData = await browser.runtime.sendMessage({
+            action: "api",
+            call: "getUserData",
+            args: [loginStatus.inst, loginStatus.userId, loginStatus.userType]
+        });
+
+        var fName = userData.userFullName.substr(0, userData.userFullName.indexOf(" "))
+
+        wmwindow.element.querySelector("#main-title-left").querySelector("h1").innerText = fName + "!"
         wmwindow.appear();
     },
     skema: async function() {

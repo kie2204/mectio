@@ -1,6 +1,7 @@
 @font-face {
     font-family: "Oxygen";
-    src: url("/fonts/Oxygen-Regular.ttf")
+    src: url("/fonts/Oxygen-Regular.ttf");
+    font-weight: normal;
 }
 
 * {
