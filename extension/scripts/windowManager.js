@@ -130,7 +130,7 @@ class wmWindow {
         } else {
             this.id = setId;
         }
-        var main = document.getElementsByTagName("main")[0];
+        var main = document.querySelector("#window-container");
 
         var windowElement = document.createElement("div");
         windowElement.setAttribute("id", this.id)
@@ -155,12 +155,10 @@ class wmWindow {
 
         requestAnimationFrame(function(){
             setTimeout(function(){
-                el.style.height = "100%";
-                // windowElement.style.transition += `, ${defaultTransitionCurve}, opacity 0.2s`;
+                el.style.height = "100vh";
+                el.style.transition += `, ${defaultTransitionCurve}, opacity 0.2s`;
                 el.style.transform = "scale(1)";
                 el.style.opacity = "1";
-
-                
             })
             setTimeout(function(){
                 el.style.height = "";
@@ -172,7 +170,8 @@ class wmWindow {
         var el = document.getElementById(this.id)
         // Luk-animation
         console.log("Lukker vindue " + this.id)
-        el.style.height = "100%";
+        el.style.height = "100vh";
+        el.style.zIndex = "1";
         el.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
         el.style.transform = "scale(1.03)";
         el.style.opacity = "0";     

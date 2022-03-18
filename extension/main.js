@@ -246,8 +246,7 @@ var loadCompatibilityPage = async function(src, push) {
 
     // Decorate iframe
     frame.style.transition = "filter 0.2s";
-    frame.style.width = "100vw";
-    frame.style.height = "100vw";
+    frame.style.width = "100%";
     frame.style.border = "none";
     frame.style.backgroundColor = "#ccc";
 
@@ -277,9 +276,6 @@ var loadCompatibilityScripts = function(frame){
     } catch (e) {
         console.log("Error: " + e)
     }
-    
-    frame.style.height = `${frame.contentWindow.document.documentElement.scrollHeight}px`;
-    frame.style.filter = "";
 
     for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
         var onclick = x.getAttribute("onclick");
@@ -292,6 +288,15 @@ var loadCompatibilityScripts = function(frame){
             })
         }
     }
+
+    var body = frame.contentWindow.document.body;
+    var html = frame.contentWindow.document.documentElement;
+
+    var height = Math.max( body.scrollHeight, body.offsetHeight, 
+        html.clientHeight, html.scrollHeight, html.offsetHeight );
+    
+    frame.style.height = `${height*2}px`;
+    frame.style.filter = "";
 }
 
 var loadNavLinks = async function(url) {
