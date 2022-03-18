@@ -237,6 +237,9 @@ var loadCompatibilityPage = async function(src, push) {
     if (push == 1) {
         window.history.pushState({}, "", src)
     }
+    
+    var prevWindow = windowManager.activeWindow;
+    windowManager.close(prevWindow)
 
     frame.setAttribute("src", src)
     frame.setAttribute("scrolling", "no")
@@ -248,14 +251,12 @@ var loadCompatibilityPage = async function(src, push) {
     frame.style.border = "none";
     frame.style.backgroundColor = "#ccc";
 
-    var prevWindow = windowManager.activeWindow;
     var wmwindow = new wmWindow(0, unhide);
 
     // Append frame to window
     wmwindow.element.appendChild(frame)
     frame.contentWindow.addEventListener("load", function(){
         loadCompatibilityScripts(frame)
-        windowManager.close(prevWindow)
         wmwindow.appear();
     })
 }

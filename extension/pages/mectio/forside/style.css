@@ -6,12 +6,13 @@
     box-sizing: border-box;
 }
 #main {
-    max-width: 72rem;
+    max-width: 60rem;
     flex-grow: 1;
     margin-right: 2rem;
 }
 #main-title {
     padding: 2rem 0;
+    justify-content: space-between;
 }
 #main-title, #main-title-left, #main-title-right {
     display: flex;
@@ -35,10 +36,15 @@
     background-color: var(--nav-color);
     min-height: 100rem;
     border-radius: .5rem;
+    box-sizing: border-box;
+    padding: 1rem;
 }
-
+.main-window {
+    background-color: white;
+    min-height: 1rem;
+}
 #sidebar-container {
-    width: 22rem;
+    width: 20rem;
     border-radius: .5rem;
 }
 

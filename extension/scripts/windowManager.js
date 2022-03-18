@@ -174,7 +174,7 @@ class wmWindow {
         console.log("Lukker vindue " + this.id)
         el.style.height = "100%";
         el.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
-        el.style.transform = "scale(1.02)";
+        el.style.transform = "scale(1.03)";
         el.style.opacity = "0";     
         
         setTimeout(function(){
