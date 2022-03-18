@@ -1,17 +1,19 @@
+var browser = browser || chrome
+
 var loadConfig = async function(){
-    var config = await chrome.storage.local.get(['config']);
+    var config = await browser.storage.local.get(['config']);
 
     if (typeof(config.config) != "object") {
         console.log("Config invalid, resetting to default")
         await setDefaultConfig();
-        config = await chrome.storage.local.get(['config']);
+        config = await browser.storage.local.get(['config']);
     }
 
     return config.config;
 }
 
 var saveConfig = function(config){
-    chrome.storage.local.set({config: config}, function() {
+    browser.storage.local.set({config: config}, function() {
         console.log('Value is set to ' + config);
     });
 }
@@ -20,7 +22,7 @@ var setDefaultConfig = async function(){
     var fetched = await fetch("/config.mectio")
     var defaultConfig = await fetched.json()
 
-    await chrome.storage.local.set({config: defaultConfig});
+    await browser.storage.local.set({config: defaultConfig});
     return true;
 }
 

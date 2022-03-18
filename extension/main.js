@@ -226,7 +226,7 @@ var pageLoaders = {
 
 var loadCompatibilityPage = async function(src, push) {
     var unhide = 0;
-    var config = await chrome.storage.local.get(['config']);
+    var config = await browser.storage.local.get(['config']);
     if (config.config.compatHideUntilLoad == 1) {
         unhide = 1;
     }
@@ -349,7 +349,7 @@ var getPageFromLink = function(link) {
 }
 
 
-chrome.storage.local.get(['config'], async function(config) {
+browser.storage.local.get(['config'], async function(config) {
     var x = config.config;
 
     // Check if config valid
@@ -358,8 +358,8 @@ chrome.storage.local.get(['config'], async function(config) {
         var fetched = await fetch(`${browser.runtime.getURL('/')}config.mectio`)
         var defaultConfig = await fetched.json()
 
-        await chrome.storage.local.set({config: defaultConfig});
-        x = (await chrome.storage.local.get(['config'])).config;
+        await browser.storage.local.set({config: defaultConfig});
+        x = (await browser.storage.local.get(['config'])).config;
     }
 
     // check if enabled

@@ -4,6 +4,7 @@
 
 const parse5 = p5.parse5;
 var lectioURL = "https://www.lectio.dk/"
+var browser = browser || chrome;
 
 // Main 
 var lectioAPI = {
@@ -245,7 +246,7 @@ var lectioAPI = {
         };
     },
     setAspNetSID: async function(sid, expiry) { // Sætter ASP.NET SessionId. SessionId er forbundet til dit login, og bliver normalt slettet efter session.
-        await chrome.cookies.set(
+        await browser.cookies.set(
             {
                 url: lectioURL,
                 name: "ASP.NET_SessionId",
@@ -257,7 +258,7 @@ var lectioAPI = {
                 expirationDate: expiry
             }
         )
-        return await chrome.cookies.get(
+        return await browser.cookies.get(
             {
                 url: lectioURL,
                 name: "ASP.NET_SessionId"
