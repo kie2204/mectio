@@ -2,7 +2,6 @@
 // Fungerer med manifest v3, kræver parse5
 // Bruger indbygget fetch() der deler cookies med browseren
 
-const parse5 = p5.parse5;
 const DOMParser = new xmldom.DOMParser();
 var lectioURL = "https://www.lectio.dk/"
 var browser = browser || chrome;
