@@ -230,7 +230,7 @@ var pageLoaders = {
 
 var loadCompatibilityPage = async function(src, push) {
     var unhide = 0;
-    if (getConfig("compatHideUntilLoad") == 1) {
+    if (await getConfig("compatHideUntilLoad") == 1) {
         unhide = 1;
     }
 
@@ -388,8 +388,6 @@ browser.storage.local.get(['config'], async function(config) {
         await browser.storage.local.set({config: defaultConfig});
         x = (await browser.storage.local.get(['config'])).config;
     }
-
-    currentConfig = config;
 
     // check if enabled
     if (x.enabled == 1) {
