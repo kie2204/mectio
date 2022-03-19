@@ -5,6 +5,7 @@ var browser = browser || chrome;
 
 var defaultInst = 0;
 var loginStatus;
+var currentConfig;
 
 var getLocalPage = async function(page) {
     return new Promise(resolve => {
@@ -174,8 +175,12 @@ var loadPage = async function(page, push) {
     if (typeof(page.page) == "string") {
         switch (page.page) {
             case "forside":
-                await pageLoaders.forside(page.link);
-                break;
+                if (await getConfig("dummyFrontPage") == 1) {
+                    await pageLoaders.forside();
+                    return;
+                } else {
+                    loadCompatibilityPage(page.link, push)
+                }
             default:
                 return;
         }
@@ -226,8 +231,7 @@ var pageLoaders = {
 
 var loadCompatibilityPage = async function(src, push) {
     var unhide = 0;
-    var config = await browser.storage.local.get(['config']);
-    if (config.config.compatHideUntilLoad == 1) {
+    if (currentConfig.config.compatHideUntilLoad == 1) {
         unhide = 1;
     }
 
@@ -254,10 +258,25 @@ var loadCompatibilityPage = async function(src, push) {
 
     // Append frame to window
     wmwindow.element.appendChild(frame)
-    frame.contentWindow.addEventListener("load", function(){
-        loadCompatibilityScripts(frame)
-        wmwindow.appear();
+    frame.contentWindow.addEventListener("load", function() {
+        reloadFrameScript(frame, wmwindow)
     })
+}
+
+var reloadFrameScript = function(frame, wmwindow) {
+    frame.contentWindow.addEventListener("unload", function(){
+        wmwindow.hide();
+
+        setTimeout(function(){
+            frame.contentWindow.addEventListener("load", function() {
+                window.history.replaceState({}, "", frame.contentWindow.location.href)
+                reloadFrameScript(frame, wmwindow)
+            })
+        }, 100)
+    })
+
+    loadCompatibilityScripts(frame)
+    wmwindow.appear();
 }
 
 var loadCompatibilityScripts = function(frame){
@@ -279,9 +298,10 @@ var loadCompatibilityScripts = function(frame){
 
     for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
         var onclick = x.getAttribute("onclick");
-        
+        var lecCommand = x.getAttribute("lec-command");
+        var dataCommand = x.getAttribute("data-command");
 
-        if (typeof(onclick) != "string" && x.href.includes("https://www.lectio.dk/")) {
+        if (typeof(onclick) != "string" && typeof(lecCommand) != "string" && typeof(dataCommand) != "string" && x.href.includes("https://www.lectio.dk/")) {
             x.addEventListener("click", function(e){
                 e.preventDefault();
                 loadPage(getPageFromLink(frame.contentWindow.document.activeElement.href), 1)
@@ -307,7 +327,7 @@ var loadNavLinks = async function(url) {
     });
 
     document.getElementById("mectio-nav-links").innerHTML = "";
-
+    
     if (Array.isArray(navLinks.links) == false || navLinks.links.length == 0) {
         windowManager.setHeaderState(1)
         return;
@@ -319,6 +339,9 @@ var loadNavLinks = async function(url) {
         var navLink = document.createElement("a")
         navLink.appendChild(document.createTextNode(x.name))
         navLink.setAttribute("href", x.href)
+        if (x.active) {
+            navLink.classList.add("active")
+        }
 
         document.getElementById("mectio-nav-links").appendChild(navLink);
 
@@ -367,6 +390,8 @@ browser.storage.local.get(['config'], async function(config) {
         x = (await browser.storage.local.get(['config'])).config;
     }
 
+    currentConfig = config;
+
     // check if enabled
     if (x.enabled == 1) {
         setListeners();
@@ -382,4 +407,10 @@ var setListeners = function() {
             getPageFromLink(window.location.href)
         )
     })
+}
+
+var getConfig = async function(attr) {
+    var conf = await browser.storage.local.get(['config'])
+
+    return conf.config[attr]
 }

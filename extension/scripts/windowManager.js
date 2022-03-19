@@ -166,15 +166,22 @@ class wmWindow {
         })
     }
 
-    close() {
+    hide() {
         var el = document.getElementById(this.id)
+
         // Luk-animation
-        logs.info("Lukker vindue " + this.id)
         el.style.height = "100vh";
         el.style.zIndex = "1";
         el.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
         el.style.transform = "scale(1.03)";
-        el.style.opacity = "0";     
+        el.style.opacity = "0";    
+    }
+
+    close() {
+        var el = document.getElementById(this.id)
+
+        logs.info("Lukker vindue " + this.id) 
+        this.hide();
         
         setTimeout(function(){
             el.remove();

@@ -1,5 +1,6 @@
 {
     "enabled": 1,
     "compatHideUntilLoad": 1,
+    "dummyFrontPage": 0,
     "theme": "default"
 }

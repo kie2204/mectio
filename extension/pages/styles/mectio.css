@@ -198,6 +198,10 @@ nav * {
     background-color: #6897d1;
 }
 
+#mectio-nav-links a.active {
+    text-shadow: 0 0 0.05rem black;
+}
+
 main {
     display: flex;
 }

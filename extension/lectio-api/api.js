@@ -1,8 +1,14 @@
 // Lectio API - af kie2204
-// Fungerer med manifest v3, kræver parse5
+// Fungerer med manifest v3, kræver xmldom
 // Bruger indbygget fetch() der deler cookies med browseren
 
-const DOMParser = new xmldom.DOMParser();
+const DOMParser = new xmldom.DOMParser({
+    errorHandler: {
+        warning: (msg) => {console.log(msg)},
+        error: (msg) => {console.log(msg)},
+        fatalError: (msg) => {console.log(msg)},
+     },
+});
 var lectioURL = "https://www.lectio.dk/"
 var browser = browser || chrome;
 
