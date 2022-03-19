@@ -3,6 +3,7 @@
 // Bruger indbygget fetch() der deler cookies med browseren
 
 const parse5 = p5.parse5;
+const DOMParser = new xmldom.DOMParser();
 var lectioURL = "https://www.lectio.dk/"
 var browser = browser || chrome;
 
@@ -16,17 +17,17 @@ var lectioAPI = {
     },
     getInstList: async function() {
         var rawData = await this.getParseData(`lectio/login_list.aspx`);
-        var parsedInstData = parse5.parse(rawData);
+        var parsedInstData = DOMParser.parseFromString(rawData, "text/html");
 
-        var instsUnparsed = findKey(parsedInstData, "nodeName", "div").objects[0].childNodes
+        var instsUnparsed = parsedInstData.getElementById("schoolsdiv").childNodes;
 
         var count = 0;
         var instList = []
 
-        for (var x of instsUnparsed) {
+        for (i = 0; i < instsUnparsed.length; i++) {
             try {
-                var instURL = x.childNodes[0].attrs[0].value
-                var instName = x.childNodes[0].childNodes[0].value
+                var instURL = instsUnparsed[i].childNodes[0].getAttribute("href");
+                var instName = instsUnparsed[i].textContent;
 
                 var chop1 = instURL.substr(instURL.indexOf("/lectio/")+8)
                 var instId = chop1.substr(0, chop1.indexOf("/"))
@@ -45,8 +46,10 @@ var lectioAPI = {
     },
     getInstData: async function(id) { // Giver JSON info om inst ud fra nummer
         var rawData = await this.getParseData(`lectio/${id}/`);
-        var parsedInstData = parse5.parse(rawData);
-        var filtered = findKey(parsedInstData, "value", "m_masterleftDiv").prevObject[0][1][0].value.trim()
+        var parsedInstData = DOMParser.parseFromString(rawData, "text/html");
+
+        var filtered = parsedInstData.getElementById("m_masterleftDiv").childNodes[0].textContent.trim();
+
         return {
             id: id,
             name: filtered
@@ -65,18 +68,17 @@ var lectioAPI = {
         }
 
         var rawData = await this.getParseData(`lectio/${id}/forside.aspx`);
-        var parsedData = parse5.parse(rawData);
+        var parsedData = DOMParser.parseFromString(rawData, "text/html");
 
         try {
-            var parsed2 = findKey(parsedData, "value", "ls-user-name")
-            var username = parsed2.prevObject[0][1][0].value.trim()
+            var username = parsedData.getElementsByClassName("ls-user-name")[0].textContent;
 
-            var userLink = parsed2.prevObject[0][0][1].value
+            var userLink = parsedData.getElementsByClassName("ls-user-name")[0].getAttribute("href")
             var userId = userLink.substr(userLink.lastIndexOf("elevid=")+7)
 
             // Find elev/lærer id og type
 
-            var userString = findKey(parsedData, "value", "s_m_HeaderContent_MainTitle").prevObject[0][1][0].value.trim()
+            var userString = parsedData.getElementById("s_m_HeaderContent_MainTitle").textContent;
             var userStringFiltered = userString.substr(0, userString.indexOf(" - Forside"))
 
             var userType;
@@ -113,25 +115,27 @@ var lectioAPI = {
             return {error: "Ikke logget ind"}
         }
 
-        var rawData;
+        var dataUrl;
         switch (type) {
             case 0:
-                rawData = await this.getParseData(`lectio/${id}/SkemaNy.aspx?type=elev&elevid=${userID}`);
+                dataUrl = `lectio/${id}/SkemaNy.aspx?type=elev&elevid=${userID}`;
                 break;
             case 1:
-                rawData = await this.getParseData(`lectio/${id}/SkemaNy.aspx?type=laerer&laererid=${userID}`);
+                dataUrl = `lectio/${id}/SkemaNy.aspx?type=laerer&laererid=${userID}`;
                 break;
             default:
                 return {error: "Bruger ikke fundet"}
         }
-        var parsedData = parse5.parse(rawData);
+
+        var rawData = await this.getParseData(dataUrl);
+        var parsedData = DOMParser.parseFromString(rawData, "text/html");
 
         try {
-            var userString = findKey(parsedData, "value", "s_m_HeaderContent_MainTitle").prevObject[0][1][0].value
+            var userString = parsedData.getElementById("s_m_HeaderContent_MainTitle").textContent;
         } catch (e) {
             return {error: "Bruger ikke fundet"}
         }
-        var userPfpUrl = findKey(parsedData, "value", "s_m_HeaderContent_picctrlthumbimage").prevObject[0][0][3].value + "&fullsize=1"
+        var userPfpUrl = parsedData.getElementById("s_m_HeaderContent_picctrlthumbimage").getAttribute("src") + "&fullsize=1"
 
         var userFullName;
         var userStringFiltered = userString.substr(0, userString.indexOf(" - Skema"))
@@ -166,10 +170,10 @@ var lectioAPI = {
     login: async function(id, username, password) { // Logger ind på Lectio
         // Get VIEWSTATE og EVENTVALIDATION (lectio sikkerhedskrav nederen)
         var rawData = await this.getParseData(`lectio/${id}/login.aspx`);
-        var parsedInstData = parse5.parse(rawData);
+        var parsedData = DOMParser.parseFromString(rawData, "text/html");
 
-        var aspNet_VSX = findKey(parsedInstData, "value", "__VIEWSTATEX").prevObject[0][0][3].value
-        var aspNet_EVV = findKey(parsedInstData, "value", "__EVENTVALIDATION").prevObject[0][0][3].value
+        var aspNet_VSX = parsedData.getElementById("__VIEWSTATEX").getAttribute("value")
+        var aspNet_EVV = parsedData.getElementById("__EVENTVALIDATION").getAttribute("value")
 
         var data = { // ALLE felter her skal sendes til Lectio
             '__EVENTTARGET': 'm$Content$submitbtn2',
@@ -210,29 +214,25 @@ var lectioAPI = {
     getNavLinks: async function(url) {
         var response = await fetch(url)
         var rawData = await response.text();
-        var parsedData = parse5.parse(rawData);
-
-        try {
-            var userString = findKey(parsedData, "value", "ls-subnav1")
-        } catch (e) {
-            return {error: "Bruger ikke fundet"}
-        }
+        var parsedData = DOMParser.parseFromString(rawData, "text/html");
 
         var navLinks = [];
         try {
-            var navArray = userString.prevObject[0][1]
+            var navArray = parsedData.getElementsByClassName("ls-subnav1")[0].childNodes
         } catch (e) {
-            var navArray = "";
+            return {error: "Ingen links fundet"}
         }
 
-        for (var x of navArray) {
+        for (i = 0; i < navArray.length; i++) {
             try {
-                var navName = x.childNodes[0].childNodes[0].value
-                var navLink = x.childNodes[0].attrs[0].value
+                var navLink = navArray[i].childNodes[0].getAttribute("href");
+                var navActive = navArray[i].getAttribute("class").includes("ls-subnav-active")
+                var navName = navArray[i].textContent;
 
                 navLinks.push({
                     name: navName, 
-                    href: navLink
+                    href: navLink,
+                    active: navActive
                 })
             } catch (e) {}
         }
@@ -274,12 +274,12 @@ var lectioAPI = {
             }
 
             var rawData = await lectioAPI.getParseData(`lectio/${id}/forside.aspx`);
-            var parsedData = parse5.parse(rawData);
+            var parsedData = DOMParser.parseFromString(rawData, "text/html");
 
-            var aktuelt = findKey(parsedData, "value", "s_m_Content_Content_aktueltIsland_pa")
-            var undervisning = findKey(parsedData, "value", "s_m_Content_Content_undervisningIsland_pa")
-            var komm = findKey(parsedData, "value", "s_m_Content_Content_kommIsland_pa")
-            var skema = findKey(parsedData, "value", "s_m_Content_Content_skemaIsland_pa")
+            var aktuelt = parsedData.getElementById("s_m_Content_Content_aktueltIsland_pa")
+            var undervisning = parsedData.getElementById("s_m_Content_Content_undervisningIsland_pa")
+            var komm = parsedData.getElementById("s_m_Content_Content_kommIsland_pa")
+            var skema = parsedData.getElementById("s_m_Content_Content_skemaIsland_pa")
 
             return {
                 notices: {},
@@ -290,112 +290,4 @@ var lectioAPI = {
             }
         }
     }
-}
-
-// Sorting function (very bad optimization)
-
-function findKey(obj, key, value) {
-	if (Array.isArray(obj)) {
-		//console.log(`Array input, scanning objects`)
-		
-		var objects = []
-		var unpackedObjects = []
-		var filteredObjects = []
-        var os // o(bject)s
-
-        for (var xxx of obj) {
-			if(Array.isArray(xxx)) {
-                obj = obj.concat(xxx)
-                obj = obj.filter(x => x !== xxx)
-                //console.log(obj)
-            }
-		}
-
-		for (var xxx of obj) {
-			os = searchObjects(xxx, key, value)
-			if (os.status == 1) {
-				return os;
-			}
-			//console.log(os.objects)
-			objects = objects.concat(os.objects)
-		}
-
-		// Unpack arrays in objects 
-		for (var xxx of objects) {
-			if (Array.isArray(xxx)) {
-				unpackedObjects = unpackedObjects.concat(xxx)
-			}
-		}
-		
-		// Filter objects 
-		//console.log(unpackedObjects)
-		for (var xxxx of unpackedObjects) {
-			var stringified = JSON.stringify(xxxx, function(key, value) {
-				if(key == 'parentNode') { 
-					return value.id;
-				} else {
-					return value;
-				}
-			})
-
-			if (stringified.includes(value)) {
-				filteredObjects.push(xxxx)
-			} else {}
-		}
-
-		//console.log("All objects:")
-		//console.log(filteredObjects)
-		if (filteredObjects.length == 0) {
-			return {"error": "Key value pair not found"}
-		} else {
-			return findKey(filteredObjects, key, value)
-		}
-
-	} else if (typeof(obj) == "object") {
-		var xx = searchObjects(obj, key, value)
-		//console.log(xx.objects)
-		if (xx.status == 1) {
-			return xx;
-		} else {
-			return findKey(xx.objects, key, value)
-		}
-	}
-}
-
-var prevObject = []
-
-function searchObjects(obj, key, value) {
-    //console.log("Searching this object")
-    //console.log(obj)
-    var objects = []
-
-    for(let [k, val] of Object.entries(obj)) {
-        if(k != "parentNode" && typeof(val) == 'object') {
-            //console.log(`Found ${typeof (val)} at ${k}`)
-            objects.push(obj[k])
-        } else {
-            //console.log(`${typeof(val)} ${k} ${val}`)
-            if (k == key) {
-                //console.log(`Key match! (${k}: ${val})`)
-                if (val == value) {
-                    //console.log("Found value " + val)
-                    return {
-						"status": 1,
-						"objects": [obj],
-						"prevObject": [prevObject]
-					};
-                } else {}
-            } else {}
-        }
-    }
-
-	prevObject = objects;
-
-    //console.log("Found objects")
-    //console.log(objects)
-
-    return {
-		"status": 0,
-		"objects": objects
-	};
 }
