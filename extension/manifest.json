@@ -23,7 +23,7 @@
       {
         "matches": ["*://*.lectio.dk/*"],
         "run_at": "document_start",
-        "js": ["scripts/catchPhrases.js", "scripts/windowManager.js", "main.js"]
+        "js": ["scripts/catchPhrases.js", "scripts/windowManager.js", "scripts/logs.js", "main.js"]
       }
     ],
 

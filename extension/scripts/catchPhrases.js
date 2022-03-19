@@ -8,7 +8,7 @@ catchPhrases.get = function (type) {
 
             return phrases[index]
         default:
-            console.log("catchPhrases fejl: mangler type")
+            logs.info("catchPhrases fejl: mangler type")
             return "..øøøhh?"
     }
 

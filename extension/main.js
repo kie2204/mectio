@@ -38,8 +38,8 @@ var startInit = async function() {
         value: 1
     });
 
-    console.log("mectio er i ALPHA. Der kan være fejl og mangler")
-    console.log("mectio: " + catchPhrases.get("loading"))
+    logs.info("mectio er i ALPHA. Der kan være fejl og mangler")
+    logs.info(catchPhrases.get("loading"))
 
     // Interrupt loading
     document.open();
@@ -53,7 +53,7 @@ var startInit = async function() {
     link.href = browser.runtime.getURL('/') + 'icons/icon-48.ico';
 
     // Log it
-    console.log("mectio: starter init")
+    logs.info("starter init")
     document.documentElement.innerHTML = ""
     await windowManager.init();
 
@@ -127,7 +127,7 @@ var showLoginPage = async function() {
         args: []
     });
 
-    console.log(instList)
+    logs.info(instList)
 
     for (var x of instList.instList) {
         var el = document.createElement("option");
@@ -150,7 +150,7 @@ var submitLoginForm = async function(e) {
     var uname = document.getElementById("mf-uname").value
     var pword = document.getElementById("mf-pword").value
 
-    console.log(`Logger ind på inst. id ${inst} med brugernavn ${uname}`)
+    logs.info(`Logger ind på inst. id ${inst} med brugernavn ${uname}`)
 
     loginStatus = await browser.runtime.sendMessage({
         action: "api",
@@ -274,7 +274,7 @@ var loadCompatibilityScripts = function(frame){
         doc.getElementsByTagName("header")[0].style.display = "none";
         doc.getElementById("s_m_HeaderContent_subnav_div").style.display = "none";
     } catch (e) {
-        console.log("Error: " + e)
+        logs.info("Error: " + e)
     }
 
     for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
@@ -342,7 +342,7 @@ var getPageFromLink = function(link) {
         page = "forside"   
     }
 
-    console.log({
+    logs.info({
         link: link,
         page: page
     })
@@ -359,7 +359,7 @@ browser.storage.local.get(['config'], async function(config) {
 
     // Check if config valid
     if (typeof(x) != "object") {
-        console.log("Config invalid, resetting to default")
+        logs.info("Config invalid, resetting to default")
         var fetched = await fetch(`${browser.runtime.getURL('/')}config.mectio`)
         var defaultConfig = await fetched.json()
 
@@ -377,7 +377,7 @@ var setListeners = function() {
     startInit();
 
     window.addEventListener("popstate", function(){
-        console.log("State pop")
+        logs.info("State pop")
         loadPage( // Very clunky but it works
             getPageFromLink(window.location.href)
         )

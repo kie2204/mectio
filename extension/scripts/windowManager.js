@@ -34,7 +34,7 @@ windowManager = {
         
                 document.title = "mectio";
                 document.getElementsByTagName('p')[0].innerHTML = "";
-                console.log("wm init done");
+                logs.info("wm init done");
                 resolve();
             });
         });
@@ -71,7 +71,7 @@ windowManager = {
                     main.classList.add("collapse2")
                     break;
                 default:
-                    console.log("Ugyldig argument, forventer 0, 1 eller 2")    
+                    logs.warn("Ugyldig argument, forventer 0, 1 eller 2")    
             }
         })
 
@@ -94,7 +94,7 @@ windowManager = {
     close: function(id) {
         try {
             this.getWindow(id).close();
-        } catch (e) {console.log("Could not close window "+ id)}
+        } catch (e) {logs.warn("Could not close window "+ id)}
     },
     activeWindow: "",
     setActiveWindow: function(id) {
@@ -103,7 +103,7 @@ windowManager = {
             x.window.element.style.zIndex = "1";
         }
         document.getElementById(id).style.zIndex = "1000";
-        console.log(`Active window set to ${id}`)
+        logs.info(`Active window set to ${id}`)
     },
     toggleInstName: function(toggle, name) {
         requestAnimationFrame(function(){
@@ -139,7 +139,7 @@ class wmWindow {
         windowElement.style.opacity = "0";  
         
         main.appendChild(windowElement);
-        console.log("mectio: nyt vindue med id " + this.id + " åbnet.")
+        logs.info("Nyt vindue med id " + this.id + " åbnet.")
 
         this.element = windowElement;
         windowManager.registerWindow(this.id, this)
@@ -169,7 +169,7 @@ class wmWindow {
     close() {
         var el = document.getElementById(this.id)
         // Luk-animation
-        console.log("Lukker vindue " + this.id)
+        logs.info("Lukker vindue " + this.id)
         el.style.height = "100vh";
         el.style.zIndex = "1";
         el.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
