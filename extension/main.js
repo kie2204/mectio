@@ -5,7 +5,6 @@ var browser = browser || chrome;
 
 var defaultInst = 0;
 var loginStatus;
-var currentConfig;
 
 var getLocalPage = async function(page) {
     return new Promise(resolve => {
@@ -231,7 +230,7 @@ var pageLoaders = {
 
 var loadCompatibilityPage = async function(src, push) {
     var unhide = 0;
-    if (currentConfig.config.compatHideUntilLoad == 1) {
+    if (getConfig("compatHideUntilLoad") == 1) {
         unhide = 1;
     }
 
