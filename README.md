@@ -1,4 +1,4 @@
-![](https://github.com/kie2204/mectio/blob/main/banner.png?raw=true)
+![](https://github.com/kie2204/mectio/blob/main/docs/banner2.png?raw=true)
 # mectio
 Browser-udvidelse der transformerer din Lectio-oplevelse!
 
