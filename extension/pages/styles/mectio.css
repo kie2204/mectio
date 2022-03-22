@@ -184,6 +184,7 @@ nav * {
     font-weight: bold;
     padding: 0 1rem;
     margin-right: .5rem;
+    border: none;
 }
 
 #mectio-nav-links a {

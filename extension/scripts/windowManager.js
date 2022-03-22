@@ -2,6 +2,7 @@ var defaultTransitionCurve = "transform 0.2s cubic-bezier(0, 0, 0.2, 1) "
 
 windowManager = {
     initStatus: 0,
+    maxRegisteredWindows: 3,
     init: async() => {
         // Stop loading site, replace title
         document.body.innerHTML = "";
@@ -79,22 +80,44 @@ windowManager = {
     },
     registeredWindows: [],
     registerWindow: function(id, window) {
+        if (this.registeredWindows.length > 3) {
+            logs.warn("For mange vinduer")
+            this.registeredWindows[0].window.close();
+        }
         this.registeredWindows.push({
             id: id,
             window: window
         })
     },
+    unregisterWindow: function(id) {
+        var reg = this.registeredWindows;
+
+        var obj = reg.find(x => x.id === id)
+        var index = reg.indexOf(obj)
+
+        console.log(reg)
+        console.log(id + " " + index)
+
+        this.registeredWindows.splice(index, 1)
+    },
     getWindow: function(id) {
         try {
-            return this.registeredWindows.find(x => x.id === id).window;
+            return this.registeredWindows.find(x => x.id === id);
         } catch (e) {
             return false;
         }
     },
     close: function(id) {
         try {
-            this.getWindow(id).close();
+            this.getWindow(id).window.close();
         } catch (e) {logs.warn("Could not close window "+ id)}
+    },
+    closeAll: function() {
+        for (var x of this.registeredWindows) {
+            try {
+                x.window.close();
+            } catch (e) {logs.warn("Could not close window "+ id)}
+        }
     },
     activeWindow: "",
     setActiveWindow: function(id) {
@@ -124,12 +147,19 @@ windowManager = {
 }
 
 class wmWindow {
-    constructor(setId, appearWait) {
+    constructor(setId, appearWait, data) {
         if (typeof(setId) != "string") {
             this.id = (Math.random() + 1).toString(36).substring(2);
         } else {
             this.id = setId;
         }
+
+        if (typeof(data) != "object") {
+            this.data = {};
+        } else {
+            this.data = data;
+        }
+
         var main = document.querySelector("#window-container");
 
         var windowElement = document.createElement("div");
@@ -170,7 +200,7 @@ class wmWindow {
         var el = document.getElementById(this.id)
 
         // Luk-animation
-        el.style.height = "100vh";
+        el.style.height = "100vh !important";
         el.style.zIndex = "1";
         el.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
         el.style.transform = "scale(1.03)";
@@ -178,10 +208,12 @@ class wmWindow {
     }
 
     close() {
-        var el = document.getElementById(this.id)
+        var id = this.id;
+        var el = document.getElementById(id)
 
-        logs.info("Lukker vindue " + this.id) 
+        logs.info("Lukker vindue " + id) 
         this.hide();
+        windowManager.unregisterWindow(id)
         
         setTimeout(function(){
             el.remove();

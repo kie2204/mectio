@@ -60,12 +60,12 @@ var startInit = async function() {
     loginStatus = await browser.runtime.sendMessage({
         action: "api",
         call: "getLoginStatus",
-        args: [getInstFromLink(window.location.href)]
+        args: [parseLinkObject({link:window.location.href}).inst]
     });
 
     if (loginStatus.loginStatus == 1) {
         await doUserInit(loginStatus.inst);
-        loadPage(getPageFromLink(window.location.href));
+        loadPage({link: window.location.href});
     } else {
         showLoginPage();
     }
@@ -73,9 +73,7 @@ var startInit = async function() {
     document.getElementById("mectio-profile").addEventListener("click", async function(e){
         e.preventDefault();
 
-        for (var prop of windowManager.registeredWindows) {
-            windowManager.close(prop.id)
-        }
+        windowManager.closeAll();
 
         await browser.runtime.sendMessage({
             action: "api",
@@ -137,7 +135,7 @@ var showLoginPage = async function() {
         selectMenu.appendChild(el);
     }
 
-    selectMenu.value = getInstFromLink(window.location.href);
+    selectMenu.value = parseLinkObject({link: window.location.href}).inst;
 
     document.getElementById("mectio-login-form").addEventListener("submit", submitLoginForm);
 }
@@ -168,9 +166,15 @@ var submitLoginForm = async function(e) {
     }
 }
 
-var loadPage = async function(page, push) {
+var loadPage = async function(data, push) {
+    var page = parseLinkObject(data);
+
     var src = "";
-    
+
+    try {
+        windowManager.getWindow(windowManager.activeWindow).window.hide()
+    } catch (e) {logs.warn("Intet aktivt vindue")}
+
     if (typeof(page.page) == "string") {
         switch (page.page) {
             case "forside":
@@ -202,7 +206,6 @@ var pageLoaders = {
 
         await loadNavLinks(link);
         wmwindow.element.innerHTML = page;
-        windowManager.close(prevWindow)
 
         userData = await browser.runtime.sendMessage({
             action: "api",
@@ -223,7 +226,7 @@ var pageLoaders = {
         var page = await getLocalPage("/pages/mectio/forside.html")
         wmwindow.element.innerHTML = page;
 
-        windowManager.close(prevWindow)
+        windowManager.getWindow(prevWindow).window.element.hide()
         window.history.pushState({}, "", src)
     }
 }
@@ -242,7 +245,9 @@ var loadCompatibilityPage = async function(src, push) {
     }
     
     var prevWindow = windowManager.activeWindow;
-    windowManager.close(prevWindow)
+    try {
+        windowManager.getWindow(prevWindow).window.hide()
+    } catch (e) {logs.warn("Intet aktivt vindue")}
 
     frame.setAttribute("src", src)
     frame.setAttribute("scrolling", "no")
@@ -303,7 +308,7 @@ var loadCompatibilityScripts = function(frame){
         if (typeof(onclick) != "string" && typeof(lecCommand) != "string" && typeof(dataCommand) != "string" && x.href.includes("https://www.lectio.dk/")) {
             x.addEventListener("click", function(e){
                 e.preventDefault();
-                loadPage(getPageFromLink(frame.contentWindow.document.activeElement.href), 1)
+                loadPage({link: frame.contentWindow.document.activeElement.href}, 1)
             })
         }
     }
@@ -347,31 +352,43 @@ var loadNavLinks = async function(url) {
         navLink.addEventListener("click", function(e){
             e.preventDefault();
 
-            loadPage(getPageFromLink(document.activeElement.href), 1);
+            loadPage({link: document.activeElement.href}, 1);
         })
     }
 }
 
-var getInstFromLink = function(link) {
-    return parseInt(link.substr(link.indexOf("/lectio/")+8).substr(0,link.substr(link.indexOf("/lectio/")+8).indexOf("/")))
-}
+var parseLinkObject = function(attr) {
+    var link = attr.link;
+    var page = attr.page;
+    var inst;
 
-var getPageFromLink = function(link) {
-    var instId = getInstFromLink(link)
-    var page;
+    if (typeof link != "undefined") {
+        // Parse link
+        inst = parseInt(link.substr(link.indexOf("/lectio/")+8).substr(0,link.substr(link.indexOf("/lectio/")+8).indexOf("/")))
 
-    if (link.includes(`https://www.lectio.dk/lectio/${instId}/forside.aspx`)) {
-        page = "forside"   
+        if (link.includes(`https://www.lectio.dk/lectio/${inst}/forside.aspx`)) {
+            page = "forside" 
+        }
     }
 
-    logs.info({
+    if (typeof link == "undefined" && typeof page != "undefined") {
+        inst = defaultInst;
+
+        if (page == "forside") {
+            link = `https://www.lectio.dk/lectio/${inst}/forside.aspx`;
+        }
+    }
+
+    logs.info(JSON.stringify({
         link: link,
-        page: page
-    })
+        page: page,
+        inst: inst
+    }))
 
     return {
         link: link,
-        page: page
+        page: page,
+        inst: inst
     };
 }
 
@@ -400,10 +417,12 @@ var setListeners = function() {
 
     window.addEventListener("popstate", function(){
         logs.info("State pop")
-        loadPage( // Very clunky but it works
-            getPageFromLink(window.location.href)
-        )
+        loadPage({page: window.location.href})
     })
+
+    browser.runtime.sendMessage({
+        action: "kill"
+    });
 }
 
 var getConfig = async function(attr) {
