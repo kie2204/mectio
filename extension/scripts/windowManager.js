@@ -200,7 +200,7 @@ class wmWindow {
         var el = document.getElementById(this.id)
 
         // Luk-animation
-        el.style.height = "100vh !important";
+        el.style.maxHeight = "100vh";
         el.style.zIndex = "1";
         el.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
         el.style.transform = "scale(1.03)";
