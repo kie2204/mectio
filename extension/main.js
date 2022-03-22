@@ -417,7 +417,7 @@ var setListeners = function() {
 
     window.addEventListener("popstate", function(){
         logs.info("State pop")
-        loadPage({page: window.location.href})
+        loadPage({link: window.location.href})
     })
 
     browser.runtime.sendMessage({
