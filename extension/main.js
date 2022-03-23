@@ -17,10 +17,10 @@ var getLocalPage = async function(page) {
                 var href = x.getAttribute("href");
                 var src = x.getAttribute('src');
 
-                if (typeof(href) == "string" && href.substr(0,4) != "http") {
+                if (typeof(href) == "string" && href.substr(0,4) != "http" && href.length != 0) {
                     x.href = browser.runtime.getURL('/') + href;
                 }
-                if (typeof(src) == "string" && src.substr(0,4) != "http") {
+                if (typeof(src) == "string" && src.substr(0,4) != "http" && src.length != 0) {
                     x.src = browser.runtime.getURL('/') + src;
                 }
             }
@@ -167,7 +167,39 @@ var submitLoginForm = async function(e) {
 }
 
 var loadPage = async function(data, push) {
+    window.scrollTo({
+        top: 0, 
+        behavior: "smooth"
+    })
+
     var page = parseLinkObject(data);
+
+    if (push == 1) {
+        window.history.pushState({}, "", page.link)
+    }
+
+    // Tjek om vindue er åbent
+    for (var x of windowManager.registeredWindows) {
+        if (typeof x == 'object') {
+            console.log(JSON.stringify(x.window.data))
+            console.log(JSON.stringify(page))
+
+            if (JSON.stringify(x.window.data) == JSON.stringify(page)) {
+                logs.info("Found open window")
+
+                loadNavLinks(page.link)
+
+                if (windowManager.activeWindow != x.id) {
+                    windowManager.getWindow(windowManager.activeWindow).window.hide();
+                    windowManager.getWindow(x.id).window.appear();
+                }
+
+                windowManager.setActiveWindow(x.id);
+
+                return true;
+            }
+        }
+    }
 
     var src = "";
 
@@ -182,14 +214,14 @@ var loadPage = async function(data, push) {
                     await pageLoaders.forside();
                     return;
                 } else {
-                    loadCompatibilityPage(page.link, push)
+                    loadCompatibilityPage(page.link)
                 }
             default:
                 return;
         }
     } else {
         src = page.link;
-        loadCompatibilityPage(src, push)
+        loadCompatibilityPage(src)
     }
 }
 
@@ -200,8 +232,10 @@ var pageLoaders = {
         }
         window.history.pushState({}, "", link);
 
+        var data = parseLinkObject({page: "forside"});
+
         var prevWindow = windowManager.activeWindow;
-        var wmwindow = new wmWindow(0, 1);
+        var wmwindow = new wmWindow(0, 1, data);
         var page = await getLocalPage("/pages/mectio/forside/forside.html")
 
         await loadNavLinks(link);
@@ -231,7 +265,9 @@ var pageLoaders = {
     }
 }
 
-var loadCompatibilityPage = async function(src, push) {
+var loadCompatibilityPage = async function(src) {
+    var data = parseLinkObject({link: src})
+
     var unhide = 0;
     if (await getConfig("compatHideUntilLoad") == 1) {
         unhide = 1;
@@ -239,10 +275,6 @@ var loadCompatibilityPage = async function(src, push) {
 
     var frame = document.createElement("iframe")
     loadNavLinks(src)
-
-    if (push == 1) {
-        window.history.pushState({}, "", src)
-    }
     
     var prevWindow = windowManager.activeWindow;
     try {
@@ -258,7 +290,7 @@ var loadCompatibilityPage = async function(src, push) {
     frame.style.border = "none";
     frame.style.backgroundColor = "#ccc";
 
-    var wmwindow = new wmWindow(0, unhide);
+    var wmwindow = new wmWindow(0, unhide, data);
 
     // Append frame to window
     wmwindow.element.appendChild(frame)
@@ -274,6 +306,7 @@ var reloadFrameScript = function(frame, wmwindow) {
         setTimeout(function(){
             frame.contentWindow.addEventListener("load", function() {
                 window.history.replaceState({}, "", frame.contentWindow.location.href)
+                wmwindow.updateData(parseLinkObject({link: frame.contentWindow.location.href}))
                 reloadFrameScript(frame, wmwindow)
             })
         }, 100)
@@ -378,6 +411,11 @@ var parseLinkObject = function(attr) {
             link = `https://www.lectio.dk/lectio/${inst}/forside.aspx`;
         }
     }
+
+    var url = new URL(link);
+    url.searchParams.delete('prevurl');
+
+    link = url.href;
 
     logs.info(JSON.stringify({
         link: link,

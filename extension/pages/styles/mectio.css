@@ -238,3 +238,31 @@ main {
     background-color: #ccc;
     border-radius: .5rem;
 }
+
+#sidebar-title {
+    display: flex;
+    align-items: center;
+    background-color: var(--main-color);
+    color: white;
+    padding: .8rem;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+}
+
+#sidebar-title h1 {
+    margin: 0 .5rem;
+    font-size: 1.33rem;
+    font-weight: 300;
+    flex-grow: 1;
+}
+
+#sidebar-title span {
+}
+
+.nav-options {
+}
+
+.nav-options a {
+    color: white;
+    text-decoration: none;
+}

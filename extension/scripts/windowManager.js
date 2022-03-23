@@ -2,7 +2,7 @@ var defaultTransitionCurve = "transform 0.2s cubic-bezier(0, 0, 0.2, 1) "
 
 windowManager = {
     initStatus: 0,
-    maxRegisteredWindows: 3,
+    maxRegisteredWindows: 10,
     init: async() => {
         // Stop loading site, replace title
         document.body.innerHTML = "";
@@ -80,9 +80,16 @@ windowManager = {
     },
     registeredWindows: [],
     registerWindow: function(id, window) {
-        if (this.registeredWindows.length > 3) {
+        this.registeredWindows = this.registeredWindows.filter(a => a != false)
+
+        if (this.registeredWindows.length > this.maxRegisteredWindows) {
             logs.warn("For mange vinduer")
-            this.registeredWindows[0].window.close();
+            try {
+                this.registeredWindows[0].window.close();
+            } catch (e) {
+                this.registeredWindows = this.registeredWindows.filter(a => a !== false)
+                this.registeredWindows[0].window.close();
+            }
         }
         this.registeredWindows.push({
             id: id,
@@ -95,10 +102,7 @@ windowManager = {
         var obj = reg.find(x => x.id === id)
         var index = reg.indexOf(obj)
 
-        console.log(reg)
-        console.log(id + " " + index)
-
-        this.registeredWindows.splice(index, 1)
+        this.registeredWindows[index] = false;
     },
     getWindow: function(id) {
         try {
@@ -116,14 +120,16 @@ windowManager = {
         for (var x of this.registeredWindows) {
             try {
                 x.window.close();
-            } catch (e) {logs.warn("Could not close window "+ id)}
+            } catch (e) {logs.warn("Could not close window "+ x.id)}
         }
     },
     activeWindow: "",
     setActiveWindow: function(id) {
         this.activeWindow = id;
         for (var x of this.registeredWindows) {
-            x.window.element.style.zIndex = "1";
+            if (typeof x == 'object') {
+                x.window.element.style.zIndex = "1";
+            }
         }
         document.getElementById(id).style.zIndex = "1000";
         logs.info(`Active window set to ${id}`)
@@ -179,9 +185,15 @@ class wmWindow {
         } 
     }
 
+    updateData(data) {
+        this.data = data;
+    }
+
     appear() {
         var el = document.getElementById(this.id)
         windowManager.setActiveWindow(this.id)
+
+        el.style.display = "";
 
         requestAnimationFrame(function(){
             setTimeout(function(){
@@ -192,6 +204,8 @@ class wmWindow {
             })
             setTimeout(function(){
                 el.style.height = "";
+                el.style.transform = "scale(1)";
+                el.style.display = "";
             }, 500)
         })
     }
@@ -204,7 +218,13 @@ class wmWindow {
         el.style.zIndex = "1";
         el.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
         el.style.transform = "scale(1.03)";
-        el.style.opacity = "0";    
+        el.style.opacity = "0";  
+        
+        setTimeout(function(){
+            el.style.transition = ``;
+            el.style.transform = "scale(0.95)";
+            el.style.display = "none";
+        }, 200)
     }
 
     close() {
