@@ -329,6 +329,11 @@ var loadCompatibilityScripts = function(frame){
     try {
         doc.getElementsByTagName("header")[0].style.display = "none";
         doc.getElementById("s_m_HeaderContent_subnav_div").style.display = "none";
+
+        var row2 = doc.getElementById("s_m_HeaderContent_subnavigator_genericSecondRow_tr")
+        if (row2 != null) {
+            doc.getElementById("s_m_outerContentFrameDiv").prepend(row2)
+        }
     } catch (e) {
         logs.info("Error: " + e)
     }
