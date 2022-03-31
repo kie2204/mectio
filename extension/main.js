@@ -5,6 +5,7 @@ var browser = browser || chrome;
 
 var defaultInst = 0;
 var loginStatus;
+var currentUserData;
 
 var getLocalPage = async function(page) {
     return new Promise(resolve => {
@@ -18,6 +19,7 @@ var getLocalPage = async function(page) {
                 var src = x.getAttribute('src');
 
                 if (typeof(href) == "string" && href.substr(0,4) != "http" && href.length != 0) {
+                    logs.info("Link " + href + " length " + href.length)
                     x.href = browser.runtime.getURL('/') + href;
                 }
                 if (typeof(src) == "string" && src.substr(0,4) != "http" && src.length != 0) {
@@ -72,17 +74,23 @@ var startInit = async function() {
 
     document.getElementById("mectio-profile").addEventListener("click", async function(e){
         e.preventDefault();
-
-        windowManager.closeAll();
-
-        await browser.runtime.sendMessage({
-            action: "api",
-            call: "logout",
-            args: []
-        });
-
-        showLoginPage();
+        logout();
     })
+}
+
+var logout = async function() {
+    windowManager.closeAll();
+
+    await browser.runtime.sendMessage({
+        action: "api",
+        call: "logout",
+        args: []
+    });
+
+    loginStatus = "";
+    currentUserData = "";
+
+    showLoginPage();
 }
 
 var doUserInit = async function(inst) {
@@ -100,16 +108,17 @@ var doUserInit = async function(inst) {
         call: "getInstData",
         args: [inst]
     });
+
     windowManager.toggleInstName(1, instName.name)
 
-    userPfpLink = await browser.runtime.sendMessage({
+    currentUserData = await browser.runtime.sendMessage({
         action: "api",
         call: "getUserData",
         args: [loginStatus.inst, loginStatus.userId, loginStatus.userType]
     });
 
     document.getElementById("mectio-profile").href = `https://www.lectio.dk/lectio/${loginStatus.inst}/logout.aspx`
-    document.getElementById("mectio-profile-picture").style.backgroundImage = `url(${userPfpLink.userPfpUrl})`
+    document.getElementById("mectio-profile-picture").style.backgroundImage = `url(${currentUserData.userPfpUrl})`
 }
 
 var showLoginPage = async function() {
@@ -150,13 +159,13 @@ var submitLoginForm = async function(e) {
 
     logs.info(`Logger ind på inst. id ${inst} med brugernavn ${uname}`)
 
-    loginStatus = await browser.runtime.sendMessage({
+    apiCall = await browser.runtime.sendMessage({
         action: "api",
         call: "login",
         args: [inst, uname, pword]
     });
 
-    if (loginStatus.loginStatus == 1) {
+    if (apiCall.loginStatus == 1) {
         windowManager.close("mectio-login");
 
         await doUserInit(inst);
@@ -181,8 +190,6 @@ var loadPage = async function(data, push) {
     // Tjek om vindue er åbent
     for (var x of windowManager.registeredWindows) {
         if (typeof x == 'object') {
-            console.log(JSON.stringify(x.window.data))
-            console.log(JSON.stringify(page))
 
             if (JSON.stringify(x.window.data) == JSON.stringify(page)) {
                 logs.info("Found open window")
@@ -241,15 +248,26 @@ var pageLoaders = {
         await loadNavLinks(link);
         wmwindow.element.innerHTML = page;
 
-        userData = await browser.runtime.sendMessage({
-            action: "api",
-            call: "getUserData",
-            args: [loginStatus.inst, loginStatus.userId, loginStatus.userType]
-        });
-
-        var fName = userData.userFullName.substr(0, userData.userFullName.indexOf(" "))
+        var fName = currentUserData.userFullName.substr(0, currentUserData.userFullName.indexOf(" "))
 
         wmwindow.element.querySelector("#main-title-left").querySelector("h1").innerText = fName + "!"
+
+        var pageData = await browser.runtime.sendMessage({
+            action: "api.data",
+            call: "getFrontPage",
+            args: [defaultInst]
+        });
+
+        var dashEl = document.getElementsByClassName("card-scroll")[0]
+
+        for (var x of pageData.dashboard) {
+            var a = document.createElement("div")
+            a.classList.add("card")
+
+            a.textContent = x;
+            dashEl.appendChild(a)
+        }
+
         wmwindow.appear();
     },
     skema: async function() {

@@ -2,7 +2,7 @@ var defaultTransitionCurve = "transform 0.2s cubic-bezier(0, 0, 0.2, 1) "
 
 windowManager = {
     initStatus: 0,
-    maxRegisteredWindows: 10,
+    maxRegisteredWindows: 20,
     init: async() => {
         // Stop loading site, replace title
         document.body.innerHTML = "";
@@ -14,14 +14,15 @@ windowManager = {
                 // not using innerHTML as it would break js event listeners of the page // comment from stackoverflow
         
                 links = document.querySelectorAll("*"); // Probably bad for performance
+
                 for (var x of links) {
                     var href = x.getAttribute("href");
                     var src = x.getAttribute('src');
 
-                    if (typeof(href) == "string" && href.substr(0,4) != "http") {
+                    if (typeof(href) == "string" && href.substr(0,4) != "http" && href.substr(0,1) != "#" && href.length != 0) {
                         x.href = browser.runtime.getURL('/') + href;
                     }
-                    if (typeof(src) == "string" && src.substr(0,4) != "http") {
+                    if (typeof(src) == "string" && src.substr(0,4) != "http" && src.substr(0,1) != "#" && src.length != 0) {
                         x.src = browser.runtime.getURL('/') + src;
                     }
                 }

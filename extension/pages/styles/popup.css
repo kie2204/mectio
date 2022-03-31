@@ -2,7 +2,7 @@ body {
     height: 420px;
     width: 420px;
     overflow: scroll;
-    background: whitesmoke;
+    background: white;
     margin: 0;
 }
 header {
@@ -41,7 +41,7 @@ main {
     position: relative;
     display: inline-block;
     width: 3rem;
-    height: .5rem;
+    height: 1rem;
 }
 
 .switch input { 

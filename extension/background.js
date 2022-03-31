@@ -46,6 +46,11 @@ function handleMessage(request, sender, sendResponse) {
         case "api":
             doApiRequest(request.call, request.args).then(r => sendResponse(r));
             break;
+        case "api.data":
+            console.log(request.call)
+            console.log(request.args)
+            doApiDataRequest(request.call, request.args).then(r => sendResponse(r));
+            break;
         case "kill":
             startKill(sender.tab);
             break;
@@ -74,6 +79,12 @@ async function doApiRequest(call, args) {
             data = await lectioAPI.getInstData(args[0])
             return data;
     }*/
+}
+
+async function doApiDataRequest(call, args) {
+    data = await lectioAPI.data[call](args[0], args[1], args[2])
+    console.log(data)
+    return data;
 }
 
 function setInactive(request) {

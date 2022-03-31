@@ -281,17 +281,26 @@ var lectioAPI = {
             var rawData = await lectioAPI.getParseData(`lectio/${id}/forside.aspx`);
             var parsedData = DOMParser.parseFromString(rawData, "text/html");
 
-            var aktuelt = parsedData.getElementById("s_m_Content_Content_aktueltIsland_pa")
-            var undervisning = parsedData.getElementById("s_m_Content_Content_undervisningIsland_pa")
-            var komm = parsedData.getElementById("s_m_Content_Content_kommIsland_pa")
-            var skema = parsedData.getElementById("s_m_Content_Content_skemaIsland_pa")
+            var aktueltIs = parsedData.getElementById("s_m_Content_Content_aktueltIsland_pa")
+            var undervisningIs = parsedData.getElementById("s_m_Content_Content_undervisningIsland_pa")
+            var kommIs = parsedData.getElementById("s_m_Content_Content_kommIsland_pa")
+            var skemaIs = parsedData.getElementById("s_m_Content_Content_skemaIsland_pa")
+
+            // Parse aktuelt
+            var importantInfo = parsedData.getElementById("s_m_Content_Content_importantInfo")
+            var infoTable = importantInfo.getElementsByTagName("tr")
+            var dashboard = [];
+
+            for (i = 0; i < infoTable.length; i++) {
+                dashboard.push(infoTable[i].getElementsByTagName("td")[1].textContent);
+            }
 
             return {
                 notices: {},
-                dashboard: aktuelt,
-                education: undervisning,
-                comms: komm,
-                schedule: skema
+                dashboard: dashboard /*,
+                education: undervisningIs,
+                comms: kommIs,
+                schedule: skemaIs*/
             }
         }
     }
