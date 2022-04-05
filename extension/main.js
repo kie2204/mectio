@@ -258,7 +258,7 @@ var pageLoaders = {
             args: [defaultInst]
         });
 
-        var dashEl = document.getElementsByClassName("card-scroll")[0]
+        var dashEl = wmwindow.element.getElementsByClassName("card-scroll")[0]
 
         for (var x of pageData.dashboard) {
             var a = document.createElement("div")
@@ -386,7 +386,9 @@ var loadNavLinks = async function(url) {
         args: [url]
     });
 
-    document.getElementById("mectio-nav-links").innerHTML = "";
+    var nLContainer = document.getElementsByClassName("mectio-nav-link-container")[0];
+
+    nLContainer.innerHTML = "";
     
     if (Array.isArray(navLinks.links) == false || navLinks.links.length == 0) {
         windowManager.setHeaderState(1)
@@ -403,7 +405,7 @@ var loadNavLinks = async function(url) {
             navLink.classList.add("active")
         }
 
-        document.getElementById("mectio-nav-links").appendChild(navLink);
+        nLContainer.appendChild(navLink);
 
         navLink.addEventListener("click", function(e){
             e.preventDefault();
