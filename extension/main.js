@@ -122,7 +122,7 @@ var doUserInit = async function(inst) {
 }
 
 var showLoginPage = async function() {
-    var loginPage = new wmWindow("mectio-login");
+    var loginPage = new wmWindow({windowId: "mectio-login"});
     loginPage.element.innerHTML = await getLocalPage("/pages/login.html");
     windowManager.setHeaderState(0)
 
@@ -166,7 +166,7 @@ var submitLoginForm = async function(e) {
     });
 
     if (apiCall.loginStatus == 1) {
-        windowManager.close("mectio-login");
+        windowManager.getWindow("mectio-login").window.close();
 
         await doUserInit(inst);
         loadPage({page: "forside"}, 1);
@@ -218,7 +218,7 @@ var loadPage = async function(data, push) {
         switch (page.page) {
             case "forside":
                 if (await getConfig("dummyFrontPage") == 1) {
-                    await pageLoaders.forside();
+                    await pageLoaders.forside(page.link);
                     return;
                 } else {
                     loadCompatibilityPage(page.link)
@@ -239,10 +239,10 @@ var pageLoaders = {
         }
         window.history.pushState({}, "", link);
 
-        var data = parseLinkObject({page: "forside"});
+        var data = parseLinkObject({link});
 
         var prevWindow = windowManager.activeWindow;
-        var wmwindow = new wmWindow(0, 1, data);
+        var wmwindow = new wmWindow({appearWait: 1, data});
         var page = await getLocalPage("/pages/mectio/forside/forside.html")
 
         await loadNavLinks(link);
@@ -308,7 +308,7 @@ var loadCompatibilityPage = async function(src) {
     frame.style.border = "none";
     frame.style.backgroundColor = "#ccc";
 
-    var wmwindow = new wmWindow(0, unhide, data);
+    var wmwindow = new wmWindow({appearWait: unhide, data});
 
     // Append frame to window
     wmwindow.element.appendChild(frame)
@@ -339,10 +339,16 @@ var loadCompatibilityScripts = function(frame){
     
     // Inject CSS with link
     var injCSS = doc.createElement("link");
-    var injCSSHref = `${browser.runtime.getURL('/')}pages/styles/lectioCompatibilityInject.css`
+    var injCSSHref = browser.runtime.getURL('pages/styles/lectioCompatibilityInject.css')
     injCSS.setAttribute("rel", "stylesheet")
     injCSS.setAttribute("href", injCSSHref)
     doc.head.appendChild(injCSS)
+
+    // Inject CSS with link
+    var injScript = doc.createElement("script");
+    var injScriptSrc = browser.runtime.getURL('scripts/lectioKILLER-frame.js')
+    injScript.setAttribute("src", injScriptSrc)
+    doc.head.appendChild(injScript)
 
     try {
         doc.getElementsByTagName("header")[0].style.display = "none";
@@ -416,43 +422,7 @@ var loadNavLinks = async function(url) {
 }
 
 var parseLinkObject = function(attr) {
-    var link = attr.link;
-    var page = attr.page;
-    var inst;
-
-    if (typeof link != "undefined") {
-        // Parse link
-        inst = parseInt(link.substr(link.indexOf("/lectio/")+8).substr(0,link.substr(link.indexOf("/lectio/")+8).indexOf("/")))
-
-        if (link.includes(`https://www.lectio.dk/lectio/${inst}/forside.aspx`)) {
-            page = "forside" 
-        }
-    }
-
-    if (typeof link == "undefined" && typeof page != "undefined") {
-        inst = defaultInst;
-
-        if (page == "forside") {
-            link = `https://www.lectio.dk/lectio/${inst}/forside.aspx`;
-        }
-    }
-
-    var url = new URL(link);
-    url.searchParams.delete('prevurl');
-
-    link = url.href;
-
-    logs.info(JSON.stringify({
-        link: link,
-        page: page,
-        inst: inst
-    }))
-
-    return {
-        link: link,
-        page: page,
-        inst: inst
-    };
+    return navigation.parseLinkObject(attr)
 }
 
 
@@ -477,6 +447,8 @@ browser.storage.local.get(['config'], async function(config) {
 
 var setListeners = function() {
     startInit();
+
+    navigator.serviceWorker.register(browser.runtime.getURL('/scripts/dummy-worker.js'))
 
     window.addEventListener("popstate", function(){
         logs.info("State pop")

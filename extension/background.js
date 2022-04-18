@@ -2,11 +2,16 @@ var browser = browser || chrome;
 
 // Load api
 try {
-    importScripts('/lectio-api/xmldom.bundle.js', '/lectio-api/api.js');
+    importScripts('/scripts/lectio-api/xmldom.bundle.js', '/scripts/lectio-api/api.js');
 } catch (e) {
     console.error("FEJL: Kan ikke indlæse lectio api scripts")
     console.error(e);
 }
+
+// Fetch
+self.addEventListener("fetch", function(){
+    alert("Fetch")
+})
 
 function switchIcon(type) {
     // Skifter ikon.

@@ -11,7 +11,6 @@ windowManager = {
         return new Promise(resolve => {
             fetch(browser.runtime.getURL('/pages/main.html')).then(r => r.text()).then(html => {
                 document.body.innerHTML = html;
-                // not using innerHTML as it would break js event listeners of the page // comment from stackoverflow
         
                 links = document.querySelectorAll("*"); // Probably bad for performance
 
@@ -112,11 +111,6 @@ windowManager = {
             return false;
         }
     },
-    close: function(id) {
-        try {
-            this.getWindow(id).window.close();
-        } catch (e) {logs.warn("Could not close window "+ id)}
-    },
     closeAll: function() {
         for (var x of this.registeredWindows) {
             try {
@@ -129,10 +123,10 @@ windowManager = {
         this.activeWindow = id;
         for (var x of this.registeredWindows) {
             if (typeof x == 'object') {
-                x.window.element.style.zIndex = "1";
+                x.window.element.classList.add("hidden");
             }
         }
-        document.getElementById(id).style.zIndex = "1000";
+        document.getElementById(id).classList.remove("hidden");
         logs.info(`Active window set to ${id}`)
     },
     toggleInstName: function(toggle, name) {
@@ -154,26 +148,33 @@ windowManager = {
 }
 
 class wmWindow {
-    constructor(setId, appearWait, data) {
-        if (typeof(setId) != "string") {
-            this.id = (Math.random() + 1).toString(36).substring(2);
+    constructor(args) {
+        /* 
+        windowId: Vindue custom id,
+        appearWait: Vent med at vise vindue (true/false, 0/1), 
+        data: Data-objekt
+        */
+
+        if (typeof(args) !== "object") args = {}
+
+        if (typeof(args.windowId) != "string") {
+            this.id = (Math.random() + 1).toString(36).substring(2); // generer random id
         } else {
-            this.id = setId;
+            this.id = args.windowId;
         }
 
-        if (typeof(data) != "object") {
+        if (typeof(args.data) != "object") {
             this.data = {};
         } else {
-            this.data = data;
+            this.data = args.data;
         }
 
         var main = document.querySelector("#window-container");
 
         var windowElement = document.createElement("div");
+
         windowElement.setAttribute("id", this.id)
         windowElement.setAttribute("class", "mectio-window")
-        windowElement.style.transform = "scale(0.95)";
-        windowElement.style.opacity = "0";  
         
         main.appendChild(windowElement);
         logs.info("Nyt vindue med id " + this.id + " åbnet.")
@@ -181,7 +182,7 @@ class wmWindow {
         this.element = windowElement;
         windowManager.registerWindow(this.id, this)
 
-        if (appearWait != 1) {
+        if (args.appearWait != 1) {
             this.appear();
         } 
     }
@@ -195,37 +196,13 @@ class wmWindow {
         windowManager.setActiveWindow(this.id)
 
         el.style.display = "";
-
-        requestAnimationFrame(function(){
-            setTimeout(function(){
-                el.style.height = "100vh";
-                el.style.transition += `, ${defaultTransitionCurve}, opacity 0.2s`;
-                el.style.transform = "scale(1)";
-                el.style.opacity = "1";
-            })
-            setTimeout(function(){
-                el.style.height = "";
-                el.style.transform = "scale(1)";
-                el.style.display = "";
-            }, 500)
-        })
     }
 
     hide() {
         var el = document.getElementById(this.id)
 
         // Luk-animation
-        el.style.maxHeight = "100vh";
-        el.style.zIndex = "1";
-        el.style.transition = `${defaultTransitionCurve}, opacity 0.2s`;
-        el.style.transform = "scale(1.03)";
-        el.style.opacity = "0";  
-        
-        setTimeout(function(){
-            el.style.transition = ``;
-            el.style.transform = "scale(0.95)";
-            el.style.display = "none";
-        }, 200)
+        el.style.display = "none";
     }
 
     close() {

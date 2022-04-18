@@ -10,7 +10,10 @@
     --main-color-dark: #172c46;
     --main-color-light: #426897;
     --nav-color: #b3d0ff;
-    --nav-color-light: #bad1ec;
+    --nav-color-light: #c6e1ff;
     --nav-color-dark: #8db9ec;
+    --nav-color-darker: #6b9dd6;
     --white: #fff;
+
+    --default-transition-curve: cubic-bezier(0, 0, 0.2, 1);
 }

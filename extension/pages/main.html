@@ -4,13 +4,21 @@
 
 <div id="header-container">
     <header>
-        <a id="mectio-logo-wrapper" href="#">
-            <img id="mectio-logo" src="icons/logo-dark.svg" alt="mectio">
-            <div id="mectio-text-wrapper">
-                <img id="mectio-logo-text" src="icons/logo-textonly-dark.svg">
-                <p id="mectio-inst-text"></p>
+        <div id="mectio-left-wrapper" class="wrapper">
+            <a href="#" id="mectio-open-primnav"><span class="material-icons-round">menu</span></a>
+            <a id="mectio-logo-wrapper" href="#">
+                <img id="mectio-logo" src="icons/logo-dark.svg" alt="mectio">
+                <div id="mectio-text-wrapper">
+                    <img id="mectio-logo-text" src="icons/logo-textonly-dark.svg">
+                    <p id="mectio-inst-text"></p>
+                </div>
+            </a>
+        </div>
+        <div id="mectio-header-center-wrapper" class="wrapper"> 
+            <div id="mectio-header-bookmarks">
+
             </div>
-        </a>
+        </div>
         <div id="mectio-right-wrapper">
             <a href="#" id="mectio-profile">
                 <span id="mectio-profile-picture">
@@ -24,9 +32,14 @@
         </div>
     </header>
     <nav>
-        <select id="mectio-nav-title">
-            <option value="default">Navigation</option>
-        </select>
+        <div id="mectio-nav-selector">
+            <span id="mectio-nav-title">Navigation</span>
+            <div id="mectio-nav-dropdown" class="hidden">
+                <a href="#">Opt 1</a>
+                <a href="#">Opt 2</a>
+                <a href="#">Longer longer longest option</a>
+            </div>
+        </div>
         <div id="mectio-nav-links">
             <div class="mectio-nav-link-container">
 
