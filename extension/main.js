@@ -448,8 +448,6 @@ browser.storage.local.get(['config'], async function(config) {
 var setListeners = function() {
     startInit();
 
-    navigator.serviceWorker.register(browser.runtime.getURL('/scripts/dummy-worker.js'))
-
     window.addEventListener("popstate", function(){
         logs.info("State pop")
         loadPage({link: window.location.href})

@@ -303,6 +303,7 @@ main {
     bottom: 1rem;
     background-color: #ccc;
     border-radius: .5rem;
+    transform: translateX(0%);
 }
 
 #sidebar-title {
@@ -324,6 +325,17 @@ main {
 
 #sidebar-title span {
 }
+
+/* Hidden sidebar */
+
+#sidebar-container.hidden {
+    width: 0rem;
+}
+
+#sidebar-container.hidden #sidebar {
+    transform: translateX(100%);
+}
+
 
 .nav-options {
 }

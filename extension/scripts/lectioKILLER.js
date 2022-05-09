@@ -2,6 +2,9 @@
 // I nogle tilfælde bliver lectio scripts indlæst, her slettes de værste funktioner
 
 window.addEventListener("load", function(){
+    // Rydder timer for sessionsudløb, sletter funktion
+    clearInterval(SessionHelper.Instance.sessionCheckIntervalId);
     delete SessionHelper;
+    // Ved ikke hvad den her gør
     delete LectioPageOps;
 })

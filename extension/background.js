@@ -8,11 +8,6 @@ try {
     console.error(e);
 }
 
-// Fetch
-self.addEventListener("fetch", function(){
-    alert("Fetch")
-})
-
 function switchIcon(type) {
     // Skifter ikon.
     // 0 = inaktiv, 1 = aktiv

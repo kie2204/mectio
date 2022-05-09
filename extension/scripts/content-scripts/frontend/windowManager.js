@@ -144,6 +144,18 @@ windowManager = {
                     document.getElementById("mectio-text-wrapper").classList.toggle("show-instname")
             }
         })
+    },
+    sidebar: {
+        getVisible: function() {
+            if (element.classList.contains("hidden")) return false;
+            return true;
+        },
+        hide: function() {
+            document.getElementById("sidebar-container").classList.add("hidden");
+        },
+        show: function() {
+            document.getElementById("sidebar-container").classList.remove("hidden");
+        }
     }
 }
 
