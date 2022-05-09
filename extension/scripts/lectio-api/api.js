@@ -9,10 +9,17 @@ const DOMParser = new xmldom.DOMParser({
         fatalError: (msg) => {console.log(msg)},
      },
 });
+
 var lectioURL = "https://www.lectio.dk/"
 var browser = browser || chrome;
 
-// Main 
+var api = {
+    call: function(call, args) {
+        
+    }
+}
+
+// Legacy 
 var lectioAPI = {
     getParseData: async function(x) { // Henter side fra lectio og parserer siden
         var reqLink = [lectioURL, x].join('')
