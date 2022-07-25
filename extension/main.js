@@ -243,7 +243,7 @@ var pageLoaders = {
 
         var prevWindow = windowManager.activeWindow;
         var wmwindow = new wmWindow({appearWait: 1, data});
-        var page = await getLocalPage("/pages/mectio/forside/forside.html")
+        var page = await getLocalPage("/pages/mectio/forside/index.html")
 
         await loadNavLinks(link);
         wmwindow.element.innerHTML = page;
@@ -275,7 +275,7 @@ var pageLoaders = {
         loadNavLinks(window.location.origin + src)
 
         var wmwindow = new wmWindow();
-        var page = await getLocalPage("/pages/mectio/forside.html")
+        var page = await getLocalPage("/pages/mectio/forside/index.html")
         wmwindow.element.innerHTML = page;
 
         windowManager.getWindow(prevWindow).window.element.hide()

@@ -42,9 +42,28 @@ var navigation = {
         };
     },
     navbar: {
+        loadDefault: function() {
 
+        },
+        maxLoadedGroups: 5,
+        loadGroup: function(attr) {
+
+        },
+        deleteGroup: function(attr) {
+
+        },
     },
     pageLoad: {
+        loadConfig: {
+            "forside": "pages/mectio/forside/"  
+        },
+        loadURL: function(attr) {
+            // Convert to data object from link
+            pageMeta = navigation.parseLinkObject(attr.url);
 
+            if (this.loadConfig[pageMeta.page]) {
+                alert(this.loadConfig[pageMeta.page])
+            }
+        }
     }
 }

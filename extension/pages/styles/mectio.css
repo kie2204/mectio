@@ -8,6 +8,12 @@ body {
     position: fixed;
     width: 100%;
     z-index: 69696969;
+    transition: transform 0.2s;
+    transition-timing-function: var(--default-transition-curve);
+}
+
+#header-container.hidden {
+    transform: translateY(-100%);
 }
 
 #header-container * {
@@ -16,10 +22,10 @@ body {
 
 header {
     width: 100%;
-    background-color: var(--main-color);
+    background-color: white;
     display: flex;
     top: 0;
-    height: 4.2rem;
+    height: 3.5rem;
     align-items: center;
     justify-content: space-between;
     padding: 8px 16px;
@@ -30,8 +36,8 @@ header {
 #mectio-logo-wrapper {
     background-color: white;
     border-radius: .8rem;
-    height: 2rem;
-    min-width: 2rem;
+    height: 1.9rem;
+    min-width: 1.9rem;
     display: flex;
     align-items: center;
     padding: .4rem;
@@ -42,8 +48,7 @@ header {
 
 #mectio-logo-wrapper:hover {
     width: initial;
-    border-radius: 1rem;
-    padding: .5rem;
+    box-shadow: 0px 0px .2rem var(--main-color-light);
 }
 
 #mectio-logo-wrapper:hover {
@@ -78,7 +83,7 @@ header {
 }
 
 #mectio-logo-text {
-    height: 20px;
+    height: 18px;
     margin: 0;
     transition: height 0.2s;
 }
@@ -110,7 +115,7 @@ header {
 
 
 #mectio-open-primnav {
-    color: white;
+    color: var(--main-color);
     margin-right: 1rem;
 }
 
@@ -124,7 +129,7 @@ header {
 
 #mectio-right-wrapper a {
     font-size: 1rem;
-    color: white;
+    color: var(--main-color);
     text-decoration: none;
     padding: .25rem;
     margin: .5rem;
@@ -135,12 +140,12 @@ header {
 }
 
 #mectio-right-wrapper a:hover {
-    background-color: var(--main-color-light);
+    background-color: #ddd;
 }
 
 #mectio-right-wrapper #mectio-profile {
-    height: 2.5rem;
-    width: 2.5rem;
+    height: 2rem;
+    width: 2rem;
     background-color: var(--nav-color);
     border-radius: 100rem;
     padding: 0;
@@ -201,14 +206,32 @@ main.collapse2 #sidebar {
 
 /* Nav styles */
 
+#nav-wrapper {
+    padding: 0.25rem 1rem;
+    background-image: linear-gradient(180deg, white, transparent);
+}
+
+#nav-wrapper.hidden {
+    height: 0;
+}
+
 nav {
     background-color: var(--nav-color);
     height: 2rem;
     display: flex;
-    padding: 0 2rem;
+    
     font-size: 0.9rem;
     box-sizing: border-box;
     box-shadow: 0px 0px 2px var(--nav-color-dark);
+    border-radius: .5rem;
+    z-index: 1001;
+    transition: transform 0.1s, opacity 0.1s;
+    transition-timing-function: var(--default-transition-curve);
+}
+
+#nav-wrapper.hidden nav {
+    transform: translateY(-25%) scale(0.999);
+    opacity: 0;
 }
 
 nav * {
@@ -223,6 +246,7 @@ nav * {
     padding: 0 1rem;
     margin-right: .5rem;
     border: none;
+    border-radius: .5rem;
 }
 
 #mectio-nav-links a {
@@ -266,6 +290,7 @@ main {
 
 #mectio-nav-dropdown.hidden {
     transform: translateY(-100%);
+    opacity: 0;
 }
 
 #mectio-nav-dropdown a {

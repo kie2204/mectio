@@ -42,31 +42,28 @@ windowManager = {
     },
     setHeaderState: function(state) { // state 0: skjul, 1: vis, 2: vis header + nav
         var mectioHeader = document.getElementById("header-container")
-        var nav = document.getElementsByTagName("nav")[0]
+        var nav = document.getElementById("nav-wrapper")
         var main = document.getElementsByTagName("main")[0]
-        var prevTransition = mectioHeader.style.transition;
-
-        mectioHeader.style.transition = defaultTransitionCurve;
-        nav.style.transition = defaultTransitionCurve;
 
         requestAnimationFrame(function(){
             switch(state) {
                 case 0:
-                    mectioHeader.style.transform = "translateY(-100%)";
-                    nav.style.transform = "translateY(-100%)";
+                    mectioHeader.classList.add("hidden")
+                    nav.classList.add("hidden")
     
                     main.classList.remove("collapse1")
                     main.classList.remove("collapse2")
                     break;
                 case 1:
-                    mectioHeader.style.transform = "";
-                    nav.style.transform = "translateY(-100%)";
+                    mectioHeader.classList.remove("hidden")
+                    nav.classList.add("hidden")
+
                     main.classList.add("collapse1")
                     main.classList.remove("collapse2")
                     break;
                 case 2:
-                    mectioHeader.style.transform = "";
-                    nav.style.transform = "";
+                    mectioHeader.classList.remove("hidden")
+                    nav.classList.remove("hidden")
     
                     main.classList.remove("collapse1")
                     main.classList.add("collapse2")
