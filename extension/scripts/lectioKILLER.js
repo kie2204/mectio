@@ -3,7 +3,9 @@
 
 window.addEventListener("load", function(){
     // Rydder timer for sessionsudløb, sletter funktion
-    clearInterval(SessionHelper.Instance.sessionCheckIntervalId);
+    if (SessionHelper?.Instance) {
+        clearInterval(SessionHelper.Instance.sessionCheckIntervalId);
+    }
     delete SessionHelper;
     // Ved ikke hvad den her gør
     delete LectioPageOps;
