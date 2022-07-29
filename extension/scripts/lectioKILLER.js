@@ -1,12 +1,12 @@
 // Kører i main world, har adgang til lectio js funktioner
-// I nogle tilfælde bliver lectio scripts indlæst, her slettes de værste funktioner
+// I nogle tilfælde bliver lectio scripts indlæst, nogle af dem påvirker mectio
 
 window.addEventListener("load", function(){
     // Rydder timer for sessionsudløb, sletter funktion
-    if (SessionHelper?.Instance) {
+    try {
         clearInterval(SessionHelper.Instance.sessionCheckIntervalId);
+    } catch (e) {
+        console.log("SessionHelper ikke aktiv, ignorerer")
     }
     delete SessionHelper;
-    // Ved ikke hvad den her gør
-    delete LectioPageOps;
 })
