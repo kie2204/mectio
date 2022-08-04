@@ -7,6 +7,11 @@ var defaultInst = 0;
 var loginStatus;
 var currentUserData;
 
+var _LECTIO_BASE_URL = "https://www.lectio.dk"
+
+var lecRequest = new LecRequest();
+var auth = new Auth();
+
 var getLocalPage = async function(page) {
     return new Promise(resolve => {
         fetch(browser.runtime.getURL(page)).then(r => r.text()).then(html => {
@@ -59,17 +64,18 @@ var startInit = async function() {
     document.documentElement.innerHTML = ""
     await windowManager.init();
 
-    loginStatus = await browser.runtime.sendMessage({
-        action: "api",
-        call: "getLoginStatus",
-        args: [parseLinkObject({link:window.location.href}).inst]
+    var loginScreen = new LoginScreen({
+        defaultInst: 680,
+        submitCallback: auth.login
     });
+
+    loginStatus = await Promise.resolve(auth.loginStatus);
 
     if (loginStatus.loginStatus == 1) {
         await doUserInit(loginStatus.inst);
         loadPage({link: window.location.href});
     } else {
-        showLoginPage();
+        loginScreen.show();
     }
 
     document.getElementById("mectio-profile").addEventListener("click", async function(e){
@@ -90,7 +96,7 @@ var logout = async function() {
     loginStatus = "";
     currentUserData = "";
 
-    showLoginPage();
+    loginScreen.show;
 }
 
 var doUserInit = async function(inst) {
@@ -102,6 +108,8 @@ var doUserInit = async function(inst) {
         call: "getLoginStatus",
         args: [inst]
     });
+
+
 
     instName = await browser.runtime.sendMessage({
         action: "api",
@@ -128,11 +136,7 @@ var showLoginPage = async function() {
 
     // Tilføj institutioner til dropdown
     var selectMenu = document.getElementById("mf-inst")
-    var instList = await browser.runtime.sendMessage({
-        action: "api",
-        call: "getInstList",
-        args: []
-    });
+    var instList = await Promise.resolve(auth.instList);
 
     logs.info(instList)
 
@@ -154,18 +158,18 @@ var submitLoginForm = async function(e) {
     var theForm = document.getElementById("mectio-login-form")
 
     var inst = document.getElementById("mf-inst").value
-    var uname = document.getElementById("mf-uname").value
-    var pword = document.getElementById("mf-pword").value
+    var username = document.getElementById("mf-uname").value
+    var password = document.getElementById("mf-pword").value
 
-    logs.info(`Logger ind på inst. id ${inst} med brugernavn ${uname}`)
+    logs.info(`Logger ind på ${document.getElementById("mf-inst").options[document.getElementById("mf-inst").selectedIndex].textContent} (ID: ${inst}) med brugernavn ${username}`)
 
-    apiCall = await browser.runtime.sendMessage({
-        action: "api",
-        call: "login",
-        args: [inst, uname, pword]
-    });
+    call = await auth.login({
+        inst,
+        username,
+        password
+    })
 
-    if (apiCall.loginStatus == 1) {
+    if (call.loginStatus == 1) {
         windowManager.getWindow("mectio-login").window.close();
 
         await doUserInit(inst);

@@ -1,14 +1,14 @@
 var defaultTransitionCurve = "transform 0.2s cubic-bezier(0, 0, 0.2, 1) "
 
 windowManager = {
-    initStatus: 0,
+    initStatus: 0, // Promise eller 0
     maxRegisteredWindows: 20,
     init: async() => {
         // Stop loading site, replace title
         document.body.innerHTML = "";
     
         // Inject mectio document structure
-        return new Promise(resolve => {
+        windowManager.initStatus = new Promise(resolve => {
             fetch(browser.runtime.getURL('/pages/main.html')).then(r => r.text()).then(html => {
                 document.body.innerHTML = html;
         
@@ -160,61 +160,89 @@ class wmWindow {
     constructor(args) {
         /* 
         windowId: Vindue custom id,
-        appearWait: Vent med at vise vindue (true/false, 0/1), 
+        appearWait: Vent med at vise vindue (true/false, 0/1) (default: 0), 
         data: Data-objekt
         */
-
-        if (typeof(args) !== "object") args = {}
-
-        if (typeof(args.windowId) != "string") {
-            this.id = (Math.random() + 1).toString(36).substring(2); // generer random id
-        } else {
-            this.id = args.windowId;
-        }
-
-        if (typeof(args.data) != "object") {
-            this.data = {};
-        } else {
-            this.data = args.data;
-        }
-
-        var main = document.querySelector("#window-container");
-
-        var windowElement = document.createElement("div");
-
-        windowElement.setAttribute("id", this.id)
-        windowElement.setAttribute("class", "mectio-window")
+        this.initStatus = false;
         
-        main.appendChild(windowElement);
-        logs.info("Nyt vindue med id " + this.id + " åbnet.")
-
-        this.element = windowElement;
-        windowManager.registerWindow(this.id, this)
-
-        if (args.appearWait != 1) {
-            this.appear();
-        } 
+        this.init(args);
     }
 
-    updateData(data) {
+    async init(args) {
+        // Definer til promise
+        var obj = this;
+
+        // Inject
+        this.initStatus = new Promise(async (resolve, reject) => {
+            // Vent på windowmanager
+            console.log(windowManager.initStatus);
+            await windowManager.initStatus;
+            console.log(windowManager.initStatus);
+
+            console.log(args);
+            if (typeof (args) !== "object")
+                args = {};
+
+            if (typeof (args.windowId) != "string") {
+                obj.id = (Math.random() + 1).toString(36).substring(2); // generer random id
+            } else {
+                obj.id = args.windowId;
+            }
+
+            if (typeof (args.data) != "object") {
+                obj.data = {};
+            } else {
+                obj.data = args.data;
+            }
+
+            var main = document.querySelector("#window-container");
+
+            var windowElement = document.createElement("div");
+
+            windowElement.setAttribute("id", obj.id);
+            windowElement.setAttribute("class", "mectio-window");
+
+            main.appendChild(windowElement);
+            logs.info("Nyt vindue med id " + obj.id + " åbnet.");
+
+            obj.element = windowElement;
+            windowManager.registerWindow(obj.id, obj);
+
+            if (args.appearWait != 1) {
+                obj.appear();
+            }
+
+            resolve();
+        })
+    }
+
+    async updateData(data) {
+        await this.initStatus;
+
         this.data = data;
     }
 
-    appear() {
+    async appear() {
+        await this.initStatus;
+
         var el = document.getElementById(this.id)
         windowManager.setActiveWindow(this.id)
 
         el.style.display = "";
     }
 
-    hide() {
+    async hide() {
+        await this.initStatus;
+
         var el = document.getElementById(this.id)
 
         // Luk-animation
         el.style.display = "none";
     }
 
-    close() {
+    async close() {
+        await this.initStatus;
+
         var id = this.id;
         var el = document.getElementById(id)
 
@@ -227,7 +255,7 @@ class wmWindow {
         }, 500)
     }
 
-    show() {
-
+    async show() {
+        await this.initStatus;
     }
 }

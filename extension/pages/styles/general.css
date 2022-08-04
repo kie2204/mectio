@@ -1,6 +1,8 @@
 @font-face {
     font-family: "Inter";
-    src: url("/fonts/Inter-VariableFont_slnt\,wght.ttf");
+    src: url("/fonts/Inter.var.woff2") format('woff2-variations');
+    font-weight: 200 400;
+    font-variation-settings: 'opsz' 14;
 }
 
 /* fallback */
@@ -46,4 +48,12 @@
     --white: #fff;
 
     --default-transition-curve: cubic-bezier(0, 0, 0.2, 1);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+}
+
+h2 {
+    font-size: 1.8rem;
 }

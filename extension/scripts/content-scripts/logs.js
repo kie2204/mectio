@@ -7,7 +7,7 @@ var logs = {
             var name = ""
         }
         if (this.logLevel <= 0) {
-            console.log(`mectio [INFO] (${name}): ${l}`)
+            console.log(`mectio [INFO] (${name}): `, l)
         }
     },
     warn: function(l) {
@@ -17,7 +17,7 @@ var logs = {
             var name = ""
         }
         if (this.logLevel <= 1) {
-            console.warn(`mectio [WARN] (${name}): ${l}`)
+            console.warn(`mectio [WARN] (${name}): `, l)
         }
     },
     error: function(l) {
@@ -27,7 +27,7 @@ var logs = {
             var name = ""
         }
         if (this.logLevel <= 2) {
-            console.error(`mectio [ERROR] (${name}): ${l}`)
+            console.error(`mectio [ERROR] (${name}): `, l)
         }
     }
 }
