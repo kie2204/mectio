@@ -69,7 +69,7 @@ class LecRequest {
         var curDir = localUrl.substring(0, localUrl.lastIndexOf("/"));
 
         resText = resText.replaceAll("{_MECTIO_CURDIR}", curDir);
-        resText = resText.replaceAll("{_MECTIO_ROOTDIR}", browser.runtime.getURL("/"));
+        resText = resText.replaceAll("{_MECTIO_ROOTDIR}", browser.runtime.getURL(""));
 
         return resText;
     }
