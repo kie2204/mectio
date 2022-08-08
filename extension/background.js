@@ -36,8 +36,8 @@ function pageFetch(page) {
 
 function handleMessage(request, sender, sendResponse) {
     switch (request.action) {
-        case "switchIcon":
-            switchIcon(request.value);
+        case "setActiveTab":
+            setActiveTab(sender.tab.id, request.value);
             break;
         case "fetch":
             pageInner = pageFetch(request.page);
@@ -101,4 +101,4 @@ function startKill(tab) {
 }
   
 browser.runtime.onMessage.addListener(handleMessage);
-browser.tabs.onActivated.addListener(setInactive);
+browser.tabs.onActivated.addListener(checkTab);

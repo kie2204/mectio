@@ -1,4 +1,4 @@
-// mectio content script
+// mectio MAIN content script
 
 // Define browser API for Firefox/Chrome compatibility
 var browser = browser || chrome;
@@ -12,45 +12,37 @@ var _LECTIO_BASE_URL = "https://www.lectio.dk"
 var lecRequest = new LecRequest();
 var auth = new Auth();
 
-var getLocalPage = async function(page) {
-    return new Promise(resolve => {
-        fetch(browser.runtime.getURL(page)).then(r => r.text()).then(html => {
-            var parser = new DOMParser();
-            parsedText = parser.parseFromString(html, "text/html");
+var loginScreen = new LoginScreen();
 
-            links = parsedText.querySelectorAll("*"); // Probably bad for performance
-            for (var x of links) {
-                var href = x.getAttribute("href");
-                var src = x.getAttribute('src');
+var windowManager2 = new WindowManager2();
 
-                if (typeof(href) == "string" && href.substr(0,4) != "http" && href.length != 0) {
-                    logs.info("Link " + href + " length " + href.length)
-                    x.href = browser.runtime.getURL('/') + href;
-                }
-                if (typeof(src) == "string" && src.substr(0,4) != "http" && src.length != 0) {
-                    x.src = browser.runtime.getURL('/') + src;
-                }
-            }
+// extension local config
+var getConfig = async function(attr) {
+    var conf = await browser.storage.local.get(['config'])
 
-            result = parsedText.getRootNode().body.innerHTML;
-            resolve(result);
-        });
-    });
+    return conf.config[attr]
 }
 
-var startInit = async function() {
-    // Call on background.js to switch extension icon
+// Læs config, hvis aktiv afbryd Lectio og indlæs mectio
+getConfig("enabled").then(function(value) {
+    if (value == false) return;
+    // Her afbrydes lectio!
+    document.open();
+    document.close();
+
     browser.runtime.sendMessage({
-        action: "switchIcon",
+        action: "kill"
+    });
+})
+
+var startInit = async function() {
+    // Mark as active tab
+    browser.runtime.sendMessage({
+        action: "setActiveTab",
         value: 1
     });
 
     logs.info("mectio er i ALPHA. Der kan være fejl og mangler")
-    logs.info(catchPhrases.get("loading"))
-
-    // Interrupt loading
-    document.open();
-    document.close();
 
     // Set tab icon
     link = document.createElement('link');
@@ -60,48 +52,39 @@ var startInit = async function() {
     link.href = browser.runtime.getURL('/') + 'icons/icon-48.ico';
 
     // Log it
-    logs.info("starter init")
-    document.documentElement.innerHTML = ""
-    await windowManager.init();
+    console.debug("starter init")
+
+    await windowManager2.init()
+    windowManager2.headerState = 0;
+
+    var navigator = new Navigator({
+        navElement: document.querySelector("nav"),
+        wmInstance: windowManager2
+    });
 
     var loginScreen = new LoginScreen({
-        defaultInst: 680,
+        defaultInst: 0,
         submitCallback: auth.login
     });
 
     loginStatus = await Promise.resolve(auth.loginStatus);
-
+    
     if (loginStatus.loginStatus == 1) {
         await doUserInit(loginStatus.inst);
         loadPage({link: window.location.href});
     } else {
-        loginScreen.show();
+        loginScreen.openWindow();
     }
 
     document.getElementById("mectio-profile").addEventListener("click", async function(e){
         e.preventDefault();
-        logout();
+        auth.logout();
     })
-}
-
-var logout = async function() {
-    windowManager.closeAll();
-
-    await browser.runtime.sendMessage({
-        action: "api",
-        call: "logout",
-        args: []
-    });
-
-    loginStatus = "";
-    currentUserData = "";
-
-    loginScreen.show;
 }
 
 var doUserInit = async function(inst) {
     defaultInst = inst;
-    windowManager.setHeaderState(1)
+    windowManager2.headerState = 1;
 
     loginStatus = await browser.runtime.sendMessage({
         action: "api",
@@ -117,7 +100,7 @@ var doUserInit = async function(inst) {
         args: [inst]
     });
 
-    windowManager.toggleInstName(1, instName.name)
+    windowManager2.instName = instName.name;
 
     currentUserData = await browser.runtime.sendMessage({
         action: "api",
@@ -129,94 +112,31 @@ var doUserInit = async function(inst) {
     document.getElementById("mectio-profile-picture").style.backgroundImage = `url(${currentUserData.userPfpUrl})`
 }
 
-var showLoginPage = async function() {
-    var loginPage = new wmWindow({windowId: "mectio-login"});
-    loginPage.element.innerHTML = await getLocalPage("/pages/login.html");
-    windowManager.setHeaderState(0)
-
-    // Tilføj institutioner til dropdown
-    var selectMenu = document.getElementById("mf-inst")
-    var instList = await Promise.resolve(auth.instList);
-
-    logs.info(instList)
-
-    for (var x of instList.instList) {
-        var el = document.createElement("option");
-        var text = document.createTextNode(x.name);
-        el.setAttribute("value", x.id)
-        el.appendChild(text)
-        selectMenu.appendChild(el);
-    }
-
-    selectMenu.value = parseLinkObject({link: window.location.href}).inst;
-
-    document.getElementById("mectio-login-form").addEventListener("submit", submitLoginForm);
-}
-
-var submitLoginForm = async function(e) {
-    e.preventDefault();
-    var theForm = document.getElementById("mectio-login-form")
-
-    var inst = document.getElementById("mf-inst").value
-    var username = document.getElementById("mf-uname").value
-    var password = document.getElementById("mf-pword").value
-
-    logs.info(`Logger ind på ${document.getElementById("mf-inst").options[document.getElementById("mf-inst").selectedIndex].textContent} (ID: ${inst}) med brugernavn ${username}`)
-
-    call = await auth.login({
-        inst,
-        username,
-        password
-    })
-
-    if (call.loginStatus == 1) {
-        windowManager.getWindow("mectio-login").window.close();
-
-        await doUserInit(inst);
-        loadPage({page: "forside"}, 1);
-    } else {
-        alert("Bruh")
-    }
-}
-
 var loadPage = async function(data, push) {
     window.scrollTo({
         top: 0, 
         behavior: "smooth"
     })
 
-    var page = parseLinkObject(data);
+    var page = lecRequest.parseLink(data.link);
 
     if (push == 1) {
-        window.history.pushState({}, "", page.link)
+        window.history.pushState({}, "", page.url)
     }
 
     // Tjek om vindue er åbent
-    for (var x of windowManager.registeredWindows) {
-        if (typeof x == 'object') {
+    var matchingWindows = windowManager2.searchWindowData({url:page.url})
 
-            if (JSON.stringify(x.window.data) == JSON.stringify(page)) {
-                logs.info("Found open window")
+    if (Object.keys(matchingWindows).length >= 1) {
+        console.log("Matchende vindue allerede åbent, viser...")
+        var match = Object.keys(matchingWindows)[0];
+        windowManager2.showWindow(match)
+        windowManager2.activeWindow = match;
 
-                loadNavLinks(page.link)
-
-                if (windowManager.activeWindow != x.id) {
-                    windowManager.getWindow(windowManager.activeWindow).window.hide();
-                    windowManager.getWindow(x.id).window.appear();
-                }
-
-                windowManager.setActiveWindow(x.id);
-
-                return true;
-            }
-        }
+        return true;
     }
 
     var src = "";
-
-    try {
-        windowManager.getWindow(windowManager.activeWindow).window.hide()
-    } catch (e) {logs.warn("Intet aktivt vindue")}
 
     if (typeof(page.page) == "string") {
         switch (page.page) {
@@ -231,64 +151,14 @@ var loadPage = async function(data, push) {
                 return;
         }
     } else {
-        src = page.link;
+        src = page.url;
         loadCompatibilityPage(src)
     }
 }
 
-var pageLoaders = {
-    forside: async function(link) {
-        if (typeof link == "undefined") {
-            link = `${window.location.origin}/lectio/${defaultInst}/forside.aspx`
-        }
-        window.history.pushState({}, "", link);
-
-        var data = parseLinkObject({link});
-
-        var prevWindow = windowManager.activeWindow;
-        var wmwindow = new wmWindow({appearWait: 1, data});
-        var page = await getLocalPage("/pages/mectio/forside/index.html")
-
-        await loadNavLinks(link);
-        wmwindow.element.innerHTML = page;
-
-        var fName = currentUserData.userFullName.substr(0, currentUserData.userFullName.indexOf(" "))
-
-        wmwindow.element.querySelector("#main-title-left").querySelector("h1").innerText = fName + "!"
-
-        var pageData = await browser.runtime.sendMessage({
-            action: "api.data",
-            call: "getFrontPage",
-            args: [defaultInst]
-        });
-
-        var dashEl = wmwindow.element.getElementsByClassName("card-scroll")[0]
-
-        for (var x of pageData.dashboard) {
-            var a = document.createElement("div")
-            a.classList.add("card")
-
-            a.textContent = x;
-            dashEl.appendChild(a)
-        }
-
-        wmwindow.appear();
-    },
-    skema: async function() {
-        var src = `/lectio/${defaultInst}/SkemaNy.aspx`
-        loadNavLinks(window.location.origin + src)
-
-        var wmwindow = new wmWindow();
-        var page = await getLocalPage("/pages/mectio/forside/index.html")
-        wmwindow.element.innerHTML = page;
-
-        windowManager.getWindow(prevWindow).window.element.hide()
-        window.history.pushState({}, "", src)
-    }
-}
-
 var loadCompatibilityPage = async function(src) {
-    var data = parseLinkObject({link: src})
+    console.log("Source, ", src)
+    var data = lecRequest.parseLink(src)
 
     var unhide = 0;
     if (await getConfig("compatHideUntilLoad") == 1) {
@@ -297,11 +167,6 @@ var loadCompatibilityPage = async function(src) {
 
     var frame = document.createElement("iframe")
     loadNavLinks(src)
-    
-    var prevWindow = windowManager.activeWindow;
-    try {
-        windowManager.getWindow(prevWindow).window.hide()
-    } catch (e) {logs.warn("Intet aktivt vindue")}
 
     frame.setAttribute("src", src)
     frame.setAttribute("scrolling", "no")
@@ -312,30 +177,34 @@ var loadCompatibilityPage = async function(src) {
     frame.style.border = "none";
     frame.style.backgroundColor = "#ccc";
 
-    var wmwindow = new wmWindow({appearWait: unhide, data});
+    var wm2 = windowManager2.createWindow({
+        hidden: unhide,
+        data
+    })
 
     // Append frame to window
-    wmwindow.element.appendChild(frame)
-    frame.contentWindow.addEventListener("load", function() {
-        reloadFrameScript(frame, wmwindow)
-    })
+    wm2.windowElement.appendChild(frame);
+    frame.contentWindow.addEventListener("load", function () {
+        reloadFrameScript(frame, wm2);
+        windowManager2.activeWindow = wm2.id;
+    });
 }
 
-var reloadFrameScript = function(frame, wmwindow) {
+var reloadFrameScript = function(frame, wm) {
     frame.contentWindow.addEventListener("unload", function(){
-        wmwindow.hide();
+        windowManager2.hideWindow(wm.id);
 
         setTimeout(function(){
             frame.contentWindow.addEventListener("load", function() {
                 window.history.replaceState({}, "", frame.contentWindow.location.href)
-                wmwindow.updateData(parseLinkObject({link: frame.contentWindow.location.href}))
-                reloadFrameScript(frame, wmwindow)
+                wm.data = lecRequest.parseLink(frame.contentWindow.location.href)
+                reloadFrameScript(frame, wm)
             })
         }, 100)
     })
 
     loadCompatibilityScripts(frame)
-    wmwindow.appear();
+    windowManager2.showWindow(wm.id);
 }
 
 var loadCompatibilityScripts = function(frame){
@@ -379,14 +248,20 @@ var loadCompatibilityScripts = function(frame){
         }
     }
 
-    var body = frame.contentWindow.document.body;
-    var html = frame.contentWindow.document.documentElement;
+    setTimeout(function() { 
+        var body = frame.contentDocument.body;
+        var html = frame.contentDocument.documentElement;
 
-    var height = Math.max( body.scrollHeight, body.offsetHeight, 
-        html.clientHeight, html.scrollHeight, html.offsetHeight );
-    
-    frame.style.height = `${height*2}px`;
-    frame.style.filter = "";
+        console.log(frame.contentDocument.body, body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+
+        var height = Math.max( body.scrollHeight, body.offsetHeight, 
+            html.clientHeight, html.scrollHeight, html.offsetHeight );
+
+        console.log(frame, "Height: ", height)
+        
+        frame.style.height = `${height*2}px`;
+        frame.style.filter = "";
+    }, 1)
 }
 
 var loadNavLinks = async function(url) {
@@ -401,10 +276,10 @@ var loadNavLinks = async function(url) {
     nLContainer.innerHTML = "";
     
     if (Array.isArray(navLinks.links) == false || navLinks.links.length == 0) {
-        windowManager.setHeaderState(1)
+        windowManager2.headerState = 1;
         return;
     } else {
-        windowManager.setHeaderState(2)
+        windowManager2.headerState = 2;
     }
 
     for (var x of navLinks.links) {
@@ -424,11 +299,6 @@ var loadNavLinks = async function(url) {
         })
     }
 }
-
-var parseLinkObject = function(attr) {
-    return navigation.parseLinkObject(attr)
-}
-
 
 browser.storage.local.get(['config'], async function(config) {
     var x = config.config;
@@ -456,14 +326,4 @@ var setListeners = function() {
         logs.info("State pop")
         loadPage({link: window.location.href})
     })
-
-    browser.runtime.sendMessage({
-        action: "kill"
-    });
-}
-
-var getConfig = async function(attr) {
-    var conf = await browser.storage.local.get(['config'])
-
-    return conf.config[attr]
 }

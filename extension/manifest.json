@@ -24,13 +24,13 @@
         "matches": ["*://*.lectio.dk/*"],
         "run_at": "document_start",
         "js": [
-          "scripts/content-scripts/lec-request/lecRequest.js",
+          "scripts/content-scripts/lec/lecRequest.js",
+          "scripts/content-scripts/lec/LecCompat.js",
           "scripts/content-scripts/auth/auth.js",
-          "scripts/content-scripts/auth/loginScreen.js",
-          "scripts/content-scripts/catchPhrases.js",  
+          "scripts/content-scripts/auth/loginScreen.js", 
           "scripts/content-scripts/logs.js",
-          "scripts/content-scripts/frontend/windowManager.js",
-          "scripts/content-scripts/frontend/navigation.js",
+          "scripts/content-scripts/frontend/WindowManager2.js",
+          "scripts/content-scripts/frontend/Navigator.js",
           "main.js"
         ]
       }

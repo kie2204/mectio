@@ -1,5 +1,4 @@
 <link rel="stylesheet" href="{_MECTIO_CURDIR}/style.css">
-<script src="{_MECTIO_CURDIR}/script.js"></script>
 
 <div id="login-screen-container">
     <div id="login-screen-box">
@@ -15,7 +14,53 @@
             </div>
         </div>
         <div class="right">
-
+            <div id="login-content">
+                <div id="login-screens">
+                    <div class="login-step">
+                        <div class="login-content-title">
+                            <span class="material-symbols-rounded login-title-icon">school</span>
+                            <div class="login-title-text">
+                                <h2>Vælg skole</h2>
+                            </div>
+                        </div>
+                        <p>Brug evt. søgefeltet til at finde din skole.</p>
+                        <input type="search" name="" id="" class="login-search" placeholder="Søg efter skoler..." autocomplete="off">
+                        <div class="login-list">
+                            <p>Henter liste...</p>
+                        </div>
+                    </div>
+                    <div class="login-step">
+                        <div class="login-content-title">
+                            <span class="material-symbols-rounded login-title-icon">person_add</span>
+                            <div class="login-title-text">
+                                <h2>Log ind</h2>
+                                <p id="{_MECTIO_CURRENTINST}">Skole</p>
+                            </div>
+                        </div>
+                        <div id="input-container-container">
+                            <div class="input-container">
+                                <span class="material-symbols-rounded">person</span>
+                                <input type="text" name="" id="login-username" placeholder="Brugernavn">
+                            </div>
+    
+                            <div class="input-container">
+                                <span class="material-symbols-rounded">key</span>
+                                <input type="password" name="" id="login-password" placeholder="Adgangskode">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="login-buttons">
+                <button class="login-button" id="login-return" disabled>
+                    <span class="material-symbols-rounded">arrow_back</span>
+                    <p>Tilbage</p>
+                </button>
+                <button class="login-button" id="login-main" disabled>
+                    <p>Fortsæt</p>
+                    <span class="material-symbols-rounded">arrow_forward</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>

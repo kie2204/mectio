@@ -16,8 +16,9 @@ class Auth {
 
     }
 
-    async login(args) {
-        if (!args?.inst || !args?.username || !args?.password) {
+    login = async (args) => {
+        var ok = args.inst ? true : false && args.username ? true : false && args.password ? true : false;
+        if (ok == false) {
             console.error("Auth: kan ikke logge ind, mangler info!!!");
             return false;
         }
@@ -67,10 +68,12 @@ class Auth {
         // Vent på godkendt login
         
         if (submitPost.redirected) {
+            console.debug("Login succes")
             return {
                 loginStatus: 1
             }
         } else {
+            console.warn("Login fejl ", submitPost.text())
             return {
                 loginStatus: 0
             }

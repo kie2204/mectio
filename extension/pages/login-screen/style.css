@@ -27,9 +27,230 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: baseline;
-    line-height: 1.3;
+    line-height: 1.4;
+    font-size: 1.1rem;
 }
 
 #login-screen-box .left img {
     height: 2.5rem;
+}
+
+#login-screen-box .right {
+    width: 50%;
+    box-sizing: border-box;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: baseline;
+    line-height: 1.4;
+    font-size: 1.1rem;
+    position: relative;
+}
+
+#login-buttons {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 2rem;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+#login-buttons .login-button {
+    display: flex;
+    background-color: #aaa;
+    border: none;
+    font-size: 1.25rem;
+    padding: 0.6rem;
+    border-radius: .5rem;
+    margin-left: 1rem;
+    cursor: pointer;
+
+    box-shadow: 0px 0px 4px #0002;
+    transition: box-shadow 0.2s, filter 0.2s;
+}
+
+#login-buttons .login-button:disabled {
+    filter: grayscale(1)     contrast(0.7) !important;
+}
+
+#login-buttons .login-button:hover {
+    filter: brightness(1.1);
+    box-shadow: 0px 0px 4px #0004;
+}
+
+.login-button p {
+    margin: 0;
+    padding: 0 0.4rem;
+}
+
+#login-buttons #login-main.login-button {
+    background-color: var(--main-color-light);
+    color: white;
+}
+
+/* Login content */
+#login-content {
+    width: 100%;
+    overflow-y: hidden;
+    overflow-x: clip;
+}
+
+.login-content-title {
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    padding-bottom: .5rem;
+    z-index: 1;
+}
+
+.login-title-icon {
+    font-size: 2.5rem;
+}
+
+.login-title-text {
+    margin-left: 1rem;
+}
+
+.login-title-text h2 {
+    margin: 0;
+    font-size: 1.75rem;
+}
+
+.login-title-text p {
+    margin: 0;
+}
+
+/* Søgeelementer */
+input.login-search {
+    width: 100%;
+    background-color: #ddd;
+    border: 1px solid #aaa;
+    border-radius: 100rem;
+    padding: .6rem 1.2rem;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    transition: border 0.2s;
+}
+
+input.login-search:focus {
+    outline: none !important;
+    border: 1px solid #777;
+}
+
+/* Loginliste */
+.login-list {
+    padding: .1rem;
+}
+
+.login-opt {
+    background-color: var(--nav-color-light);
+    padding: .5rem 1rem;
+    border-radius: .5rem;
+    border: 1px solid;
+    border-color: var(--nav-color);
+    cursor: pointer;
+    margin-bottom: .5rem;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    max-height: 3rem;
+}
+
+.login-opt.hidden {
+    font-size: 0;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+.login-opt.selected {
+    border-color: var(--nav-color-dark);
+    box-shadow: 0px 0px .1rem #0006;
+}
+
+.login-opt::after {
+    content: 'check';
+    font-family: "Material Symbols Rounded";
+    float: right;
+    opacity: 0;
+    transform: scale(.5) rotate(45deg);
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.login-opt.selected::after {
+    opacity: 1;
+    transform: scale(1.2) rotate(0deg);
+}
+
+#login-screens {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    transform: translateX(calc((-100% - 1rem) * (var(--login-step) - 1)));
+    transition: transform 0.3s;
+}
+
+#login-screens .login-step {
+    width: 100%;
+    flex-shrink: 0;
+    margin-right: 1rem;
+    overflow-y: scroll;
+}
+
+#login-screens .login-step::-webkit-scrollbar {
+    display: none;
+}
+
+root {
+    --login-step: 1;
+}
+
+/* Felter */
+#input-container-container {
+    position: sticky;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.input-container {
+    width: 100%;
+    background-color: #ddd;
+    border: 1px solid #aaa;
+    border-radius: 100rem;
+    padding: .6rem 1.2rem;
+    margin-bottom: 1rem;
+    transition: border 0.2s;
+    box-sizing: border-box;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.input-container span {
+    margin-left: -6px;
+    margin-right: 10px;
+}
+
+.input-container input {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    font-size: 1.1rem;
+    flex-grow: 1;
+}
+
+.input-container input:focus {
+    outline: none !important;
 }

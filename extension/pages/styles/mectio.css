@@ -197,6 +197,23 @@ main.collapse2 #sidebar {
     z-index: 1000;
 }
 
+.mectio-window.active {
+    z-index: 1001;
+}
+
+.mectio-window.hidden {
+    display: none;
+}
+
+.mectio-window.exclusive, .mectio-window.active.exclusive {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 10000000000;
+}
+
 #mectio-login {
     position: fixed;
     height: 100%;
