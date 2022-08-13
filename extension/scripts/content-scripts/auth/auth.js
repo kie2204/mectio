@@ -16,6 +16,21 @@ class Auth {
 
     }
 
+    async prepLogin(inst) {
+        var rawData = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`);
+        console.debug(rawData)
+        var parsedData = this.parser.parseFromString(rawData.data, "text/html");
+        console.debug(parsedData);
+
+        var VSX = parsedData.getElementById("__VIEWSTATEX").getAttribute("value")
+        var EVV = parsedData.getElementById("__EVENTVALIDATION").getAttribute("value")
+
+        return {
+            EVV,
+            VSX
+        }
+    }
+
     login = async (args) => {
         var ok = args.inst ? true : false && args.username ? true : false && args.password ? true : false;
         if (ok == false) {
@@ -23,24 +38,17 @@ class Auth {
             return false;
         }
 
-        console.debug(``)
         // Get VIEWSTATE og EVENTVALIDATION (kræves af ASP.NET)
-        var rawData = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${args.inst}/login.aspx`);
-        console.debug(rawData)
-        var parsedData = this.parser.parseFromString(rawData.data, "text/html");
-        console.debug(parsedData);
-
-        var aspNet_VSX = parsedData.getElementById("__VIEWSTATEX").getAttribute("value")
-        var aspNet_EVV = parsedData.getElementById("__EVENTVALIDATION").getAttribute("value")
+        var asp = args.prepLogin ? args.prepLogin : await this.prepLogin(args.inst);
 
         var data = { // ALLE felter her skal sendes til Lectio
             '__EVENTTARGET': 'm$Content$submitbtn2',
             '__EVENTARGUMENT': "",
             '__SCROLLPOSITION': "",
-            '__VIEWSTATEX': aspNet_VSX,
+            '__VIEWSTATEX': asp.VSX,
             '__VIEWSTATEY_KEY': "",
             '__VIEWSTATE': "",
-            '__EVENTVALIDATION': aspNet_EVV,
+            '__EVENTVALIDATION': asp.EVV,
             'm$Content$username': args.username,
             'm$Content$password': args.password,
             'masterfootervalue': 'X1!ÆØÅ',

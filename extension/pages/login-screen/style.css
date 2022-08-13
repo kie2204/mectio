@@ -1,3 +1,8 @@
+/* General */
+
+
+
+/**/
 #login-screen-container {
     width: 100%;
     height: 100%;
@@ -57,7 +62,7 @@
     left: 0;
     padding: 2rem;
     box-sizing: border-box;
-    background-color: #fff;
+    background: linear-gradient(0deg, white 50%, transparent);
 }
 
 #login-buttons .login-button {
@@ -71,7 +76,12 @@
     cursor: pointer;
 
     box-shadow: 0px 0px 4px #0002;
-    transition: box-shadow 0.2s, filter 0.2s;
+    transition: box-shadow 0.2s, filter 0.2s, transform 0.1s;
+}
+
+#login-buttons .login-button:hover:active {
+    filter: brightness(0.7);
+    transform: scale(0.99);
 }
 
 #login-buttons .login-button:disabled {
@@ -161,8 +171,14 @@ input.login-search:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, filter 0.1s, transform 0.1s;
     max-height: 3rem;
+    user-select: none;
+}
+
+.login-opt:active {
+    filter: brightness(0.9);
+    transform: scale(0.99);
 }
 
 .login-opt.hidden {
@@ -174,7 +190,7 @@ input.login-search:focus {
     border: 0;
 }
 
-.login-opt.selected {
+.login-opt:hover, .login-opt.selected {
     border-color: var(--nav-color-dark);
     box-shadow: 0px 0px .1rem #0006;
 }

@@ -50,8 +50,7 @@ class LoginScreen {
     loginButton() {
         if (this.#loginStep == 1) {
             this.toStep2();
-        }
-        if (this.#loginStep == 2) {
+        } else if (this.#loginStep == 2) {
             this.callback({
                 inst: this.#inst,
                 username: document.getElementById("login-username").value,
@@ -91,7 +90,7 @@ class LoginScreen {
             var name = button.innerHTML.toLowerCase() ? button.innerHTML.toLowerCase() : ""
             var match = filterString.toLowerCase()
 
-            console.log (name, match, name.includes(match))
+            console.debug(name, match, name.includes(match))
             if (name.includes(match)) {
                 button.classList.remove("hidden")
             } else {
