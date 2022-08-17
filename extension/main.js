@@ -24,10 +24,12 @@ var getConfig = async function(attr) {
 }
 
 // Læs config, hvis aktiv afbryd Lectio og indlæs mectio
-getConfig("enabled").then(function(value) {
-    if (value == false) return;
-    // Her afbrydes lectio!
-    document.open();
+getConfig("enabled").then((value) => {
+    if (value == false)
+        return;
+        
+    // Her afbrydes lectio
+    document.open(); 
     document.close();
 
     browser.runtime.sendMessage({
@@ -36,24 +38,8 @@ getConfig("enabled").then(function(value) {
 })
 
 var startInit = async function() {
-    // Mark as active tab
-    browser.runtime.sendMessage({
-        action: "setActiveTab",
-        value: 1
-    });
-
     logs.info("mectio er i ALPHA. Der kan være fejl og mangler")
-
-    // Set tab icon
-    link = document.createElement('link');
-    link.rel = 'shortcut icon';
-    document.getElementsByTagName('head')[0].appendChild(link);
-
-    link.href = browser.runtime.getURL('/') + 'icons/icon-48.ico';
-
-    // Log it
-    console.debug("starter init")
-
+    
     await windowManager2.init()
     windowManager2.headerState = 0;
 

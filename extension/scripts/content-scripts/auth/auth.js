@@ -73,6 +73,8 @@ class Auth {
             body: formBody 
         })
 
+        var response = submitPost.text();
+
         // Vent på godkendt login
         
         if (submitPost.redirected) {
@@ -81,9 +83,10 @@ class Auth {
                 loginStatus: 1
             }
         } else {
-            console.warn("Login fejl ", submitPost.text())
+            console.warn("Login fejl ", response)
             return {
-                loginStatus: 0
+                loginStatus: 0,
+                response
             }
         }
     }

@@ -92,8 +92,10 @@ class LoginScreen {
 
             console.debug(name, match, name.includes(match))
             if (name.includes(match)) {
+                button.removeAttribute("tabindex")
                 button.classList.remove("hidden")
             } else {
+                button.setAttribute("tabindex", "-1")
                 button.classList.add("hidden")
             }
         }
@@ -106,9 +108,10 @@ class LoginScreen {
             listElement.innerHTML = "";
 
             for (var inst of list.instList) {
-                var element = document.createElement("div");
+                var element = document.createElement("a");
                 element.classList.add("login-opt");
                 element.setAttribute("id", inst.id);
+                element.setAttribute("href", "#");
                 element.innerText = inst.name;
                 listElement.appendChild(element);
 
