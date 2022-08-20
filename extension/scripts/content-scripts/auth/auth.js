@@ -22,12 +22,16 @@ class Auth {
         var parsedData = this.parser.parseFromString(rawData.data, "text/html");
         console.debug(parsedData);
 
-        var VSX = parsedData.getElementById("__VIEWSTATEX").getAttribute("value")
-        var EVV = parsedData.getElementById("__EVENTVALIDATION").getAttribute("value")
+        var loginService = parsedData.getElementById("m_Content_schoolnametd").innerText;
+        var VSX = parsedData.getElementById("__VIEWSTATEX").getAttribute("value");
+        var EVV = parsedData.getElementById("__EVENTVALIDATION").getAttribute("value");
 
         return {
-            EVV,
-            VSX
+            loginService,
+            asp: {
+                EVV,
+                VSX
+            }
         }
     }
 
@@ -39,16 +43,16 @@ class Auth {
         }
 
         // Get VIEWSTATE og EVENTVALIDATION (kræves af ASP.NET)
-        var asp = args.prepLogin ? args.prepLogin : await this.prepLogin(args.inst);
+        var prep = args.prepLogin ? args.prepLogin : await this.prepLogin(args.inst);
 
         var data = { // ALLE felter her skal sendes til Lectio
             '__EVENTTARGET': 'm$Content$submitbtn2',
             '__EVENTARGUMENT': "",
             '__SCROLLPOSITION': "",
-            '__VIEWSTATEX': asp.VSX,
+            '__VIEWSTATEX': prep.asp.VSX,
             '__VIEWSTATEY_KEY': "",
             '__VIEWSTATE': "",
-            '__EVENTVALIDATION': asp.EVV,
+            '__EVENTVALIDATION': prep.asp.EVV,
             'm$Content$username': args.username,
             'm$Content$password': args.password,
             'masterfootervalue': 'X1!ÆØÅ',
@@ -95,7 +99,9 @@ class Auth {
         Auth.loginStatus = {
             loginStatus: 0
         }
-        fetch(lectioURL + "lectio/" + this.inst + "/logout.aspx");
+        var url = _LECTIO_BASE_URL + "/lectio/" + this.inst + "/logout.aspx"
+        console.debug("Logout URL: ", url)
+        fetch(url);
     }
 
     get instList() {

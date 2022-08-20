@@ -3,23 +3,20 @@
 // Define browser API for Firefox/Chrome compatibility
 var browser = browser || chrome;
 
-var defaultInst = 0;
-var loginStatus;
-var currentUserData;
-
 var _LECTIO_BASE_URL = "https://www.lectio.dk"
 
 var lecRequest = new LecRequest();
 var auth = new Auth();
-
 var loginScreen = new LoginScreen();
-
 var windowManager2 = new WindowManager2();
+
+var currentUrlData = lecRequest.parseLink(window.location.href);
+console.log(currentUrlData)
+
 
 // extension local config
 var getConfig = async function(attr) {
     var conf = await browser.storage.local.get(['config'])
-
     return conf.config[attr]
 }
 
@@ -39,7 +36,7 @@ getConfig("enabled").then((value) => {
 
 var startInit = async function() {
     logs.info("mectio er i ALPHA. Der kan være fejl og mangler")
-    
+
     await windowManager2.init()
     windowManager2.headerState = 0;
 
@@ -49,7 +46,7 @@ var startInit = async function() {
     });
 
     var loginScreen = new LoginScreen({
-        defaultInst: 0,
+        inst: currentUrlData.inst,
         submitCallback: auth.login
     });
 
@@ -77,8 +74,6 @@ var doUserInit = async function(inst) {
         call: "getLoginStatus",
         args: [inst]
     });
-
-
 
     instName = await browser.runtime.sendMessage({
         action: "api",

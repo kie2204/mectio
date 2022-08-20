@@ -1,5 +1,5 @@
 class LoginScreen {
-    #inst;
+    #inst = NaN;
     #loginStep = 1;
 
     constructor(args) {
@@ -20,7 +20,12 @@ class LoginScreen {
             return page;
         }).then((page) => {
             this.loginPage.windowElement.innerHTML = page;
-            this.prepWindow();
+            return this.prepWindow();
+        }).then(() => {
+            if (!isNaN(this.#inst)) {
+                this.inst = this.#inst;
+                this.toStep2();
+            }
         })
     }
 
@@ -39,6 +44,8 @@ class LoginScreen {
         document.querySelector("#login-main.login-button").addEventListener("click", () => {
             return this.loginButton();
         })
+
+        return;
     }
 
     returnButton() {
@@ -70,6 +77,7 @@ class LoginScreen {
     }
 
     async toStep2() {
+        console.log("Inst", this.#inst)
         var root = document.documentElement;
         root.style.setProperty("--login-step", 2)
 
@@ -78,14 +86,14 @@ class LoginScreen {
 
         Promise.resolve(this.authLib.instList).then((list) => {
             var instText = list.instList.filter(obj => {
-                return obj.id === this.#inst;
+                return obj.id == this.#inst;
             })[0].name;
 
             document.getElementById("{_MECTIO_CURRENTINST}").innerText = instText;
         })
     }
 
-    filterInstList(filterString) {
+    filterInstList(filterString) { // Filtrerer viste skoler ud fra string
         for (var button of document.querySelector(".login-list").childNodes) {
             var name = button.innerHTML.toLowerCase() ? button.innerHTML.toLowerCase() : ""
             var match = filterString.toLowerCase()
@@ -103,7 +111,7 @@ class LoginScreen {
 
     async getInstList() {
         var listElement = document.querySelector(".login-list")
-        Promise.resolve(this.authLib.instList).then((list) => {
+        await Promise.resolve(this.authLib.instList).then((list) => {
             // Tilføj til loginskærm
             listElement.innerHTML = "";
 
@@ -121,6 +129,9 @@ class LoginScreen {
                 })
             }
         })
+
+        console.log("getinstlist done")
+        return;
     }
 
     set inst(inst) {
