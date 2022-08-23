@@ -83,10 +83,10 @@ class WindowManager2 {
          */
         console.debug("WindowManager2: Nyt vindue")
         var id = (Math.random() + 1).toString(36).substring(2) + (Math.random() + 1).toString(36).substring(2)
-        var hidden = args.hidden ? true : false;
-        var exclusive = args.exclusive ? true : false;
-        var persistent = args.persistent ? true : false;
-        var data = args.data ? args.data : {};
+        var hidden = args?.hidden ? true : false;
+        var exclusive = args?.exclusive ? true : false;
+        var persistent = args?.persistent ? true : false;
+        var data = args?.data ? args.data : {};
 
         var windowElement = document.createElement("div");
         windowElement.setAttribute("id", id)

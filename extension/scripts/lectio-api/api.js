@@ -2,6 +2,8 @@
 // Fungerer med manifest v3, kræver xmldom
 // Bruger indbygget fetch() der deler cookies med browseren
 
+// Legacy!!! Skal erstattes snart, service worker skal kun stå for notifikationer
+
 const DOMParser = new xmldom.DOMParser({
     errorHandler: {
         warning: (msg) => {console.log(msg)},

@@ -62,7 +62,7 @@ class LecRequest {
     }
 
     // Lokale sider
-    async getLocalPage(link) { // link til siden, fra rod af mectio (f.eks. pages/login-screen/index.html)
+    async getLocalPage(link) { // link til siden, fra rod af mectio (f.eks. "pages/login-screen/index.html")
         var localUrl = browser.runtime.getURL(link) // Finder link til siden
 
         var resText = await this.fetchText(localUrl);

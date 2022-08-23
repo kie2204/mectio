@@ -88,11 +88,19 @@ class Auth {
             }
         } else {
             console.warn("Login fejl ", response)
+            var error = this.parseLoginError(response)
             return {
                 loginStatus: 0,
-                response
+                response,
+                error
             }
         }
+    }
+
+    parseLoginError(res) {
+        var parsed = this.parser.parseFromString(res, "text/html");
+
+        return parsed.querySelector("[data-title=Fejl]").innerText;
     }
 
     async logout() {

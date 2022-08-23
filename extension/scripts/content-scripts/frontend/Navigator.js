@@ -30,7 +30,13 @@ class Navigator {
         })
     }
 
-    async start() { 
+    async init() { 
 
+    }
+
+    async load(args) {
+        var x = await lecCompat.load(args)
+        console.log("x", x)
+        window.history.replaceState("", "", x.url)
     }
 }
