@@ -21,15 +21,40 @@ class LecCompat {
 
     prepIFrame(frame) {
         frame.setAttribute("scrolling", "no")
-        frame.setAttribute("sandbox", "allow-same-origin allow-scripts allow-forms")
+        frame.setAttribute("sandbox", "allow-same-origin allow-scripts allow-forms allow-popups")
 
         // Decorate iframe
-        frame.style.transition = "filter 0.2s";
         frame.style.width = "100%";
-        frame.style.height = "1000px";
         frame.style.border = "none";
+        frame.style.minHeight = "100vh";
 
         this.window.windowElement.appendChild(frame);
+
+        // Loading transition
+        frame.classList.add("loading")
+        frame.style.transition = "filter 0.2s, opacity 0.2s, transform 0.2s";
+
+        // Set frame listeners
+        frame.addEventListener("load", () => {
+            frame.classList.remove("loading")
+
+            frame.contentWindow.addEventListener("unload", () => {
+                frame.style.height = "";
+
+                frame.classList.add("loading")
+                console.log("Unload event")
+                
+                setTimeout(() => {
+                    this.iFrameDOMLoad(frame).then(() => {
+                        this.injectCSS(frame);
+                        this.injectScripts(frame);
+                        this.applyPatches(frame);
+                    })
+                }, 0)
+            })
+        })
+
+        frame.contentWindow.location.replace("about:blank");
     }
 
     async load(args) {
@@ -40,21 +65,26 @@ class LecCompat {
         console.debug(args.url)
         var url = typeof args.url == "string" ? args.url : "";
         console.debug(url)
+
+        var frame = this.frame;
         
         var parsedUrl = new URL(url)
         // parsedUrl.searchParams.delete("prevurl")
         console.log(parsedUrl.href)
 
-        this.frame.contentWindow.location.replace(parsedUrl.href);
+        frame.contentWindow.location.replace(parsedUrl.href);
         
-        this.iFrameLoad(this.frame).then(() => {
-            this.injectCSS(this.frame);
-            this.injectScripts(this.frame);
-            this.applyPatches(this.frame);
-        })
+        await this.iFrameLoad(frame) // Todo: få domcontentloaded event til at virke hvis mulig
+
+        this.injectCSS(frame);
+        this.injectScripts(frame);
+        this.applyPatches(frame);
+
+        var pageData = this.frame.contentDocument.documentElement.innerHTML;
 
         return {
-            url: parsedUrl.href
+            url: parsedUrl.href,
+            data: pageData
         };
     }
 
@@ -98,15 +128,6 @@ class LecCompat {
             var onclick = x.getAttribute("onclick");
             var lecCommand = x.getAttribute("lec-command");
             var dataCommand = x.getAttribute("data-command");
-    
-            if (typeof(onclick) != "string" && typeof(lecCommand) != "string" && typeof(dataCommand) != "string" && x.href.includes("https://www.lectio.dk/")) {
-                x.addEventListener("click", async (e) => {
-                    e.preventDefault();
-                    console.debug("LecCompat: click fanget")
-                    this.load({url: frame.contentWindow.document.activeElement.href})
-                })
-                console.log("element", x, "patched")
-            }
         }
 
         // Sæt højde
@@ -123,12 +144,16 @@ class LecCompat {
             
             frame.style.height = `${height*2}px`;
             frame.style.filter = "";
-        }, 1)
+        }, 0)
+
+        // Navigation
+        document.title = `${frame.contentWindow.location.pathname} - mectio`
+        window.history.replaceState("", "", frame.contentWindow.location.href)
     }
 
     async iFrameDOMLoad(frame) {
         return new Promise(resolve => {
-            frame.contentWindow.addEventListener("DOMContentLoaded", () => { resolve(true); })
+            frame.contentDocument.addEventListener("DOMContentLoaded", () => { resolve(true); })
         })
     }
 

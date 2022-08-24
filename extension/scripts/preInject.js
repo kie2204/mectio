@@ -1,4 +1,4 @@
-// mectio preload
+// mectio preload, ubrugt
 
 window.loadP = function(pageData) {
     pageData2 = pageData.replace("LectioPageOps.InitializeHistory(PageHistoryBehavior.PrevUrl);", "") // fjerner funktion der forstyrrer mectio

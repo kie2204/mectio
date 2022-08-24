@@ -166,55 +166,79 @@ class Auth {
         return Auth.loginStatus;
     }
 
-    async updateLoginStatus(id) {
-        if (typeof id == 'undefined') {
-            var x = this.lecRequest.parseLink(window.location.href).inst;
-            id = parseInt(x);
-        }
+    async updateLoginStatus(args) {
+        /**
+         * id: skole id
+         * url: url
+         * data: html fra lec
+         */
+
+        var rawData;
 
         Auth.loginStatus = new Promise(async (resolve, reject) => {
-            var rawData = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${id}/forside.aspx`);
-            var parsedData = this.parser.parseFromString(rawData.data, "text/html");
-
-            try {
-                var username = parsedData.getElementsByClassName("ls-user-name")[0].textContent;
-
-                var userLink = parsedData.getElementsByClassName("ls-user-name")[0].getAttribute("href")
-                var userId = userLink.substr(userLink.lastIndexOf("elevid=")+7) // 7 fordi "elevid=" er 7 lang :)
-
-                // Find elev/lærer id og type
-
-                var userString = parsedData.getElementById("s_m_HeaderContent_MainTitle").textContent;
-                var userStringFiltered = userString.substr(0, userString.indexOf(" - Forside"))
-
-                var userType;
-                switch (userStringFiltered.substr(0, userStringFiltered.indexOf(" "))) {
-                    case "Eleven":
-                        userType = 0;
-                        break;
-                    case "Læreren":
-                        userType = 1;
-                        break;
+            if (typeof args?.data == "undefined") {
+                // Hent ny data
+                if (typeof args?.id == 'undefined') {
+                    var x = this.lecRequest.parseLink(window.location.href).inst;
+                    id = parseInt(x);
                 }
+    
+                rawData = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${id}/forside.aspx`);
+            } else {
+                rawData = args.data;
+            }
 
-                // Send tilbage
+            var parsedData = this.parseLoginUserId(rawData);
 
-                resolve({
-                    loginStatus: 1,
-                    username: username,
-                    userId: userId,
-                    userType: userType,
-                    inst: id
-                })
-            } catch (e) {
-                resolve({
-                    loginStatus: 0,
-                    error: e,
-                    username: ""
-                })
+            if (parsedData == false) {
+                resolve({ loginStatus: 0 })
+            } else {
+                parsedData.loginStatus = 1;
+                resolve(parsedData);
             }
         })
 
         return Auth.loginStatus;
+    }
+
+    parseLoginUserId(data) { // Finder id på bruger, der er logget ind ud fra rå HTML data
+        try {
+            var parsedData = this.parser.parseFromString(data, "text/html");
+
+            var username = parsedData.getElementsByClassName("ls-user-name")[0].textContent;
+            var usernameHref = parsedData.getElementsByClassName("ls-user-name")[0].href;
+
+            var parsedHref = new URL(usernameHref)
+            var parsedLink = this.lecRequest.parseLink(usernameHref)
+
+            var inst = parsedLink.inst;
+
+            // Get user type, lærer/elev
+            var userType = parsedHref.searchParams.get("type");
+
+            // Get userid
+            var userId;
+            switch (userType) {
+                case "elev":
+                    userId = parsedHref.searchParams.get("elevid");
+                    userType = 0;
+                    break;
+                case "laerer":
+                    userId = parsedHref.searchParams.get("laererid");
+                    userType = 1;
+                    break;
+            }
+
+        } catch (e) {
+            console.error("User id parse fejl! ", e)
+            return false;
+        }
+
+        return {
+            inst, //
+            userId, //
+            username, //
+            userType //
+        }
     }
 }
