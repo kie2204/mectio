@@ -1,7 +1,7 @@
 @font-face {
     font-family: "Inter";
     src: url("/fonts/Inter.var.woff2") format('woff2-variations');
-    font-weight: 100 900;
+    font-weight: 300 700;
 }
 
 * {
@@ -14,16 +14,75 @@
     --white: #fff;
 }
 
+INPUT, OPTION, SELECT, BUTTON, TEXTAREA, .s2weekHeader TD {
+    font-family: "Inter", sans-serif;
+}
+
 SECTION.island {
     background-image: none;
-    background-color: var(--main-color-light);
+    border: none;
+    box-shadow: none;
 }
 
 SECTION.island .islandHeader {
+    background-color: var(--main-color-light);
+    margin-left: .5rem;
+    padding: .5rem 1rem;
+    border-radius: .3rem .3rem 0 0;
     font-family: "Inter", sans-serif;
     color: white;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+SECTION.island .islandHeader::after {
+    content: "​";
+}
+
+SECTION.island .islandHeaderContainer {
+    border: none;
+}
+
+.s2dayHeaderSimple {
+    background-color: initial;
 }
 
 .ls-island4 {
     background-color: var(--nav-color-light);
+}
+
+SECTION.island .islandContent {
+    border: 1px solid grey;
+    border-radius: 4px;
+    background: #fafafa;
+    box-shadow: 0px 0px 0.5rem #0004;
+}
+
+A[href].s2skemabrik {
+    background-color: #0000;
+    border: none;
+    border-left: 2px solid;
+}
+
+A.s2bgbox {
+    margin-bottom: 0.3rem;
+}
+
+.s2bgbox .s2skemabrikcontent {
+    padding-left: .3rem;
+}
+
+.s2bgbox .s2skemabrikInnerContainer, .s2nohover .s2bgbox[class~="s2marking"] .s2skemabrikInnerContainer:hover {
+    background-image: none;
+    transition: background-color 0.2s;
+}
+
+.s2bgbox.s2skemabrik .s2skemabrikInnerContainer:hover, .s2bgbox[class~="s2marking"] .s2skemabrikInnerContainer:hover {
+    background-image: none;
+    background-color: #b7dbff;
+    color: initial;
+}
+
+.s2skema .s2infoHeader A.s2skemabrik[href]:hover, A.s2skemabrik[href]:hover {
+    color: unset !important;
 }

@@ -14,6 +14,8 @@ class Navigator {
         // Lav liste med URL-callbacks
         this.urlCallbacks = []
 
+        //
+
         this.parser = new DOMParser();
     }
     
@@ -35,10 +37,11 @@ class Navigator {
     }
 
     async init() { 
+        windowManager2.headerState = 2;
         this.load({
             url: this.currentPage
         }).then((res) => {
-            return auth.updateLoginStatus({
+            return this.update({
                 data: res.data
             })
         })
@@ -57,9 +60,8 @@ class Navigator {
     update(args) { // Opdaterer navigation
         /**
          * url:
-         * rawData:
+         * data:
          */
-
 
     }
 }
