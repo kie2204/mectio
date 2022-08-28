@@ -114,6 +114,13 @@ class WindowManager2 {
             data
         };
     }
+    destroyWindow(id) {
+        var win = this.openWindows[id];
+
+        win.windowElement.remove();
+
+        this.openWindows[id] = undefined;
+    }
     get activeWindow() {
         return this.#activeWindow;
     }

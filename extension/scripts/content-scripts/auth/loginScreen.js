@@ -29,6 +29,14 @@ class LoginScreen {
         })
     }
 
+    async closeWindow() {
+        console.debug("Lukker...")
+        console.debug(typeof this.loginPage)
+        if (typeof this.loginPage != "object") return false;
+        
+        windowManager2.destroyWindow(this.loginPage.id);
+    }
+
     async prepWindow() { // Forbered login-vindue
         await this.getInstList();
 
@@ -45,6 +53,16 @@ class LoginScreen {
             return this.loginButton();
         })
 
+        document.querySelector("#mectio-disable-link").addEventListener("click", () => {
+            loadConfig().then((c) => {
+                c.enabled = 0;
+
+                return saveConfig(c)
+            }).then(() => {
+                window.location.reload();
+            })
+        })
+
         return;
     }
 
@@ -58,7 +76,7 @@ class LoginScreen {
         if (this.#loginStep == 1) {
             this.toStep2();
         } else if (this.#loginStep == 2) {
-            this.callback({
+            this.submit({
                 inst: this.#inst,
                 username: document.getElementById("login-username").value,
                 password: document.getElementById("login-password").value
@@ -78,6 +96,7 @@ class LoginScreen {
 
     async toStep2() {
         console.log("Inst", this.#inst)
+
         var root = document.documentElement;
         root.style.setProperty("--login-step", 2)
 
@@ -150,13 +169,18 @@ class LoginScreen {
     }
 
     submit(args) {
-        return this.callback(args);
+        return this.callback(args).then((res) => {
+            console.debug(res.loginStatus)
+            var ok = res.loginStatus ? true : false;
+
+            if (ok == false) return res;
+
+            this.closeWindow();
+            return res;
+        });
     }
 
     show() {
-        if (this.loginPage.initStatus == false) {
-            this.loginPage.init(this.windowArgs);
-        }
         this.loginPage.appear()
     }
     

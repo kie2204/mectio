@@ -36,7 +36,7 @@ SECTION.island .islandHeader {
 }
 
 SECTION.island .islandHeader::after {
-    content: "​";
+    content: "\200B";
 }
 
 SECTION.island .islandHeaderContainer {

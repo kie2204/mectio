@@ -30,15 +30,19 @@ browser.storage.local.get(['config'], async function(config) {
 
     // check if enabled
     if (c.enabled == 1) {
-        // Her afbrydes lectio
-        document.open(); 
-        document.close();
+        if (document instanceof HTMLDocument) {
+            // Her afbrydes lectio
+            document.open(); 
+            document.close();
 
-        browser.runtime.sendMessage({
-            action: "kill"
-        });
+            browser.runtime.sendMessage({
+                action: "kill"
+            });
 
-        init();
+            init();
+        } else {
+            console.log("mectio: Ikke et html-dokument, indlæser ikke")
+        }
     }
 });
 
@@ -94,3 +98,23 @@ var loadNavLinks = async function(url) {
     }
 }
 */
+
+// Config funktioner, skal flyttes
+
+var loadConfig = async function(){
+    var config = await browser.storage.local.get(['config']);
+
+    if (typeof(config.config) != "object") {
+        console.log("Config invalid, resetting to default")
+        await setDefaultConfig();
+        config = await browser.storage.local.get(['config']);
+    }
+
+    return config.config;
+}
+
+var saveConfig = function(config){
+    browser.storage.local.set({config: config}, function() {
+        console.log('Value is set to ' + config);
+    });
+}

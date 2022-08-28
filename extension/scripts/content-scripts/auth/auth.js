@@ -97,10 +97,11 @@ class Auth {
         }
     }
 
-    parseLoginError(res) {
-        var parsed = this.parser.parseFromString(res, "text/html");
+    parseLoginError(res) { // Fungerer ikke, da fejl er gemt i script tag
+        //var parsed = this.parser.parseFromString(res, "text/html");
 
-        return parsed.querySelector("[data-title=Fejl]").innerText;
+        //return parsed.querySelector("[data-title=Fejl]").innerText;
+        return false;
     }
 
     async logout() {
@@ -184,11 +185,11 @@ class Auth {
                 }
     
                 rawData = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${id}/forside.aspx`);
-            } else {
+            } else { // Brug sendt data
                 rawData = args.data;
             }
 
-            var parsedData = this.parseLoginUserId(rawData);
+            var parsedData = this.parseCurrentUserId(rawData);
 
             if (parsedData == false) {
                 resolve({ loginStatus: 0 })
@@ -201,7 +202,7 @@ class Auth {
         return Auth.loginStatus;
     }
 
-    parseLoginUserId(data) { // Finder id på bruger, der er logget ind ud fra rå HTML data
+    parseCurrentUserId(data) { // Finder id på bruger, der er logget ind ud fra rå HTML data
         try {
             var parsedData = this.parser.parseFromString(data, "text/html");
 

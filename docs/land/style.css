@@ -1,6 +1,67 @@
 /* General */
 
 
+.material-symbols-rounded {
+    font-family: 'Material Symbols Rounded';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+}
+
+.material-symbols-rounded {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0
+}
+
+* {
+    font-family: "Inter", sans-serif;
+    --main-color: #203e60;
+    --main-color-dark: #172c46;
+    --main-color-light: #426897;
+    --nav-color: #b3d0ff;
+    --nav-color-light: #c6e1ff;
+    --nav-color-dark: #8db9ec;
+    --nav-color-darker: #6b9dd6;
+    --white: #fff;
+
+    --default-transition-curve: cubic-bezier(0, 0, 0.2, 1);
+}
+
+body {
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+p.notice {
+    font-size: 75%;
+}
+
+a.stealth {
+    color: black;
+    text-decoration: none;
+}
+
+a.stealth:hover {
+    text-decoration: underline;
+}
+
 
 /**/
 #login-screen-container {
@@ -65,30 +126,29 @@
     background: linear-gradient(0deg, white 50%, transparent);
 }
 
-#login-buttons .login-button {
+button {
     display: flex;
     background-color: #aaa;
     border: none;
     font-size: 1.25rem;
     padding: 0.6rem;
     border-radius: .5rem;
-    margin-left: 1rem;
     cursor: pointer;
 
     box-shadow: 0px 0px 4px #0002;
     transition: box-shadow 0.2s, filter 0.2s, transform 0.1s;
 }
 
-#login-buttons .login-button:hover:active {
+.login-button:hover:active {
     filter: brightness(0.7);
     transform: scale(0.99);
 }
 
-#login-buttons .login-button:disabled {
+.login-button:disabled {
     filter: grayscale(1)     contrast(0.7) !important;
 }
 
-#login-buttons .login-button:hover {
+.login-button:hover {
     filter: brightness(1.1);
     box-shadow: 0px 0px 4px #0004;
 }
@@ -98,8 +158,8 @@
     padding: 0 0.4rem;
 }
 
-#login-buttons #login-main.login-button {
-    background-color: var(--main-color-light);
+#login-main.login-button {
+    background-color: #468b46;
     color: white;
 }
 
@@ -121,7 +181,7 @@
     z-index: 1;
 }
 
-.login-title-icon {
+.material-symbols-rounded.login-title-icon {
     font-size: 2.5rem;
 }
 
@@ -275,4 +335,17 @@ root {
 
 .input-container input:focus {
     outline: none !important;
+}
+
+#browser-icons {
+    max-height: 3rem;
+    background-color: #eee;
+    width: fit-content;
+    padding: .8rem .6rem;
+    border-radius: .4rem;
+}
+
+#browser-icons * {
+    height: 3rem;
+    padding-inline: .2rem;
 }

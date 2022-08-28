@@ -1,7 +1,7 @@
 // lecRequest: Henter data fra Lectio og behandler til brug andre steder
 class LecRequest {
     constructor() {
-        this.defaultHost = "www.lectio.dk"
+        this.defaultHost = "www.lectio.dk" // Midlertidig
     }
 
     async getPage(link) { // Henter lectio-side
@@ -28,7 +28,7 @@ class LecRequest {
          */
     }
 
-    async fetchText(link) {
+    async fetchText(link) { // fetch().text() wrapper, bruges internt
         var res = await fetch(link);
 
         if (res.ok !== true) {

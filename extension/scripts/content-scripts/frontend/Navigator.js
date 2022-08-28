@@ -37,19 +37,26 @@ class Navigator {
     }
 
     async init() { 
-        windowManager2.headerState = 2;
+        windowManager2.headerState = 0;
+
         this.load({
             url: this.currentPage
         }).then((res) => {
-            return this.update({
+            // Opdater login status
+            return auth.updateLoginStatus({
                 data: res.data
             })
+        }).then((st) => {
+            if (st.loginStatus == 1) {
+                // Nothing?
+            } else {
+                this.showLogin();
+            }
         })
     }
 
     async showLogin(inst) {
-        loginScreen.inst = inst || NaN;
-        loginScreen.show();
+        loginScreen.openWindow();
     }
 
     async load(args) {
