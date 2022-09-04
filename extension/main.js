@@ -59,44 +59,6 @@ var init = async function() {
     })
 }
 
-/*
-var loadNavLinks = async function(url) {
-    navLinks = await browser.runtime.sendMessage({
-        action: "api",
-        call: "getNavLinks",
-        args: [url]
-    });
-
-    var nLContainer = document.getElementsByClassName("mectio-nav-link-container")[0];
-
-    nLContainer.innerHTML = "";
-    
-    if (Array.isArray(navLinks.links) == false || navLinks.links.length == 0) {
-        windowManager2.headerState = 1;
-        return;
-    } else {
-        windowManager2.headerState = 2;
-    }
-
-    for (var x of navLinks.links) {
-        var navLink = document.createElement("a")
-        navLink.appendChild(document.createTextNode(x.name))
-        navLink.setAttribute("href", x.href)
-        if (x.active) {
-            navLink.classList.add("active")
-        }
-
-        nLContainer.appendChild(navLink);
-
-        navLink.addEventListener("click", function(e){
-            e.preventDefault();
-
-            loadPage({link: document.activeElement.href}, 1);
-        })
-    }
-}
-*/
-
 // Config funktioner, skal flyttes
 
 var loadConfig = async function(){
