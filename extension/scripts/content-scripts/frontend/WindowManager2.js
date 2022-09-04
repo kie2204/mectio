@@ -26,6 +26,7 @@ class WindowManager2 {
         this.readyState = new Promise(async (resolve, reject) => {
             // Nulstil document
             document.documentElement.innerHTML = "";
+            document.body.style.opacity = "0";
 
             // Indsæt html for dok-struktur
             await this.lecReqLib.getLocalPage("pages/main.html").then((text) => {

@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    opacity: 1 !important;
     overflow-x: hidden;
     overflow-y: scroll;
 }
@@ -222,67 +223,6 @@ main.collapse2 #sidebar {
     padding: 0 !important;
 }
 
-/* Nav styles */
-
-#nav-wrapper {
-    padding: 0.25rem 1rem;
-    background-image: linear-gradient(180deg, white, transparent);
-}
-
-#nav-wrapper.hidden {
-    height: 0;
-}
-
-nav {
-    background-color: var(--nav-color);
-    height: 2rem;
-    display: flex;
-    
-    font-size: 0.9rem;
-    box-sizing: border-box;
-    box-shadow: 0px 0px 2px var(--nav-color-dark);
-    border-radius: .5rem;
-    z-index: 1001;
-    transition: transform 0.1s, opacity 0.1s;
-    transition-timing-function: var(--default-transition-curve);
-}
-
-#nav-wrapper.hidden nav {
-    transform: translateY(-25%) scale(0.999);
-    opacity: 0;
-}
-
-nav * {
-    height: 100%;
-    align-items: center;
-    display: flex;
-}
-
-#mectio-nav-title {
-    background-color: var(--nav-color-dark);
-    font-weight: bold;
-    padding: 0 1rem;
-    margin-right: .5rem;
-    border: none;
-    border-radius: .5rem;
-}
-
-#mectio-nav-links a {
-    padding: 0 .5rem;
-    color: #222;
-    text-decoration: none;
-    transition: 0.2s;
-}
-
-#mectio-nav-links a:hover {
-    color: #000;
-    background-color: #6897d1;
-}
-
-#mectio-nav-links a.active {
-    text-shadow: 0 0 0.05rem black;
-}
-
 main {
     display: flex;
 }
@@ -290,35 +230,6 @@ main {
 #window-container {
     flex-grow: 1;
     position: relative;
-}
-
-/* Nav dropdown */
-
-#mectio-nav-dropdown {
-    position: absolute;
-    background-color: var(--nav-color-light);
-    top: 100%;
-    display: block;
-
-    height: auto;
-    width: max-content;
-    z-index: -1;
-    transition: transform 0.2s;
-}
-
-#mectio-nav-dropdown.hidden {
-    transform: translateY(-100%);
-    opacity: 0;
-}
-
-#mectio-nav-dropdown a {
-    color: black;
-    text-decoration: none;
-    padding: .75rem 1rem;
-}
-
-#mectio-nav-dropdown a:hover {
-    background-color: var(--nav-color);
 }
 
 /* Sidebar */

@@ -4,6 +4,8 @@ class LecCompat {
          *      window: Vindue hvor frame indlæses
          *  }
          */
+
+        this.updateCallback = function(){};
     }
 
     init(args) {
@@ -21,7 +23,7 @@ class LecCompat {
 
     prepIFrame(frame) {
         frame.setAttribute("scrolling", "no")
-        frame.setAttribute("sandbox", "allow-same-origin allow-scripts allow-forms allow-popups")
+        frame.setAttribute("sandbox", "allow-same-origin allow-scripts allow-forms allow-popups allow-downloads")
 
         // Decorate iframe
         frame.style.width = "100%";
@@ -54,14 +56,32 @@ class LecCompat {
             })
         })
 
+        // Sæt højde
+        setInterval(function() { 
+            var body = frame.contentDocument.body;
+            var html = frame.contentDocument.documentElement;
+    
+            // console.log(frame.contentDocument.body, body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+    
+            var height = Math.max( body.scrollHeight, body.offsetHeight, 
+                html.clientHeight, html.scrollHeight, html.offsetHeight );
+    
+            // console.log(frame, "Height: ", height)
+            
+            frame.style.height = `${height}px`;
+            frame.style.filter = "";
+        }, 500)
+
         frame.contentWindow.location.replace("about:blank");
     }
 
-    async load(args) {
+    async load(args, callback) {
         /** {
          *      url: Url der loades
          *  }
          */
+        this.updateCallback = callback;
+
         console.debug(args.url)
         var url = typeof args.url == "string" ? args.url : "";
         console.debug(url)
@@ -123,32 +143,18 @@ class LecCompat {
 
     applyPatches(frame) {
         console.debug("Aktiverer link patch", frame)
-        // Patch links
+        // Patch links (bruges ikke)
         for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
             var onclick = x.getAttribute("onclick");
             var lecCommand = x.getAttribute("lec-command");
             var dataCommand = x.getAttribute("data-command");
         }
 
-        // Sæt højde
-        setTimeout(function() { 
-            var body = frame.contentDocument.body;
-            var html = frame.contentDocument.documentElement;
-    
-            console.log(frame.contentDocument.body, body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-    
-            var height = Math.max( body.scrollHeight, body.offsetHeight, 
-                html.clientHeight, html.scrollHeight, html.offsetHeight );
-    
-            console.log(frame, "Height: ", height)
-            
-            frame.style.height = `${height*2}px`;
-            frame.style.filter = "";
-        }, 0)
-
         // Navigation
-        document.title = `${frame.contentWindow.location.pathname} - mectio`
-        window.history.replaceState("", "", frame.contentWindow.location.href)
+        mNavigator.update({
+            url: frame.contentWindow.location.href,
+            data: frame.contentDocument.documentElement.innerHTML
+        })
     }
 
     async iFrameDOMLoad(frame) {

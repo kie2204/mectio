@@ -11,6 +11,8 @@ var loginScreen = new LoginScreen();
 var windowManager2 = new WindowManager2();
 var lecCompat = new LecCompat();
 
+var mNavigator = new Navigator(); // variable navn "navigator" er reserveret
+
 var currentUrlData = lecRequest.parseLink(window.location.href);
 
 browser.storage.local.get(['config'], async function(config) {
@@ -51,14 +53,10 @@ var init = async function() {
 
     await windowManager2.init()
     await lecCompat.init()
-    windowManager2.headerState = 0;
 
-    var navigator = new Navigator({
-        navElement: document.querySelector("nav"),
-        wmInstance: windowManager2
-    });
-
-    navigator.init();
+    await mNavigator.init({
+        navElement: document.querySelector("nav")
+    })
 }
 
 /*

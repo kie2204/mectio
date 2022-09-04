@@ -1,7 +1,8 @@
 <link rel="stylesheet" id="style-general" href="{_MECTIO_ROOTDIR}pages/styles/general.css">
 <link rel="stylesheet" id="style-general" href="{_MECTIO_ROOTDIR}pages/styles/mectio.css">
+<link rel="stylesheet" id="style-general" href="{_MECTIO_ROOTDIR}pages/styles/nav.css">
 
-<div id="header-container">
+<div id="header-container" class="hidden">
     <header>
         <div id="mectio-left-wrapper" class="wrapper">
             <a href="#" id="mectio-open-primnav"><span class="material-symbols-rounded">menu</span></a>
@@ -31,19 +32,25 @@
         </div>
     </header>
     <div id="nav-wrapper">
-        <nav>
+        <nav class="hidden">
             <div id="mectio-nav-selector">
-                <span id="mectio-nav-title">Navigation</span>
                 <div id="mectio-nav-dropdown" class="hidden">
                     <a href="#">Opt 1</a>
                     <a href="#">Opt 2</a>
                     <a href="#">Longer longer longest option</a>
                 </div>
+                <div id="mectio-nav-title">
+                    Henter navn...
+                </div>
             </div>
             <div id="mectio-nav-links">
-                <div class="mectio-nav-link-container">
-    
+                <div class="mectio-nav-group">
+                    <a>Henter links...</a>
                 </div>
+            </div>
+            <div id="mectio-nav-filler"></div>
+            <div id="mectio-nav-right">
+                
             </div>
         </nav>
     </div>
