@@ -31,6 +31,7 @@ header {
     justify-content: space-between;
     padding: 8px 16px;
     box-sizing: border-box;
+    border-bottom: .05rem solid #0002;
     z-index: 6969;
 }
 
