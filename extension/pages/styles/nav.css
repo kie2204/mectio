@@ -109,6 +109,28 @@ nav > div {
     transform: scale(1) rotate(0deg);
 }
 
+/* Nav title */
+
+#mectio-nav-title {
+    width: max-content;
+    display: flex; 
+    align-items: center;
+}
+
+#mectio-nav-title::before {
+    content: "link";
+    font-family: "Material Symbols Rounded";
+    margin-left: -.25rem;
+    margin-right: .25rem;
+}
+
+#mectio-nav-title::after {
+    content: "expand_more";
+    font-family: "Material Symbols Rounded";
+    margin-left: .25rem;
+    margin-right: -.25rem;
+}
+
 /* Nav links */
 
 #mectio-nav-links {
