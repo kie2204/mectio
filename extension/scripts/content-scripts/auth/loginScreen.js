@@ -166,6 +166,14 @@ class LoginScreen {
 
         document.querySelector("#login-return.login-button").removeAttribute("disabled")
         this.#loginStep = 2;
+
+        await new Promise(resolve => {
+            setTimeout(() => {
+                resolve(true);
+            }, 300)
+        })
+
+        document.querySelector("#login-username").focus()
     }
 
     filterInstList(filterString) { // Filtrerer viste skoler ud fra string
