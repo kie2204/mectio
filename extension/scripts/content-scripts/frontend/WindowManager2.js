@@ -118,9 +118,12 @@ class WindowManager2 {
     destroyWindow(id) {
         var win = this.openWindows[id];
 
-        win.windowElement.remove();
-
-        this.openWindows[id] = undefined;
+        try {
+            win.windowElement.remove();
+            this.openWindows[id] = undefined;
+        } catch (e) {
+            console.warn("Kunne ikke lukke vindue, object:", win)
+        }
     }
     get activeWindow() {
         return this.#activeWindow;

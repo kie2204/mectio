@@ -84,7 +84,9 @@ class Auth {
         if (submitPost.redirected) {
             console.debug("Login succes")
             return {
-                loginStatus: 1
+                loginStatus: 1,
+                response,
+                newUrl: submitPost.url
             }
         } else {
             console.warn("Login fejl ", response)

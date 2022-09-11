@@ -3,11 +3,10 @@
 class Navigator {
     constructor(args) {
         // Init libs
-        console.log("Navigator")
         this.parser = new DOMParser();
+        this.lecRequest = new LecRequest();
 
         // Init variables
-        this.currentPage = window.location.href; // Nuværende side
         this.urlCallbacks = [ // Liste af URL-callbacks
             {
                 callback: function(){},
@@ -15,6 +14,10 @@ class Navigator {
                 priority: 0
             }
         ] 
+
+        // PageData
+        this.currentPage = window.location.href; // Nuværende side
+        this.pageData = this.lecRequest.parseLink(this.currentPage);
         this.currentUser = {
             signedIn: false,
             general: {
@@ -37,24 +40,36 @@ class Navigator {
                 studentId: "" // eks. 1a 23
             }
         }
-
-        console.log("Navigator")
     }
 
-    init(args) { 
+    async init(args) { 
         // Aktiver ikon
         this.setIconListeners()
-        console.debug("Navigation: Ikon aktiveret")
 
         // Type checks
         this.navElement = args?.navElement ? args?.navElement : false; // typisk document.getElementById("nav")
         if ((this.navElement instanceof Element) == false) throw "Intet nav-element valgt!!"
-        
-        windowManager2.headerState = 2;
 
-        return this.load({
-            url: this.currentPage
+        var loginState
+        var localPath = this.pageData.localPath || "";
+
+        if (
+            localPath.substring(0,10).includes("login.aspx") ||
+            this.pageData.url == "https://www.lectio.dk/"
+        ) {
+            loginState = await this.showLogin(this.pageData?.inst);
+
+            this.userInit();
+        }
+
+        windowManager2.headerState = 2;
+        this.load({
+            url: loginState?.newUrl || this.currentPage
         })
+    }
+
+    userInit() {
+        // Forbered nuværende bruger 
     }
 
     setIconListeners() {
@@ -72,10 +87,13 @@ class Navigator {
                 value: 0
             });
         })
+
+        return console.debug("Navigation: Ikon aktiveret")
     }
 
     async showLogin(inst) {
-        loginScreen.openWindow();
+        loginScreen.inst = inst;
+        return loginScreen.waitForLogin()
     }
 
     async load(args) {
@@ -136,6 +154,8 @@ class Navigator {
 
         var navTitle = document.getElementById("mectio-nav-title")
         navTitle.innerText = "id: " + nav.navCtxId; // todo
+
+        if (typeof nav.links != "object") return;
 
         var navGroup = document.createElement("div")
         navGroup.classList.add("mectio-nav-group")

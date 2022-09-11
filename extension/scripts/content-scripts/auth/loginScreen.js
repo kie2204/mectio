@@ -6,8 +6,21 @@ class LoginScreen {
         this.authLib = new Auth();
         this.lecReqLib = new LecRequest();
         this.#inst = args?.inst ? args?.inst : NaN;
+        this.windowState = false;
 
-        this.callback = args?.submitCallback || this.authLib.login; // callback når der klikkes log ind
+        this.submitCallback = args?.submitCallback || this.authLib.login; // callback når der klikkes log ind
+        this.successCallback = (a, b) => {};
+    }
+
+    async waitForLogin() {
+        return new Promise((resolve, reject) => {
+            this.successCallback = (res) => {
+                console.log("Succ")
+                resolve(res)
+            }
+
+            this.openWindow();
+        })
     }
 
     async openWindow() {
@@ -22,6 +35,8 @@ class LoginScreen {
             this.loginPage.windowElement.innerHTML = page;
             return this.prepWindow();
         }).then(() => {
+            this.windowState = true;
+
             if (!isNaN(this.#inst)) {
                 this.inst = this.#inst;
                 this.toStep2();
@@ -31,10 +46,27 @@ class LoginScreen {
 
     async closeWindow() {
         console.debug("Lukker...")
-        console.debug(typeof this.loginPage)
+
         if (typeof this.loginPage != "object") return false;
-        
-        windowManager2.destroyWindow(this.loginPage.id);
+
+        window.requestAnimationFrame(async () => {
+            var container = document.querySelector("#login-screen-container")
+            var box = document.querySelector("#login-screen-box")
+
+            container.style.transitionDuration = "0.2s";
+            box.style.transitionDuration = "0.2s";
+
+            container.classList.add("hidden")
+
+            await new Promise(resolve => {
+                container.addEventListener("transitionend", () => {
+                    resolve(true);
+                })
+            })
+
+            this.windowState = false;
+            windowManager2.destroyWindow(this.loginPage.id);
+        })
     }
 
     async prepWindow() { // Forbered login-vindue
@@ -61,6 +93,19 @@ class LoginScreen {
             }).then(() => {
                 window.location.reload();
             })
+        })
+
+        window.requestAnimationFrame(function() {
+            var container = document.querySelector("#login-screen-container")
+            var box = document.querySelector("#login-screen-box")
+
+            container.style.transition = "transform, opacity"
+            box.style.transition = "transform, opacity"
+
+            container.style.transitionDuration = "0.2s";
+            box.style.transitionDuration = "0.2s";
+
+            container.classList.remove("hidden")
         })
 
         return;
@@ -95,21 +140,32 @@ class LoginScreen {
     }
 
     async toStep2() {
-        console.log("Inst", this.#inst)
+        console.debug("LoginScreen: Går til trin 2, inst", this.#inst)
+
+        var instName = await Promise.resolve(this.authLib.instList).then((list) => {
+            var matchedInst = list.instList.filter(obj => {
+                return obj.id == this.#inst; // Tjekker om ID fra liste matcher valgt ID
+            })[0]; // Første match
+
+            if (typeof matchedInst == "object") {
+                return matchedInst.name;
+            } else {
+                return false;
+            }
+        })
+
+        if (!instName) {
+            console.warn("LoginScreen: Kan ikke nå trin 2, ugyldigt skole ID")
+            return false;
+        }
+
+        document.getElementById("{_MECTIO_CURRENTINST}").innerText = instName;
 
         var root = document.documentElement;
         root.style.setProperty("--login-step", 2)
 
         document.querySelector("#login-return.login-button").removeAttribute("disabled")
         this.#loginStep = 2;
-
-        Promise.resolve(this.authLib.instList).then((list) => {
-            var instText = list.instList.filter(obj => {
-                return obj.id == this.#inst;
-            })[0].name;
-
-            document.getElementById("{_MECTIO_CURRENTINST}").innerText = instText;
-        })
     }
 
     filterInstList(filterString) { // Filtrerer viste skoler ud fra string
@@ -117,7 +173,7 @@ class LoginScreen {
             var name = button.innerHTML.toLowerCase() ? button.innerHTML.toLowerCase() : ""
             var match = filterString.toLowerCase()
 
-            console.debug(name, match, name.includes(match))
+            // console.debug(name, match, name.includes(match))
             if (name.includes(match)) {
                 button.removeAttribute("tabindex")
                 button.classList.remove("hidden")
@@ -157,6 +213,11 @@ class LoginScreen {
         if (parseInt(inst) === NaN) return false;
 
         this.#inst = inst;
+
+        if (this.windowState == false) return;
+
+        document.querySelector("#login-main.login-button").removeAttribute("disabled")
+
         for (var button of document.querySelector(".login-list").childNodes) {
             if (this.#inst == button.id) {
                 button.classList.add("selected")
@@ -164,17 +225,16 @@ class LoginScreen {
                 button.classList.remove("selected")
             }
         }
-
-        document.querySelector("#login-main.login-button").removeAttribute("disabled")
     }
 
     submit(args) {
-        return this.callback(args).then((res) => {
+        return this.submitCallback(args).then((res) => {
             console.debug(res.loginStatus)
             var ok = res.loginStatus ? true : false;
 
             if (ok == false) return res;
 
+            this.successCallback(res);
             this.closeWindow();
             return res;
         });

@@ -53,9 +53,15 @@ class LecRequest {
 
         linkData.isLec = true;
 
-        if (parsedUrl.pathname.substring(0, 8) === "/lectio/") {
-            var cutPath = parsedUrl.pathname.substring(8)
+        var path = parsedUrl.pathname;
+
+        if (path.substring(0, 8) === "/lectio/") {
+            var cutPath = path.substring(8)
             linkData.inst = parseInt(cutPath.substring(0, cutPath.indexOf("/")))
+
+            // Find lokal side (alt efter /lectio/id/)
+            var localPathIndex = path.indexOf(linkData.inst) + String(linkData.inst).length + 1
+            linkData.localPath = path.substring(localPathIndex)
         }
 
         return linkData;
