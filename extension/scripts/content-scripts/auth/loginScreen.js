@@ -85,6 +85,11 @@ class LoginScreen {
             return this.loginButton();
         })
 
+        document.querySelector("#input-container-container").addEventListener("submit", (e) => {
+            e.preventDefault();
+            return this.loginButton();
+        })
+
         document.querySelector("#mectio-disable-link").addEventListener("click", () => {
             loadConfig().then((c) => {
                 c.enabled = 0;
