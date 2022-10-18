@@ -41,6 +41,7 @@ SECTION.island .islandHeader::after {
 
 SECTION.island .islandHeaderContainer {
     border: none;
+    background-image: none;
 }
 
 .s2dayHeaderSimple {

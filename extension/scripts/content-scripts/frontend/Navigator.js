@@ -5,46 +5,32 @@ class Navigator {
         // Init libs
         this.parser = new DOMParser();
         this.lecRequest = new LecRequest();
+        
+        this.lib = {
+            lecReq: new LecRequest(),
+            auth: new Auth(),
+            loginScreen: new LoginScreen(),
+            windowManager: new WindowManager2()
+        }
 
         // Init variables
         this.urlCallbacks = [ // Liste af URL-callbacks
             {
-                callback: function(){},
+                callback: function () { },
                 matches: ["*"],
                 priority: 0
             }
-        ] 
+        ]
 
         // PageData
         this.currentPage = window.location.href; // Nuværende side
-        this.pageData = this.lecRequest.parseLink(this.currentPage);
-        this.currentUser = {
-            signedIn: false,
-            general: {
-                userId: 0, 
-                username: "",
-                userType: 0
-            },
-            display: {
-                pictureUrl: "",
-                firstName: "",
-                lastName: "",
-            },
-            studentInfo: {
-                class: "", // eks. 1a
-                groups: {
-                    teams: [],
-                    internalGroups: [],
-                    otherGroups: []
-                },
-                studentId: "" // eks. 1a 23
-            }
-        }
+        this.pageData = this.lib.lecReq.parseLink(this.currentPage);
     }
 
-    async init(args) { 
+    async init(args) {
         // Aktiver ikon
         this.setIconListeners()
+        this.applyIcon()
 
         // Type checks
         this.navElement = args?.navElement ? args?.navElement : false; // typisk document.getElementById("nav")
@@ -54,7 +40,7 @@ class Navigator {
         var localPath = this.pageData.localPath || "";
 
         if (
-            localPath.substring(0,10).includes("login.aspx") ||
+            localPath.substring(0, 10).includes("login.aspx") ||
             this.pageData.url == "https://www.lectio.dk/"
         ) {
             loginState = await this.showLogin(this.pageData?.inst);
@@ -74,14 +60,14 @@ class Navigator {
 
     setIconListeners() {
         // Listeners for aktiv/inaktiv tab
-        window.addEventListener("focus", function(){
+        window.addEventListener("focus", function () {
             browser.runtime.sendMessage({
                 action: "switchIcon",
                 value: 1
             });
         })
 
-        window.addEventListener("blur", function(){
+        window.addEventListener("blur", function () {
             browser.runtime.sendMessage({
                 action: "switchIcon",
                 value: 0
@@ -91,57 +77,57 @@ class Navigator {
         return console.debug("Navigation: Ikon aktiveret")
     }
 
+    applyIcon() { // Skift sideikon
+        var link = document.createElement('link');
+        link.rel = 'shortcut icon';
+        console.log(document.getElementsByTagName('head')[0])
+        document.getElementsByTagName('head')[0].appendChild(link);
+
+        link.href = browser.runtime.getURL('icons/icon-48.ico');
+
+        document.title = "mectio";
+    }
+
     async showLogin(inst) {
         loginScreen.inst = inst;
         return loginScreen.waitForLogin()
     }
 
     async load(args) {
-        var x = await lecCompat.load(args, this.update)
+        var _lecRes = await lecCompat.load(args, this.update)
 
-        this.update({
-            url: this.currentPage,
-            data: x.data
-        })
-        return x;
+        this.update(_lecRes)
+        return _lecRes;
     }
 
-    update(args) { // Opdaterer navigation
-        /**
-         * url:
-         * data:
-         */
-        this.currentPage = args.url;
+    /**
+     * 
+     * @param {LecResponse} _lecRes 
+     * @returns 
+     */
 
-        this.updateNavBar({
-            url: this.currentPage,
-            data: args.data
-        })
+    update(_lecRes) { // Opdaterer navigation
+        console.log(_lecRes)
+        if (!(_lecRes instanceof LecResponse)) throw "Nav fejl: Ingen LecResponse, kan ikke opdatere!"
+
+        this.currentPage = _lecRes.path.url;
+
+        this.updateNavBar(_lecRes);
 
         document.title = `${this.currentPage} - mectio`
         window.history.replaceState("", "", this.currentPage)
 
-        return auth.updateLoginStatus({
-            data: args.data
-        })
+        return auth.updateLoginStatus(_lecRes)
     }
 
-    updateNavBar(args) {
-        /**
-         * url:
-         * data:
-         */
+    /**
+     * 
+     * @param {LecResponse} _lecRes 
+     * @returns 
+     */
 
-        // Type check
-        if (
-            typeof args?.url !== "string" ||
-            typeof args?.data !== "string"
-        ) {
-            console.log(args)
-            return false
-        }
-
-        var nav = this.parseSubnav(args.data)
+    updateNavBar(_lecRes) {
+        var nav = this.parseSubnav(_lecRes.rawData)
 
         // Slet tidl. nav-gruppe (midlertidig fix)
         try {
@@ -188,7 +174,7 @@ class Navigator {
         try {
             var navArray = parsedData.getElementsByClassName("ls-subnav1")[0].childNodes
         } catch (e) {
-            return {error: "Ingen links fundet"}
+            return { error: "Ingen links fundet" }
         }
 
         var navTitle = parsedData.getElementById("s_m_HeaderContent_MainTitle")
@@ -201,15 +187,15 @@ class Navigator {
                 var navName = navArray[i].textContent;
 
                 navLinks.push({
-                    name: navName, 
+                    name: navName,
                     href: navLink,
                     active: navActive
                 })
-            } catch (e) {}
+            } catch (e) { }
         }
 
         if (navLinks.length == 0) {
-            return {error: "Ingen links fundet"}
+            return { error: "Ingen links fundet" }
         }
 
         return {

@@ -4,20 +4,20 @@ class LecRequest {
         this.defaultHost = "www.lectio.dk" // Midlertidig
     }
 
-    async getPage(link) { // Henter lectio-side
-        var pageData = this.parseLink(link)
+    async getPage(_url) { // Henter lectio-side
+        var path = new LecPath(_url)
+        console.log(path)
 
-        if (pageData.isLec !== true) {
-            console.warn(link + ": Ikke et Lectio-link");
-            return pageData;
+        if (path.isLec !== true) {
+            console.warn(path.url + ": Ikke et Lectio-link");
+            return new LecResponse(path.url, "");
         }
 
-        console.debug("Henter side " + link)
+        console.debug("Henter side " + _url)
 
-        var resText = await this.fetchText(link);
-        pageData.data = resText;
+        var resText = await this.fetchText(_url);
 
-        return pageData;
+        return new LecResponse(path.url, resText);
         /** PageData:
          * {
          *      isLec: boolean // Siden tilhører lectio. Hvis ikke, bliver hverken data eller inst hentet.
@@ -40,31 +40,8 @@ class LecRequest {
         return resText;
     }
 
-    parseLink(link) { // Behandler link
-        var parsedUrl = new URL(link);
-        var linkData = {};
-
-        linkData.url = parsedUrl.href;
-
-        if (parsedUrl.host !== this.defaultHost) { // Tjekker om siden er del af Lectio
-            linkData.isLec = false;
-            return linkData;
-        }
-
-        linkData.isLec = true;
-
-        var path = parsedUrl.pathname;
-
-        if (path.substring(0, 8) === "/lectio/") {
-            var cutPath = path.substring(8)
-            linkData.inst = parseInt(cutPath.substring(0, cutPath.indexOf("/")))
-
-            // Find lokal side (alt efter /lectio/id/)
-            var localPathIndex = path.indexOf(linkData.inst) + String(linkData.inst).length + 1
-            linkData.localPath = path.substring(localPathIndex)
-        }
-
-        return linkData;
+    parseLink(_url) { // Behandler link
+        return new LecPath(_url);
     }
 
     // Lokale sider
@@ -78,5 +55,54 @@ class LecRequest {
         resText = resText.replaceAll("{_MECTIO_ROOTDIR}", browser.runtime.getURL(""));
 
         return resText;
+    }
+}
+
+class LecPath {
+    constructor(_url) {
+        this.parseUrl(_url);
+    }
+    parseUrl(_url) {
+        // Brug URL class til parsin
+        var parsedUrl = new URL(_url);
+        this._url = parsedUrl.href;
+
+        // Er Lectio URL?
+        if (parsedUrl.origin !== _LECTIO_BASE_URL) { // Tjekker om siden er del af Lectio
+            this.isLec = false;
+            return;
+        } else {
+            this.isLec = true;
+        }
+
+        // Lokal URL for skole
+        var path = parsedUrl.pathname;
+
+        if (path.substring(0, 8) === "/lectio/") {
+            var cutPath = path.substring(8)
+            this.inst = parseInt(cutPath.substring(0, cutPath.indexOf("/")))
+
+            // Find lokal side (alt efter /lectio/id/)
+            var localPathIndex = path.indexOf(this.inst) + String(this.inst).length + 1
+            this.localPath = path.substring(localPathIndex)
+        }
+    }
+    set url(_url) {
+        this.parseUrl(_url);
+    }
+    get url() {
+        return this._url;
+    }
+}
+
+class LecResponse {
+    constructor(_url, _rawData) {
+        this.path = new LecPath(_url);
+        this.rawData = _rawData;
+
+        // Sæt timestamp
+        this.timestamp = new Date();
+
+        console.log(this)
     }
 }

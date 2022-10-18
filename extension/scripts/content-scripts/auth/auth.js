@@ -1,12 +1,51 @@
+class LecLoginState {
+
+}
+
+class LecLoginPrep {
+    constructor(_lecRes) {
+        var parser = new DOMParser();
+
+        var parsedData = parser.parseFromString(_lecRes.rawData, "text/html");
+        console.debug(parsedData);
+
+        var _loginService = parsedData.getElementById("m_Content_schoolnametd").innerText;
+
+        // Find vigtigste ASP felter
+        var VSX = parsedData.getElementById("__VIEWSTATEX").getAttribute("value");
+        var EVV = parsedData.getElementById("__EVENTVALIDATION").getAttribute("value");
+
+        // Find resten af ASP felter
+        var aspHidden = parsedData.querySelectorAll(".aspNetHidden")
+        var aspExtended = {}
+
+        for (var el of aspHidden) {
+            var _children = el.childNodes;
+            for (var child of _children) {
+                if (child.nodeName == "INPUT") {
+                    console.log(child.name, child.value);
+                    // Tilføj til extended list
+                    aspExtended[child.name] = child.value;
+                }
+            }
+        }
+
+        this.loginService = _loginService;
+        this.asp = {
+            _extended: aspExtended,
+            EVV,
+            VSX
+        }
+    }
+}
+
 class Auth {
     constructor(args) {
+        // Required libs
         this.lecRequest = new LecRequest();
         this.parser = new DOMParser();
 
-        if (args?.inst) {
-            this.inst = args.inst;
-        }
-
+        if (args?.inst) { this.inst = args.inst; }
     }
 
     static instList = false;
@@ -16,26 +55,30 @@ class Auth {
 
     }
 
+    /**
+     * 
+     * @param {number} inst 
+     * @returns 
+     */
+
     async prepLogin(inst) {
-        var rawData = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`);
-        console.debug(rawData)
-        var parsedData = this.parser.parseFromString(rawData.data, "text/html");
-        console.debug(parsedData);
+        var lecRes = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`);
+        console.debug(lecRes)
 
-        var loginService = parsedData.getElementById("m_Content_schoolnametd").innerText;
-        var VSX = parsedData.getElementById("__VIEWSTATEX").getAttribute("value");
-        var EVV = parsedData.getElementById("__EVENTVALIDATION").getAttribute("value");
+        var prep = new LecLoginPrep(lecRes);
+        console.log(prep)
 
-        return {
-            loginService,
-            asp: {
-                EVV,
-                VSX
-            }
-        }
+        return prep;
     }
 
-    login = async (args) => {
+    /**
+     * 
+     * @param {object Object} args 
+     * @param {LecLoginPrep} _lecLoginPrep 
+     * @returns 
+     */
+
+    login = async (args, _lecLoginPrep) => {
         var ok = args.inst ? true : false && args.username ? true : false && args.password ? true : false;
         if (ok == false) {
             console.error("Auth: kan ikke logge ind, mangler info!!!");
@@ -43,28 +86,44 @@ class Auth {
         }
 
         // Get VIEWSTATE og EVENTVALIDATION (kræves af ASP.NET)
-        var prep = args.prepLogin ? args.prepLogin : await this.prepLogin(args.inst);
+        if (_lecLoginPrep instanceof LecLoginPrep) {
+            // OK
+        } else {
+            _lecLoginPrep = await this.prepLogin(args.inst);
+        }
 
+        /*
         var data = { // ALLE felter her skal sendes til Lectio
             '__EVENTTARGET': 'm$Content$submitbtn2',
             '__EVENTARGUMENT': "",
             '__SCROLLPOSITION': "",
-            '__VIEWSTATEX': prep.asp.VSX,
+            '__VIEWSTATEX': _lecLoginPrep.asp.VSX,
             '__VIEWSTATEY_KEY': "",
             '__VIEWSTATE': "",
-            '__EVENTVALIDATION': prep.asp.EVV,
-            'm$Content$username': args.username,
-            'm$Content$password': args.password,
+            '__EVENTVALIDATION': _lecLoginPrep.asp.EVV,
             'masterfootervalue': 'X1!ÆØÅ',
-            'LectioPostbackId': "" 
+            'LectioPostbackId': "",
+            'm$Content$username': args.username,
+            'm$Content$password': args.password
         }
+        */
+
+        var data = _lecLoginPrep.asp._extended;
+
+        delete data['time'], data['__LASTFOCUS']
+
+        data['__EVENTTARGET'] = 'm$Content$submitbtn2';
+        data['m$Content$username'] = args.username;
+        data['m$Content$password'] = args.password;
+        data['LectioPostbackId'] = '';
+        data['masterfootervalue'] = 'X1!ÆØÅ';
 
         // Generer POST url
         var formBody = [];
         for (var property in data) {
-        var encodedKey = encodeURIComponent(property);
-        var encodedValue = encodeURIComponent(data[property]);
-        formBody.push(encodedKey + "=" + encodedValue);
+            var encodedKey = encodeURIComponent(property);
+            var encodedValue = encodeURIComponent(data[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
         }
         formBody = formBody.join("&");
 
@@ -74,13 +133,13 @@ class Auth {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: formBody 
+            body: formBody
         })
 
         var response = submitPost.text();
 
         // Vent på godkendt login
-        
+
         if (submitPost.redirected) {
             console.debug("Login succes")
             return {
@@ -129,7 +188,7 @@ class Auth {
             var res = await lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/login_list.aspx`); // Henter skole-liste
             console.debug("Response: ", res);
 
-            var parsedInstData = parser.parseFromString(res.data, "text/html");
+            var parsedInstData = parser.parseFromString(res.rawData, "text/html");
 
             var instsUnparsed = parsedInstData.getElementById("schoolsdiv").childNodes;
 
@@ -169,35 +228,34 @@ class Auth {
         return Auth.loginStatus;
     }
 
-    async updateLoginStatus(args) {
-        /**
-         * id: skole id
-         * url: url
-         * data: html fra lec
-         */
+    /**
+     * 
+     * @param {LecResponse} _lecRes
+     * @param {number} _inst 
+     * @returns 
+     */
 
-        var rawData;
-
+    async updateLoginStatus(_lecRes, _inst) {
         Auth.loginStatus = new Promise(async (resolve, reject) => {
-            if (typeof args?.data == "undefined") {
-                // Hent ny data
-                if (typeof args?.id == 'undefined') {
-                    var x = this.lecRequest.parseLink(window.location.href).inst;
-                    id = parseInt(x);
-                }
-    
-                rawData = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${id}/forside.aspx`);
-            } else { // Brug sendt data
-                rawData = args.data;
+            if (_lecRes instanceof LecResponse) {
+                // OK
+            } else if (typeof _inst == "number") {
+                // Hent ny LecRes
+                _lecRes = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${_inst}/forside.aspx`)
+            } else {
+                throw "Auth fejl: Ingen respons eller skole ID? Kan ikke opdatere loginstatus."
             }
 
-            var parsedData = this.parseCurrentUserId(rawData);
+            console.log("User Status", _lecRes)
+            var user = this.parseCurrentUserId(_lecRes.rawData);
 
-            if (parsedData == false) {
-                resolve({ loginStatus: 0 })
+            if (user == false) {
+                resolve({
+                    loginStatus: 0
+                })
             } else {
-                parsedData.loginStatus = 1;
-                resolve(parsedData);
+                user.loginStatus = 1;
+                resolve(user);
             }
         })
 

@@ -9,7 +9,7 @@ class LoginScreen {
         this.windowState = false;
 
         this.submitCallback = args?.submitCallback || this.authLib.login; // callback når der klikkes log ind
-        this.successCallback = (a, b) => {};
+        this.successCallback = (a, b) => { };
     }
 
     async waitForLogin() {
@@ -27,7 +27,7 @@ class LoginScreen {
         this.loginPage = windowManager2.createWindow({
             exclusive: true
         });
-        
+
         this.lecReqLib.getLocalPage("/pages/login-screen/index.html").then(async (page) => {
             windowManager2.headerState = 0;
             return page;
@@ -100,7 +100,7 @@ class LoginScreen {
             })
         })
 
-        window.requestAnimationFrame(function() {
+        window.requestAnimationFrame(function () {
             var container = document.querySelector("#login-screen-container")
             var box = document.querySelector("#login-screen-box")
 
@@ -256,7 +256,7 @@ class LoginScreen {
     show() {
         this.loginPage.appear()
     }
-    
+
     hide() {
         this.loginPage.hide()
     }

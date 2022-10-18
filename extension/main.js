@@ -15,6 +15,17 @@ var mNavigator = new Navigator(); // variable navn "navigator" er reserveret
 
 var currentUrlData = lecRequest.parseLink(window.location.href);
 
+var init = async function() {
+    console.log("mectio er i ALPHA. Der kan være fejl og mangler")
+
+    await windowManager2.init()
+    await lecCompat.init()
+
+    await mNavigator.init({
+        navElement: document.querySelector("nav")
+    })
+}
+
 browser.storage.local.get(['config'], async function(config) {
     console.log(currentUrlData)
 
@@ -47,17 +58,6 @@ browser.storage.local.get(['config'], async function(config) {
         }
     }
 });
-
-var init = async function() {
-    console.log("mectio er i ALPHA. Der kan være fejl og mangler")
-
-    await windowManager2.init()
-    await lecCompat.init()
-
-    await mNavigator.init({
-        navElement: document.querySelector("nav")
-    })
-}
 
 // Config funktioner, skal flyttes
 

@@ -13,7 +13,6 @@ nav {
     height: 2rem;
     display: flex;
     
-    font-size: 0.9rem;
     box-sizing: border-box;
     z-index: 1001;
     transition: transform 0.1s, opacity 0.1s;
@@ -25,8 +24,9 @@ nav {
     opacity: 0;
 }
 
-nav > div {
-    height: 100%;
+nav > div, .nav-box {
+    font-size: 0.9rem;
+    height: 2rem;
     align-items: center;
     display: flex;
     margin-inline: .3rem;
@@ -43,6 +43,7 @@ nav > div {
     padding: 0 1rem;
     border: none;
     border-radius: .5rem;
+    cursor: pointer;
 }
 
 #mectio-nav-filler {

@@ -34,13 +34,15 @@ class LecCompat {
 
         // Loading transition
         frame.classList.add("loading")
-        frame.style.transition = "filter 0.2s, opacity 0.2s, transform 0.2s";
+        frame.style.transition = "filter, opacity, transform";
 
         // Set frame listeners
         frame.addEventListener("load", () => {
+            frame.style.transitionDuration = "0.2s"
             frame.classList.remove("loading")
 
             frame.contentWindow.addEventListener("unload", () => {
+                frame.style.transitionDuration = "0s"
                 frame.style.height = "";
 
                 frame.classList.add("loading")
@@ -102,10 +104,7 @@ class LecCompat {
 
         var pageData = this.frame.contentDocument.documentElement.innerHTML;
 
-        return {
-            url: parsedUrl.href,
-            data: pageData
-        };
+        return new LecResponse(parsedUrl.href, pageData);
     }
 
     injectCSS(frame) {
@@ -151,10 +150,8 @@ class LecCompat {
         }
 
         // Navigation
-        mNavigator.update({
-            url: frame.contentWindow.location.href,
-            data: frame.contentDocument.documentElement.innerHTML
-        })
+        var _lecRes = new LecResponse(frame.contentWindow.location.href, frame.contentDocument.documentElement.innerHTML)
+        mNavigator.update(_lecRes)
     }
 
     async iFrameDOMLoad(frame) {

@@ -11,17 +11,6 @@ class WindowManager2 {
         this.lecReqLib = new LecRequest();
         this.openWindows = {};
     }
-    applyIcon() {
-        // Skift sideikon, hører ikke til i windowmanager
-        var link = document.createElement('link');
-        link.rel = 'shortcut icon';
-        console.log(document.getElementsByTagName('head')[0])
-        document.getElementsByTagName('head')[0].appendChild(link);
-
-        link.href = browser.runtime.getURL('icons/icon-48.ico');
-
-        document.title = "mectio";
-    }
     async init() {
         this.readyState = new Promise(async (resolve, reject) => {
             // Nulstil document
@@ -45,12 +34,12 @@ class WindowManager2 {
         var nav = document.getElementById("nav-wrapper")
         var main = document.getElementsByTagName("main")[0]
 
-        requestAnimationFrame(function(){
-            switch(state) {
+        requestAnimationFrame(function () {
+            switch (state) {
                 case 0:
                     mectioHeader.classList.add("hidden")
                     nav.classList.add("hidden")
-    
+
                     main.classList.remove("collapse1")
                     main.classList.remove("collapse2")
                     break;
@@ -64,24 +53,25 @@ class WindowManager2 {
                 case 2:
                     mectioHeader.classList.remove("hidden")
                     nav.classList.remove("hidden")
-    
+
                     main.classList.remove("collapse1")
                     main.classList.add("collapse2")
                     break;
                 default:
-                    console.warn("Ugyldig argument, forventer 0, 1 eller 2")    
+                    console.warn("Ugyldig argument, forventer 0, 1 eller 2")
             }
         })
-    } 
+    }
+    /**
+     * 
+     * @param {object} args
+     * @param {boolean} args.exclusive - Vindue i fuld skærm.
+     * @param {boolean} args.persistent - Lukkes ikke under closeAll.
+     * @param {boolean} args.hidden - Skjult når oprettet.
+     * @param {object} args.data - Info tilhørende vinduet, bruges af andre funktioner 
+     * @returns 
+     */
     createWindow(args) {
-        /** Args:
-         *  {
-         *      exclusive: true/false - Vindue i fuld skærm.
-         *      persistent: true/false - Lukkes ikke under closeAll.
-         *      hidden: true/false - Skjult når oprettet.
-         *      data: object - Info tilhørende vinduet, bruges af andre funktioner
-         *  }
-         */
         console.debug("WindowManager2: Nyt vindue")
         var id = (Math.random() + 1).toString(36).substring(2) + (Math.random() + 1).toString(36).substring(2)
         var hidden = args?.hidden ? true : false;
@@ -93,8 +83,8 @@ class WindowManager2 {
         windowElement.setAttribute("id", id)
 
         windowElement.classList.add("mectio-window");
-        if (hidden == true) {windowElement.classList.add("hidden");}
-        if (exclusive == true) {windowElement.classList.add("exclusive");}
+        if (hidden == true) { windowElement.classList.add("hidden"); }
+        if (exclusive == true) { windowElement.classList.add("exclusive"); }
 
         this.hostElement.appendChild(windowElement);
 
@@ -142,7 +132,7 @@ class WindowManager2 {
         var openWindows = this.openWindows;
         var matchingWindows = {};
 
-        var searchOne = function(input, object) {
+        var searchOne = function (input, object) {
             var value1 = input[Object.keys(input)[0]]
             var value2 = object[Object.keys(input)[0]]
             if (value1 == value2) {
@@ -154,7 +144,7 @@ class WindowManager2 {
 
         for (var window in openWindows) {
             var match = searchOne(data, openWindows[window].data)
-            
+
             if (match) {
                 matchingWindows[window] = openWindows[window]
             }
