@@ -26,6 +26,7 @@
         "js": [
           "scripts/content-scripts/lec/lecRequest.js",
           "scripts/content-scripts/lec/LecCompat.js",
+          "scripts/content-scripts/lec/LecGroup.js",
           "scripts/content-scripts/auth/auth.js",
           "scripts/content-scripts/auth/LoginScreen.js", 
           "scripts/content-scripts/logs.js",

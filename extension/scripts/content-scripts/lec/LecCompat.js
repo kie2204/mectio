@@ -55,7 +55,7 @@ class LecCompat {
                     this.iFrameDOMLoad(frame).then(() => {
                         this.injectCSS(frame);
                         this.injectScripts(frame);
-                        this.applyPatches(frame);
+                        this.applyPatches(frame, true);
                     });
                 }, 0);
             });
@@ -85,7 +85,7 @@ class LecCompat {
         frame.contentWindow.location.replace("about:blank");
     }
 
-    async load(args, callback) {
+    async load(args, callback, update = false) {
         /** {
          *      url: Url der loades
          *  }
@@ -110,7 +110,9 @@ class LecCompat {
 
         var pageData = this.frame.contentDocument.documentElement.innerHTML;
 
-        return new LecResponse(parsedUrl.href, pageData);
+        const _lecRes = new LecResponse(parsedUrl.href, pageData);
+
+        return _lecRes;
     }
 
     injectCSS(frame) {
@@ -153,7 +155,7 @@ class LecCompat {
         doc.head.appendChild(injScript);
     }
 
-    applyPatches(frame) {
+    applyPatches(frame, update = false) {
         console.debug("Aktiverer link patch", frame);
         // Patch links (bruges ikke)
         for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
@@ -162,12 +164,15 @@ class LecCompat {
             var dataCommand = x.getAttribute("data-command");
         }
 
-        // Navigation
-        var _lecRes = new LecResponse(
-            frame.contentWindow.location.href,
-            frame.contentDocument.documentElement.innerHTML
-        );
-        mNavigator.update(_lecRes);
+        if (update) {
+            // get frame content
+            const _lecRes = new LecResponse(
+                frame.contentWindow.location.href,
+                frame.contentDocument.documentElement.innerHTML
+            );
+
+            mNavigator.update(_lecRes);
+        }
     }
 
     async iFrameDOMLoad(frame) {

@@ -54,6 +54,8 @@ class Navigator {
         this.load({
             url: loginState?.newUrl || this.currentPage,
         });
+
+        console.log(new LecGroup("elev", "100"))
     }
 
     userInit() {

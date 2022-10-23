@@ -1,4 +1,4 @@
-var browser = browser || chrome;
+const browser = browser || chrome;
 
 // Load api
 try {
@@ -11,7 +11,7 @@ try {
 function switchIcon(type) {
     // Skifter ikon.
     // 0 = inaktiv, 1 = aktiv
-    var path;
+    let path;
 
     switch (type) {
         case 0:

@@ -3,19 +3,19 @@
 // Define browser API for Firefox/Chrome compatibility
 var browser = browser || chrome;
 
-var _LECTIO_BASE_URL = "https://www.lectio.dk"
+const _LECTIO_BASE_URL = "https://www.lectio.dk"
 
-var lecRequest = new LecRequest();
-var auth = new Auth();
-var loginScreen = new LoginScreen();
-var windowManager2 = new WindowManager2();
-var lecCompat = new LecCompat();
+const lecRequest = new LecRequest();
+const auth = new Auth();
+const loginScreen = new LoginScreen();
+const windowManager2 = new WindowManager2();
+const lecCompat = new LecCompat();
 
-var mNavigator = new Navigator(); // variable navn "navigator" er reserveret
+const mNavigator = new Navigator(); // variable navn "navigator" er reserveret
 
-var currentUrlData = lecRequest.parseLink(window.location.href);
+const currentUrlData = lecRequest.parseLink(window.location.href);
 
-var init = async function() {
+const init = async function() {
     console.log("mectio er i ALPHA. Der kan være fejl og mangler")
 
     await windowManager2.init()
@@ -29,7 +29,7 @@ var init = async function() {
 browser.storage.local.get(['config'], async function(config) {
     console.log(currentUrlData)
 
-    var c = config.config;
+    const c = config.config;
 
     // Check if config valid
     if (typeof(c) != "object") {
@@ -61,8 +61,8 @@ browser.storage.local.get(['config'], async function(config) {
 
 // Config funktioner, skal flyttes
 
-var loadConfig = async function(){
-    var config = await browser.storage.local.get(['config']);
+const loadConfig = async function(){
+    let config = await browser.storage.local.get(['config']);
 
     if (typeof(config.config) != "object") {
         console.log("Config invalid, resetting to default")
@@ -73,7 +73,7 @@ var loadConfig = async function(){
     return config.config;
 }
 
-var saveConfig = function(config){
+const saveConfig = function(config){
     browser.storage.local.set({config: config}, function() {
         console.log('Value is set to ' + config);
     });
