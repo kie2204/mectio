@@ -1,7 +1,6 @@
 /* General */
 
 
-
 /**/
 #login-screen-container {
     width: 100%;
@@ -88,7 +87,8 @@
     cursor: pointer;
 
     box-shadow: 0px 0px 4px #0002;
-    transition: box-shadow 0.2s, filter 0.2s, transform 0.1s;
+    transition: box-shadow, filter, transform 0.1s;
+    transition-duration: calc(var(--default-transition-speed) * var(--transition-speed-scale));
 }
 
 #login-buttons .login-button:hover:active {
@@ -97,7 +97,7 @@
 }
 
 #login-buttons .login-button:disabled {
-    filter: grayscale(1)     contrast(0.7) !important;
+    filter: grayscale(1) contrast(0.7) !important;
 }
 
 #login-buttons .login-button:hover {
@@ -159,7 +159,7 @@ input.login-search {
     padding: .6rem 1.2rem;
     margin-bottom: 1rem;
     font-size: 1.1rem;
-    transition: border 0.2s;
+    transition: border var(--full-speed);
 }
 
 input.login-search:focus {
@@ -184,9 +184,13 @@ input.login-search:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: border-color 0.2s, box-shadow 0.2s, filter 0.1s, transform 0.1s;
     max-height: 3rem;
     user-select: none;
+    transition: 
+        border-color var(--full-speed),
+        box-shadow var(--full-speed),
+        filter var(--double-speed),
+        transform var(--double-speed);
 
     text-decoration: none;
     color: black;
@@ -206,7 +210,8 @@ input.login-search:focus {
     border: 0;
 }
 
-.login-opt:hover, .login-opt.selected {
+.login-opt:hover,
+.login-opt.selected {
     border-color: var(--nav-color-dark);
     box-shadow: 0px 0px .1rem #0006;
 }
@@ -217,7 +222,8 @@ input.login-search:focus {
     float: right;
     opacity: 0;
     transform: scale(.5) rotate(45deg);
-    transition: opacity 0.2s, transform 0.2s;
+    transition-property: opacity, transform;
+    transition-duration: var(--full-speed);
 }
 
 .login-opt.selected::after {
@@ -230,7 +236,7 @@ input.login-search:focus {
     height: 100%;
     display: flex;
     transform: translateX(calc((-100% - 1rem) * (var(--login-step) - 1)));
-    transition: transform 0.3s;
+    transition: transform var(--half-speed);
 }
 
 #login-screens .login-step {
@@ -264,7 +270,7 @@ root {
     border-radius: 100rem;
     padding: .6rem 1.2rem;
     margin-bottom: 1rem;
-    transition: border 0.2s;
+    transition: border var(--full-speed);
     box-sizing: border-box;
     font-size: 1.1rem;
     display: flex;

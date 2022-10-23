@@ -47,6 +47,17 @@
     --white: #fff;
 
     --default-transition-curve: cubic-bezier(0, 0, 0.2, 1);
+    --bounce-transition-curve: cubic-bezier(0.2, 2, 0.8, 0.9);
+    --default-transition-speed: 0.2s;
+    --transition-speed-scale: 1;
+
+    --full-speed: calc(var(--default-transition-speed) / var(--transition-speed-scale));
+    --double-speed: calc(var(--full-speed) * 0.5);
+    --half-speed: calc(var(--full-speed) * 2);
+}
+
+* {
+    transition-timing-function: var(--default-transition-curve);
 }
 
 h1, h2, h3, h4, h5, h6 {
