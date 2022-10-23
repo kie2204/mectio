@@ -48,6 +48,11 @@ class LecCompat {
                 frame.style.transitionDuration = "0s";
                 frame.style.height = "";
 
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                })
+
                 frame.classList.add("loading");
                 console.log("Unload event");
 
