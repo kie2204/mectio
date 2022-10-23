@@ -65,6 +65,10 @@ A[href].s2skemabrik {
     border-left: 2px solid;
 }
 
+A[href].s2skemabrik.s2bgboxeksamen {
+    border-color: #e03131;
+}
+
 A.s2bgbox {
     margin-bottom: 0.3rem;
 }
