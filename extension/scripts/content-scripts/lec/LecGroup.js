@@ -1,5 +1,4 @@
 class LecGroupType {
-    
     constructor(_urlType, _urlLookupType, _ctxType, _ctxable) {
         this.urlType = _urlType;
         this.urlLookupType = _urlLookupType;
@@ -13,19 +12,15 @@ class LecGroup {
         new LecGroupType("laerer", "laererid", "T"),
         new LecGroupType("holdelement", "holdelementid", "HE"),
         new LecGroupType("stamklasse", "klasseid"),
-    ]
+    ];
 
     constructor(_urlType, _id) {
-        if (!this.#validTypes.includes(_type)) throw `Ugyldig type ${_type}`
+        if (!this.#validTypes.includes(_type)) throw `Ugyldig type ${_type}`;
         this.type = _type;
         this.id = _id;
     }
-    set id(x) {
-       
-    }
-    #populateFromResponse(_lecRes) {
-
-    }
+    set id(x) {}
+    #populateFromResponse(_lecRes) {}
     #generateContextId(type, id) {
         return type + id;
     }
@@ -35,11 +30,12 @@ class LecUser extends LecGroup {
     #validTypes = [
         new LecGroupType("elev", "elevid", "S"),
         new LecGroupType("laerer", "laererid", "T"),
-    ]
+    ];
 
     constructor(_urlType, _id) {
-        // Type Check 
-        if (!this.#validTypes.includes(_gtype)) throw `Ugyldig gruppe type ${_type}` 
+        // Type Check
+        if (!this.#validTypes.includes(_gtype))
+            throw `Ugyldig gruppe type ${_type}`;
     }
 }
 

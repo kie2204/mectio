@@ -1,19 +1,20 @@
 // lecRequest: Henter data fra Lectio og behandler til brug andre steder
 class LecRequest {
     constructor() {
-        this.defaultHost = "www.lectio.dk" // Midlertidig
+        this.defaultHost = "www.lectio.dk"; // Midlertidig
     }
 
-    async getPage(_url) { // Henter lectio-side
-        var path = new LecPath(_url)
-        console.log(path)
+    async getPage(_url) {
+        // Henter lectio-side
+        var path = new LecPath(_url);
+        console.log(path);
 
         if (path.isLec !== true) {
             console.warn(path.url + ": Ikke et Lectio-link");
             return new LecResponse(path.url, "");
         }
 
-        console.debug("Henter side " + _url)
+        console.debug("Henter side " + _url);
 
         var resText = await this.fetchText(_url);
 
@@ -28,11 +29,14 @@ class LecRequest {
          */
     }
 
-    async fetchText(link) { // fetch().text() wrapper, bruges internt
+    async fetchText(link) {
+        // fetch().text() wrapper, bruges internt
         var res = await fetch(link);
 
         if (res.ok !== true) {
-            console.error(`Kunne ikke hente side, fejl ${res.status}: ${res.statusText}`)
+            console.error(
+                `Kunne ikke hente side, fejl ${res.status}: ${res.statusText}`
+            );
             return false;
         }
 
@@ -40,19 +44,24 @@ class LecRequest {
         return resText;
     }
 
-    parseLink(_url) { // Behandler link
+    parseLink(_url) {
+        // Behandler link
         return new LecPath(_url);
     }
 
     // Lokale sider
-    async getLocalPage(link) { // link til siden, fra rod af mectio (f.eks. "pages/login-screen/index.html")
-        var localUrl = browser.runtime.getURL(link) // Finder link til siden
+    async getLocalPage(link) {
+        // link til siden, fra rod af mectio (f.eks. "pages/login-screen/index.html")
+        var localUrl = browser.runtime.getURL(link); // Finder link til siden
 
         var resText = await this.fetchText(localUrl);
         var curDir = localUrl.substring(0, localUrl.lastIndexOf("/"));
 
         resText = resText.replaceAll("{_MECTIO_CURDIR}", curDir);
-        resText = resText.replaceAll("{_MECTIO_ROOTDIR}", browser.runtime.getURL(""));
+        resText = resText.replaceAll(
+            "{_MECTIO_ROOTDIR}",
+            browser.runtime.getURL("")
+        );
 
         return resText;
     }
@@ -68,7 +77,8 @@ class LecPath {
         this._url = parsedUrl.href;
 
         // Er Lectio URL?
-        if (parsedUrl.origin !== _LECTIO_BASE_URL) { // Tjekker om siden er del af Lectio
+        if (parsedUrl.origin !== _LECTIO_BASE_URL) {
+            // Tjekker om siden er del af Lectio
             this.isLec = false;
             return;
         } else {
@@ -79,12 +89,13 @@ class LecPath {
         var path = parsedUrl.pathname;
 
         if (path.substring(0, 8) === "/lectio/") {
-            var cutPath = path.substring(8)
-            this.inst = parseInt(cutPath.substring(0, cutPath.indexOf("/")))
+            var cutPath = path.substring(8);
+            this.inst = parseInt(cutPath.substring(0, cutPath.indexOf("/")));
 
             // Find lokal side (alt efter /lectio/id/)
-            var localPathIndex = path.indexOf(this.inst) + String(this.inst).length + 1
-            this.localPath = path.substring(localPathIndex)
+            var localPathIndex =
+                path.indexOf(this.inst) + String(this.inst).length + 1;
+            this.localPath = path.substring(localPathIndex);
         }
     }
     set url(_url) {
@@ -102,7 +113,33 @@ class LecResponse {
 
         // Sæt timestamp
         this.timestamp = new Date();
+    }
 
-        console.log(this)
+    get auth() {
+        const _rawData = this.rawData;
+        let _auth = {};
+        // Tjek sidens login status med querySelector(`[name=msapplication-starturl]`)
+        const parser = new DOMParser();
+        const parsedData = parser.parseFromString(_rawData, "text/html");
+        const metaEl = parsedData.querySelector(
+            `[name=msapplication-starturl]`
+        );
+
+        if (metaEl instanceof Element) {
+            const metaContent = metaEl.getAttribute("content");
+
+            if (metaContent.includes("forside.aspx")) {
+                // Personlig forside, derfor authenticated
+                _auth.authenticated = true;
+            } else if (metaContent.includes("default.aspx")) {
+                _auth.authenticated = false;
+            }
+        }
+
+        if (_auth.authenticated == null) {
+            _auth.authenticated = null;
+        }
+
+        return _auth;
     }
 }

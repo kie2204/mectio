@@ -1,6 +1,4 @@
-class LecLoginState {
-
-}
+class LecLoginState {}
 
 class LecLoginPrep {
     constructor(_lecRes) {
@@ -9,15 +7,21 @@ class LecLoginPrep {
         var parsedData = parser.parseFromString(_lecRes.rawData, "text/html");
         console.debug(parsedData);
 
-        var _loginService = parsedData.getElementById("m_Content_schoolnametd").innerText;
+        var _loginService = parsedData.getElementById(
+            "m_Content_schoolnametd"
+        ).innerText;
 
         // Find vigtigste ASP felter
-        var VSX = parsedData.getElementById("__VIEWSTATEX").getAttribute("value");
-        var EVV = parsedData.getElementById("__EVENTVALIDATION").getAttribute("value");
+        var VSX = parsedData
+            .getElementById("__VIEWSTATEX")
+            .getAttribute("value");
+        var EVV = parsedData
+            .getElementById("__EVENTVALIDATION")
+            .getAttribute("value");
 
         // Find resten af ASP felter
-        var aspHidden = parsedData.querySelectorAll(".aspNetHidden")
-        var aspExtended = {}
+        var aspHidden = parsedData.querySelectorAll(".aspNetHidden");
+        var aspExtended = {};
 
         for (var el of aspHidden) {
             var _children = el.childNodes;
@@ -34,8 +38,8 @@ class LecLoginPrep {
         this.asp = {
             _extended: aspExtended,
             EVV,
-            VSX
-        }
+            VSX,
+        };
     }
 }
 
@@ -45,41 +49,48 @@ class Auth {
         this.lecRequest = new LecRequest();
         this.parser = new DOMParser();
 
-        if (args?.inst) { this.inst = args.inst; }
+        if (args?.inst) {
+            this.inst = args.inst;
+        }
     }
 
     static instList = false;
     static loginStatus = false;
 
-    set inst(inst) {
-
-    }
+    set inst(inst) {}
 
     /**
-     * 
-     * @param {number} inst 
-     * @returns 
+     *
+     * @param {number} inst
+     * @returns
      */
 
     async prepLogin(inst) {
-        var lecRes = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`);
-        console.debug(lecRes)
+        var lecRes = await this.lecRequest.getPage(
+            `${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`
+        );
 
         var prep = new LecLoginPrep(lecRes);
-        console.log(prep)
+        console.log(prep);
 
         return prep;
     }
 
     /**
-     * 
-     * @param {object Object} args 
-     * @param {LecLoginPrep} _lecLoginPrep 
-     * @returns 
+     *
+     * @param {object Object} args
+     * @param {LecLoginPrep} _lecLoginPrep
+     * @returns
      */
 
     login = async (args, _lecLoginPrep) => {
-        var ok = args.inst ? true : false && args.username ? true : false && args.password ? true : false;
+        var ok = args.inst
+            ? true
+            : false && args.username
+            ? true
+            : false && args.password
+            ? true
+            : false;
         if (ok == false) {
             console.error("Auth: kan ikke logge ind, mangler info!!!");
             return false;
@@ -110,13 +121,13 @@ class Auth {
 
         var data = _lecLoginPrep.asp._extended;
 
-        delete data['time'], data['__LASTFOCUS']
+        delete data["time"], data["__LASTFOCUS"];
 
-        data['__EVENTTARGET'] = 'm$Content$submitbtn2';
-        data['m$Content$username'] = args.username;
-        data['m$Content$password'] = args.password;
-        data['LectioPostbackId'] = '';
-        data['masterfootervalue'] = 'X1!ÆØÅ';
+        data["__EVENTTARGET"] = "m$Content$submitbtn2";
+        data["m$Content$username"] = args.username;
+        data["m$Content$password"] = args.password;
+        data["LectioPostbackId"] = "";
+        data["masterfootervalue"] = "X1!ÆØÅ";
 
         // Generer POST url
         var formBody = [];
@@ -128,37 +139,42 @@ class Auth {
         formBody = formBody.join("&");
 
         // Send login til Lectio
-        var submitPost = await fetch(`${_LECTIO_BASE_URL}/lectio/${args.inst}/login.aspx`, { // Send post request med data
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: formBody
-        })
+        var submitPost = await fetch(
+            `${_LECTIO_BASE_URL}/lectio/${args.inst}/login.aspx`,
+            {
+                // Send post request med data
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: formBody,
+            }
+        );
 
         var response = submitPost.text();
 
         // Vent på godkendt login
 
         if (submitPost.redirected) {
-            console.debug("Login succes")
+            console.debug("Login succes");
             return {
                 loginStatus: 1,
                 response,
-                newUrl: submitPost.url
-            }
+                newUrl: submitPost.url,
+            };
         } else {
-            console.warn("Login fejl ", response)
-            var error = this.parseLoginError(response)
+            console.warn("Login fejl ", response);
+            var error = this.parseLoginError(response);
             return {
                 loginStatus: 0,
                 response,
-                error
-            }
+                error,
+            };
         }
-    }
+    };
 
-    parseLoginError(res) { // Fungerer ikke, da fejl er gemt i script tag
+    parseLoginError(res) {
+        // Fungerer ikke, da fejl er gemt i script tag
         //var parsed = this.parser.parseFromString(res, "text/html");
 
         //return parsed.querySelector("[data-title=Fejl]").innerText;
@@ -167,37 +183,44 @@ class Auth {
 
     async logout() {
         Auth.loginStatus = {
-            loginStatus: 0
-        }
-        var url = _LECTIO_BASE_URL + "/lectio/" + this.inst + "/logout.aspx"
-        console.debug("Logout URL: ", url)
+            loginStatus: 0,
+        };
+        var url = _LECTIO_BASE_URL + "/lectio/" + this.inst + "/logout.aspx";
+        console.debug("Logout URL: ", url);
         fetch(url);
     }
 
     get instList() {
         if (Auth.instList != false) {
-            console.info("Auth: skoleliste er hentet, eller er igang")
+            console.info("Auth: skoleliste er hentet, eller er igang");
             return Auth.instList;
         }
 
-        console.debug("Auth: henter skoleliste")
+        console.debug("Auth: henter skoleliste");
 
         Auth.instList = new Promise(async (resolve, reject) => {
             var parser = new DOMParser();
 
-            var res = await lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/login_list.aspx`); // Henter skole-liste
+            var res = await lecRequest.getPage(
+                `${_LECTIO_BASE_URL}/lectio/login_list.aspx`
+            ); // Henter skole-liste
             console.debug("Response: ", res);
 
-            var parsedInstData = parser.parseFromString(res.rawData, "text/html");
+            var parsedInstData = parser.parseFromString(
+                res.rawData,
+                "text/html"
+            );
 
-            var instsUnparsed = parsedInstData.getElementById("schoolsdiv").childNodes;
+            var instsUnparsed =
+                parsedInstData.getElementById("schoolsdiv").childNodes;
 
             var count = 0;
             var instList = [];
 
             for (var i = 0; i < instsUnparsed.length; i++) {
                 try {
-                    var instURL = instsUnparsed[i].childNodes[0].getAttribute("href");
+                    var instURL =
+                        instsUnparsed[i].childNodes[0].getAttribute("href");
                     var instName = instsUnparsed[i].textContent;
 
                     var chop1 = instURL.substr(instURL.indexOf("/lectio/") + 8);
@@ -205,14 +228,14 @@ class Auth {
 
                     instList.push({
                         id: instId,
-                        name: instName
+                        name: instName,
                     });
-                } catch (e) { }
+                } catch (e) {}
             }
 
             resolve({
                 count: instList.length,
-                instList: instList
+                instList: instList,
             });
         });
 
@@ -223,16 +246,16 @@ class Auth {
         if (Auth.loginStatus == false) {
             this.updateLoginStatus().then(() => {
                 return Auth.loginStatus;
-            })
+            });
         }
         return Auth.loginStatus;
     }
 
     /**
-     * 
+     *
      * @param {LecResponse} _lecRes
-     * @param {number} _inst 
-     * @returns 
+     * @param {number} _inst
+     * @returns
      */
 
     async updateLoginStatus(_lecRes, _inst) {
@@ -241,36 +264,41 @@ class Auth {
                 // OK
             } else if (typeof _inst == "number") {
                 // Hent ny LecRes
-                _lecRes = await this.lecRequest.getPage(`${_LECTIO_BASE_URL}/lectio/${_inst}/forside.aspx`)
+                _lecRes = await this.lecRequest.getPage(
+                    `${_LECTIO_BASE_URL}/lectio/${_inst}/forside.aspx`
+                );
             } else {
-                throw "Auth fejl: Ingen respons eller skole ID? Kan ikke opdatere loginstatus."
+                throw "Auth fejl: Ingen respons eller skole ID? Kan ikke opdatere loginstatus.";
             }
 
-            console.log("User Status", _lecRes)
             var user = this.parseCurrentUserId(_lecRes.rawData);
 
             if (user == false) {
                 resolve({
-                    loginStatus: 0
-                })
+                    loginStatus: 0,
+                });
             } else {
                 user.loginStatus = 1;
                 resolve(user);
             }
-        })
+        });
 
         return Auth.loginStatus;
     }
 
-    parseCurrentUserId(data) { // Finder id på bruger, der er logget ind ud fra rå HTML data
+    parseCurrentUserId(data) {
+        // Finder id på bruger, der er logget ind ud fra rå HTML data
         try {
             var parsedData = this.parser.parseFromString(data, "text/html");
 
-            var username = parsedData.getElementsByClassName("ls-user-name")[0].textContent;
-            var usernameHref = parsedData.getElementsByClassName("ls-user-name")[0].href;
+            var username =
+                parsedData.getElementsByClassName("ls-user-name")[0]
+                    .textContent;
+            var usernameHref =
+                parsedData.getElementsByClassName("ls-user-name")[0].href;
 
-            var parsedHref = new URL(usernameHref)
-            var parsedLink = this.lecRequest.parseLink(usernameHref)
+            var parsedHref = new URL(usernameHref);
+            var parsedLink = this.lecRequest.parseLink(usernameHref);
 
             var inst = parsedLink.inst;
 
@@ -289,9 +317,8 @@ class Auth {
                     userType = 1;
                     break;
             }
-
         } catch (e) {
-            console.error("User id parse fejl! ", e)
+            console.error("User id parse fejl! ", e);
             return false;
         }
 
@@ -299,7 +326,7 @@ class Auth {
             inst, //
             userId, //
             username, //
-            userType //
-        }
+            userType, //
+        };
     }
 }

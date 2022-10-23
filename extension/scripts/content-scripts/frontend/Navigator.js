@@ -5,22 +5,23 @@ class Navigator {
         // Init libs
         this.parser = new DOMParser();
         this.lecRequest = new LecRequest();
-        
+
         this.lib = {
             lecReq: new LecRequest(),
             auth: new Auth(),
             loginScreen: new LoginScreen(),
-            windowManager: new WindowManager2()
-        }
+            windowManager: new WindowManager2(),
+        };
 
         // Init variables
-        this.urlCallbacks = [ // Liste af URL-callbacks
+        this.urlCallbacks = [
+            // Liste af URL-callbacks
             {
-                callback: function () { },
+                callback: function () {},
                 matches: ["*"],
-                priority: 0
-            }
-        ]
+                priority: 0,
+            },
+        ];
 
         // PageData
         this.currentPage = window.location.href; // Nuværende side
@@ -29,14 +30,15 @@ class Navigator {
 
     async init(args) {
         // Aktiver ikon
-        this.setIconListeners()
-        this.applyIcon()
+        this.setIconListeners();
+        this.applyIcon();
 
         // Type checks
         this.navElement = args?.navElement ? args?.navElement : false; // typisk document.getElementById("nav")
-        if ((this.navElement instanceof Element) == false) throw "Intet nav-element valgt!!"
+        if (this.navElement instanceof Element == false)
+            throw "Intet nav-element valgt!!";
 
-        var loginState
+        var loginState;
         var localPath = this.pageData.localPath || "";
 
         if (
@@ -50,12 +52,12 @@ class Navigator {
 
         windowManager2.headerState = 2;
         this.load({
-            url: loginState?.newUrl || this.currentPage
-        })
+            url: loginState?.newUrl || this.currentPage,
+        });
     }
 
     userInit() {
-        // Forbered nuværende bruger 
+        // Forbered nuværende bruger
     }
 
     setIconListeners() {
@@ -63,108 +65,113 @@ class Navigator {
         window.addEventListener("focus", function () {
             browser.runtime.sendMessage({
                 action: "switchIcon",
-                value: 1
+                value: 1,
             });
-        })
+        });
 
         window.addEventListener("blur", function () {
             browser.runtime.sendMessage({
                 action: "switchIcon",
-                value: 0
+                value: 0,
             });
-        })
+        });
 
-        return console.debug("Navigation: Ikon aktiveret")
+        return console.debug("Navigation: Ikon aktiveret");
     }
 
-    applyIcon() { // Skift sideikon
-        var link = document.createElement('link');
-        link.rel = 'shortcut icon';
-        console.log(document.getElementsByTagName('head')[0])
-        document.getElementsByTagName('head')[0].appendChild(link);
+    applyIcon() {
+        // Skift sideikon
+        var link = document.createElement("link");
+        link.rel = "shortcut icon";
+        console.log(document.getElementsByTagName("head")[0]);
+        document.getElementsByTagName("head")[0].appendChild(link);
 
-        link.href = browser.runtime.getURL('icons/icon-48.ico');
+        link.href = browser.runtime.getURL("icons/icon-48.ico");
 
         document.title = "mectio";
     }
 
     async showLogin(inst) {
         loginScreen.inst = inst;
-        return loginScreen.waitForLogin()
+        return loginScreen.waitForLogin();
     }
 
     async load(args) {
-        var _lecRes = await lecCompat.load(args, this.update)
+        var _lecRes = await lecCompat.load(args, this.update);
 
-        this.update(_lecRes)
+        this.update(_lecRes);
         return _lecRes;
     }
 
     /**
-     * 
-     * @param {LecResponse} _lecRes 
-     * @returns 
+     *
+     * @param {LecResponse} _lecRes
+     * @returns
      */
 
-    update(_lecRes) { // Opdaterer navigation
-        console.log(_lecRes)
-        if (!(_lecRes instanceof LecResponse)) throw "Nav fejl: Ingen LecResponse, kan ikke opdatere!"
+    update(_lecRes) {
+        // Opdaterer navigation
+        if (!(_lecRes instanceof LecResponse))
+            throw "Nav fejl: Ingen LecResponse, kan ikke opdatere!";
+        console.debug("Opdaterer:", _lecRes);
 
         this.currentPage = _lecRes.path.url;
 
         this.updateNavBar(_lecRes);
 
-        document.title = `${this.currentPage} - mectio`
-        window.history.replaceState("", "", this.currentPage)
+        document.title = `${this.currentPage} - mectio`;
+        window.history.replaceState("", "", this.currentPage);
 
-        return auth.updateLoginStatus(_lecRes)
+        console.log(_lecRes.auth);
+
+        return auth.updateLoginStatus(_lecRes);
     }
 
     /**
-     * 
-     * @param {LecResponse} _lecRes 
-     * @returns 
+     *
+     * @param {LecResponse} _lecRes
+     * @returns
      */
 
     updateNavBar(_lecRes) {
-        var nav = this.parseSubnav(_lecRes.rawData)
+        var nav = this.parseSubnav(_lecRes.rawData);
 
         // Slet tidl. nav-gruppe (midlertidig fix)
         try {
             document.getElementsByClassName("mectio-nav-group")[0].remove();
         } catch (e) {
-            console.log("Ingen nav gruppe slettet.")
+            console.log("Ingen nav gruppe slettet.");
         }
 
-        var navLinks = document.getElementById("mectio-nav-links")
+        var navLinks = document.getElementById("mectio-nav-links");
 
-        var navTitle = document.getElementById("mectio-nav-title")
+        var navTitle = document.getElementById("mectio-nav-title");
         navTitle.innerText = "id: " + nav.navCtxId; // todo
 
         if (typeof nav.links != "object") return;
 
-        var navGroup = document.createElement("div")
-        navGroup.classList.add("mectio-nav-group")
+        var navGroup = document.createElement("div");
+        navGroup.classList.add("mectio-nav-group");
 
         for (var link of nav.links) {
-            var el = document.createElement("a")
+            var el = document.createElement("a");
 
             el.innerText = link.name;
             el.href = link.href;
-            if (link.active) el.classList.add("active")
+            if (link.active) el.classList.add("active");
 
             // Add click listener
             el.addEventListener("click", (e) => {
                 e.preventDefault();
                 this.load({
-                    url: document.activeElement.href
-                })
-            })
+                    url: document.activeElement.href,
+                });
+            });
 
-            navGroup.appendChild(el)
+            navGroup.appendChild(el);
         }
 
-        navLinks.appendChild(navGroup)
+        navLinks.appendChild(navGroup);
     }
 
     parseSubnav(data) {
@@ -172,35 +179,39 @@ class Navigator {
 
         var navLinks = [];
         try {
-            var navArray = parsedData.getElementsByClassName("ls-subnav1")[0].childNodes
+            var navArray =
+                parsedData.getElementsByClassName("ls-subnav1")[0].childNodes;
         } catch (e) {
-            return { error: "Ingen links fundet" }
+            return { error: "Ingen links fundet" };
         }
 
-        var navTitle = parsedData.getElementById("s_m_HeaderContent_MainTitle")
-        var navCtxId = navTitle.getAttribute("data-lectiocontextcard")
+        var navTitle = parsedData.getElementById("s_m_HeaderContent_MainTitle");
+        var navCtxId = navTitle.getAttribute("data-lectiocontextcard");
 
-        for (var i = 0; i < navArray.length; i++) { // Kører gennem alle links og tilføjer til array
+        for (var i = 0; i < navArray.length; i++) {
+            // Kører gennem alle links og tilføjer til array
             try {
                 var navLink = navArray[i].childNodes[0].getAttribute("href");
-                var navActive = navArray[i].getAttribute("class").includes("ls-subnav-active")
+                var navActive = navArray[i]
+                    .getAttribute("class")
+                    .includes("ls-subnav-active");
                 var navName = navArray[i].textContent;
 
                 navLinks.push({
                     name: navName,
                     href: navLink,
-                    active: navActive
-                })
-            } catch (e) { }
+                    active: navActive,
+                });
+            } catch (e) {}
         }
 
         if (navLinks.length == 0) {
-            return { error: "Ingen links fundet" }
+            return { error: "Ingen links fundet" };
         }
 
         return {
             navCtxId,
-            links: navLinks
+            links: navLinks,
         };
     }
 }

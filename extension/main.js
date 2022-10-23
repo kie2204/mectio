@@ -43,7 +43,7 @@ browser.storage.local.get(['config'], async function(config) {
 
     // check if enabled
     if (c.enabled == 1) {
-        if (document instanceof HTMLDocument) {
+        if (document.documentElement instanceof HTMLHtmlElement && document.body.childElementCount != 1) {
             // Her afbrydes lectio
             document.open(); 
             document.close();

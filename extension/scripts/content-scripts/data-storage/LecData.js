@@ -1,7 +1,3 @@
 class LecData {
-
-    addEntry() {
-
-    }
-    
+    addEntry() {}
 }
