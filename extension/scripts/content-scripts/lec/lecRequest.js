@@ -91,7 +91,9 @@ class LecPath {
         if (path.substring(0, 8) === "/lectio/") {
             var cutPath = path.substring(8);
             this.inst = parseInt(cutPath.substring(0, cutPath.indexOf("/")));
+        }
 
+        if (!isNaN(this.inst)) {
             // Find lokal side (alt efter /lectio/id/)
             var localPathIndex =
                 path.indexOf(this.inst) + String(this.inst).length + 1;
