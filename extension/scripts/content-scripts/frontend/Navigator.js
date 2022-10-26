@@ -121,7 +121,7 @@ class Navigator {
 
         this.updateNavBar(_lecRes);
 
-        document.title = `${this.currentPage} - mectio`;
+        document.title = `${_lecRes.path?.localPath || "."} - mectio`;
         window.history.replaceState("", "", this.currentPage);
 
         console.log(_lecRes.auth);
