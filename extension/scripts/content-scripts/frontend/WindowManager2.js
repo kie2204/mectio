@@ -1,3 +1,5 @@
+// @ts-check
+
 class WindowManager2 {
     #activeWindow = "";
 
@@ -7,7 +9,6 @@ class WindowManager2 {
          *
          *  }
          */
-        this.lecReqLib = new LecRequest();
         this.openWindows = {};
     }
 
@@ -16,7 +17,7 @@ class WindowManager2 {
         document.body.style.opacity = "0";
 
         // Indsæt html for dok-struktur
-        await this.lecReqLib.getLocalPage("pages/main.html").then((text) => {
+        await LecRequest.getLocalPage("pages/main.html").then((text) => {
             document.body.innerHTML = text;
 
             this.hostElement = document.getElementById("window-container");
@@ -30,33 +31,64 @@ class WindowManager2 {
         var nav = document.getElementById("nav-wrapper");
         var main = document.getElementsByTagName("main")[0];
 
-        requestAnimationFrame(function () {
-            switch (state) {
-                case 0:
-                    mectioHeader.classList.add("hidden");
-                    nav.classList.add("hidden");
+        if (
+            mectioHeader instanceof Element &&
+            nav instanceof Element &&
+            main instanceof Element
+        ) {
+            requestAnimationFrame(function () {
+                switch (state) {
+                    case 0:
+                        mectioHeader.classList.add("hidden");
+                        nav.classList.add("hidden");
 
-                    main.classList.remove("collapse1");
-                    main.classList.remove("collapse2");
-                    break;
-                case 1:
-                    mectioHeader.classList.remove("hidden");
-                    nav.classList.add("hidden");
+                        main.classList.remove("collapse1");
+                        main.classList.remove("collapse2");
+                        break;
+                    case 1:
+                        mectioHeader.classList.remove("hidden");
+                        nav.classList.add("hidden");
 
-                    main.classList.add("collapse1");
-                    main.classList.remove("collapse2");
-                    break;
-                case 2:
-                    mectioHeader.classList.remove("hidden");
-                    nav.classList.remove("hidden");
+                        main.classList.add("collapse1");
+                        main.classList.remove("collapse2");
+                        break;
+                    case 2:
+                        mectioHeader.classList.remove("hidden");
+                        nav.classList.remove("hidden");
 
-                    main.classList.remove("collapse1");
-                    main.classList.add("collapse2");
-                    break;
-                default:
-                    console.warn("Ugyldig argument, forventer 0, 1 eller 2");
-            }
-        });
+                        main.classList.remove("collapse1");
+                        main.classList.add("collapse2");
+                        break;
+                    default:
+                        console.warn(
+                            "Ugyldig argument, forventer 0, 1 eller 2"
+                        );
+                }
+            });
+        } else {
+            return
+        }
+    }
+    /**
+     * 
+     * @param {number} len 
+     * @returns 
+     */
+    genRandomId(len) {
+        const charset =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "abcdefghijklmnopqrstuvwxyz" +
+            "1234567890" +
+            "-_";
+        let index;
+        let randomId = "";
+
+        for (let i = 0; i < len; i++) {
+            index = Math.floor(Math.random() * charset.length);
+            randomId += charset[index];
+        }
+
+        return randomId;
     }
     /**
      *
@@ -69,9 +101,7 @@ class WindowManager2 {
      */
     createWindow(args) {
         console.debug("WindowManager2: Nyt vindue");
-        var id =
-            (Math.random() + 1).toString(36).substring(2) +
-            (Math.random() + 1).toString(36).substring(2);
+        var id = this.genRandomId(32);
         var hidden = args?.hidden ? true : false;
         var exclusive = args?.exclusive ? true : false;
         var persistent = args?.persistent ? true : false;

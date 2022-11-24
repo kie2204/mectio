@@ -4,8 +4,8 @@ class LecCompat {
          *      window: Vindue hvor frame indlæses
          *  }
          */
-
-        this.updateCallback = function () {};
+        this.updateCallback = () => {};
+        console.log(this.updateCallback);
     }
 
     init(args) {
@@ -50,8 +50,8 @@ class LecCompat {
 
                 window.scrollTo({
                     top: 0,
-                    behavior: "smooth"
-                })
+                    behavior: "smooth",
+                });
 
                 frame.classList.add("loading");
                 console.log("Unload event");
@@ -66,38 +66,17 @@ class LecCompat {
             });
         });
 
-        // Sæt højde
-        setInterval(function () {
-            var body = frame.contentDocument.body;
-            var html = frame.contentDocument.documentElement;
-
-            // console.log(frame.contentDocument.body, body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-
-            var height = Math.max(
-                body.scrollHeight,
-                body.offsetHeight,
-                html.clientHeight,
-                html.scrollHeight,
-                html.offsetHeight
-            );
-
-            // console.log(frame, "Height: ", height)
-
-            frame.style.height = `${height}px`;
-            frame.style.filter = "";
-        }, 500);
-
         frame.contentWindow.location.replace("about:blank");
     }
 
-    async load(args, callback, update = false) {
+    load = async (_lecPath, callback, update = false) => {
         /** {
          *      url: Url der loades
          *  }
          */
         this.updateCallback = callback;
 
-        var url = typeof args.url == "string" ? args.url : "";
+        var url = _lecPath.url;
 
         var frame = this.frame;
 
@@ -118,7 +97,7 @@ class LecCompat {
         const _lecRes = new LecResponse(parsedUrl.href, pageData);
 
         return _lecRes;
-    }
+    };
 
     injectCSS(frame) {
         var doc = frame.contentWindow.document;
@@ -168,6 +147,32 @@ class LecCompat {
             var lecCommand = x.getAttribute("lec-command");
             var dataCommand = x.getAttribute("data-command");
         }
+
+        // Sæt højde
+        const setHeight = function (frame) {
+            console.log("HEIHGT", frame);
+            var body = frame.contentDocument.body;
+            var html = frame.contentDocument.documentElement;
+
+            // console.log(frame.contentDocument.body, body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+
+            var height = Math.max(
+                body.scrollHeight,
+                body.offsetHeight,
+                html.clientHeight,
+                html.scrollHeight,
+                html.offsetHeight
+            );
+
+            // console.log(frame, "Height: ", height)
+
+            frame.style.height = `${height}px`;
+            frame.style.filter = "";
+        };
+
+        setTimeout(function () {
+            setHeight(frame);
+        }, 500);
 
         if (update) {
             // get frame content

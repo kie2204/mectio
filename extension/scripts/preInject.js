@@ -1,18 +1,18 @@
 // mectio preload, ubrugt
 
 window.loadP = function(pageData) {
-    pageData2 = pageData.replace("LectioPageOps.InitializeHistory(PageHistoryBehavior.PrevUrl);", "") // fjerner funktion der forstyrrer mectio
+    pageData = pageData.replace("LectioPageOps.InitializeHistory(PageHistoryBehavior.PrevUrl);", "") // fjerner funktion der forstyrrer historik
     
     console.log("...")
 
     document.open();
-    document.write(pageData2);
-
+    document.write(pageData);
     document.close();
+    
     console.log("ok")
 
-    setTimeout(function(){
-        window.parent.postMessage("ready")   
+    setTimeout(() => {
+        window.parent.postMessage("ready");
     }, 100)
 }
 

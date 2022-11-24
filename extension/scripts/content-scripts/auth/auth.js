@@ -44,20 +44,26 @@ class LecLoginPrep {
 }
 
 class Auth {
-    constructor(args) {
-        // Required libs
-        this.lecRequest = new LecRequest();
-        this.parser = new DOMParser();
+    #parser = new DOMParser();
+    #inst;
 
-        if (args?.inst) {
-            this.inst = args.inst;
+    constructor(inst) {
+        if (inst) {
+            this.#inst = inst;
+        } else {
+            console.warn("Auth: inst ikke valgt under konstruktion!");
         }
     }
 
     static instList = false;
-    static loginStatus = false;
 
-    set inst(inst) {}
+    set inst(inst) {
+        this.#inst = inst;
+    }
+
+    get inst() {
+        return this.#inst;
+    }
 
     /**
      *
@@ -65,8 +71,8 @@ class Auth {
      * @returns
      */
 
-    async prepLogin(inst) {
-        var lecRes = await this.lecRequest.getPage(
+    async #genLoginPrep(inst) {
+        var lecRes = await LecRequest.getPage(
             `${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`
         );
 
@@ -74,6 +80,14 @@ class Auth {
         console.log(prep);
 
         return prep;
+    }
+
+    #parseLoginError(res) {
+        // Fungerer ikke, da fejl er gemt i script tag
+        //var parsed = this.parser.parseFromString(res, "text/html");
+
+        //return parsed.querySelector("[data-title=Fejl]").innerText;
+        return false;
     }
 
     /**
@@ -84,9 +98,7 @@ class Auth {
      */
 
     login = async (args, _lecLoginPrep) => {
-        var ok = args.inst
-            ? true
-            : false && args.username
+        var ok = args.username
             ? true
             : false && args.password
             ? true
@@ -100,7 +112,7 @@ class Auth {
         if (_lecLoginPrep instanceof LecLoginPrep) {
             // OK
         } else {
-            _lecLoginPrep = await this.prepLogin(args.inst);
+            _lecLoginPrep = await this.#genLoginPrep(args.inst);
         }
 
         /*
@@ -140,7 +152,7 @@ class Auth {
 
         // Send login til Lectio
         var submitPost = await fetch(
-            `${_LECTIO_BASE_URL}/lectio/${args.inst}/login.aspx`,
+            `${_LECTIO_BASE_URL}/lectio/${this.#inst}/login.aspx`,
             {
                 // Send post request med data
                 method: "POST",
@@ -152,6 +164,9 @@ class Auth {
         );
 
         var response = submitPost.text();
+        var newUrl = submitPost.url;
+
+        var _lecRes = new LecResponse(newUrl, response);
 
         // Vent på godkendt login
 
@@ -159,27 +174,18 @@ class Auth {
             console.debug("Login succes");
             return {
                 loginStatus: 1,
-                response,
-                newUrl: submitPost.url,
+                lecRes: _lecRes,
             };
         } else {
             console.warn("Login fejl ", response);
-            var error = this.parseLoginError(response);
+            var error = this.#parseLoginError(response);
             return {
                 loginStatus: 0,
-                response,
+                lecRes: _lecRes,
                 error,
             };
         }
     };
-
-    parseLoginError(res) {
-        // Fungerer ikke, da fejl er gemt i script tag
-        //var parsed = this.parser.parseFromString(res, "text/html");
-
-        //return parsed.querySelector("[data-title=Fejl]").innerText;
-        return false;
-    }
 
     async logout() {
         Auth.loginStatus = {
@@ -242,48 +248,32 @@ class Auth {
         return Auth.instList;
     }
 
-    get loginStatus() {
-        if (Auth.loginStatus == false) {
-            this.updateLoginStatus().then(() => {
-                return Auth.loginStatus;
-            });
-        }
-        return Auth.loginStatus;
-    }
-
     /**
-     *
-     * @param {LecResponse} _lecRes
-     * @param {number} _inst
-     * @returns
+     * 
+     * @param {LecResponse} _lecRes 
      */
+    getPageAuthentication(_lecRes) {
+        // Tjek sidens login status med querySelector(`[name=msapplication-starturl]`)
+        const parser = new DOMParser();
+        const parsedData = parser.parseFromString(_lecRes.rawData, "text/html");
+        const metaEl = parsedData.querySelector(
+            `[name=msapplication-starturl]`
+        );
 
-    async updateLoginStatus(_lecRes, _inst) {
-        Auth.loginStatus = new Promise(async (resolve, reject) => {
-            if (_lecRes instanceof LecResponse) {
-                // OK
-            } else if (typeof _inst == "number") {
-                // Hent ny LecRes
-                _lecRes = await this.lecRequest.getPage(
-                    `${_LECTIO_BASE_URL}/lectio/${_inst}/forside.aspx`
-                );
-            } else {
-                throw "Auth fejl: Ingen respons eller skole ID? Kan ikke opdatere loginstatus.";
+        if (metaEl instanceof Element) {
+            const metaContent = metaEl.getAttribute("content");
+
+            if (metaContent.includes("forside.aspx")) {
+                // Personlig forside, derfor authenticated
+                _auth.authenticated = true;
+            } else if (metaContent.includes("default.aspx")) {
+                _auth.authenticated = false;
             }
+        }
 
-            var user = this.parseCurrentUserId(_lecRes.rawData);
-
-            if (user == false) {
-                resolve({
-                    loginStatus: 0,
-                });
-            } else {
-                user.loginStatus = 1;
-                resolve(user);
-            }
-        });
-
-        return Auth.loginStatus;
+        if (_auth.authenticated == null) {
+            _auth.authenticated = null;
+        }
     }
 
     parseCurrentUserId(data) {
@@ -298,7 +288,7 @@ class Auth {
                 parsedData.getElementsByClassName("ls-user-name")[0].href;
 
             var parsedHref = new URL(usernameHref);
-            var parsedLink = this.lecRequest.parseLink(usernameHref);
+            var parsedLink = LecRequest.parseLink(usernameHref);
 
             var inst = parsedLink.inst;
 

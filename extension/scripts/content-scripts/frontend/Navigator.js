@@ -1,13 +1,68 @@
+// @ts-check
+
 // mectio navigation manager
 // Handles page loads, redirects, navbar
-class Navigator {
+class NavCallback {
+    /**
+     *
+     * @param {Function} callback
+     * @param {Object} matches
+     * @param {?Array} matches.regex
+     * @param {?Array} matches.includes
+     * @param {?Array} matches.equal
+     */
+    constructor(callback, matches) {
+        this.callback = callback;
+        this.matches = {
+            regex: matches.regex || [],
+            includes: matches.includes || [],
+            equal: matches.equal || [],
+        };
+    }
+
+    /**
+     *
+     * @param {String} str
+     */
+    checkMatch(str) {
+        // Tjek lig med
+        if (this.matches.equal.length > 0) {
+            for (var match of this.matches.equal) {
+                if (str == match) {
+                    console.log(match, str);
+                    return true;
+                }
+            }
+        }
+
+        if (this.matches.includes.length > 0) {
+            for (var match of this.matches.includes) {
+                if (str.includes(match)) {
+                    console.log(match, str);
+                    return true;
+                }
+            }
+        }
+
+        if (this.matches.regex.length > 0) {
+            for (var match of this.matches.regex) {
+                if (match.test(str)) {
+                    console.log(match, str);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+}
+
+class MNavigator {
     constructor(args) {
         // Init libs
         this.parser = new DOMParser();
-        this.lecRequest = new LecRequest();
 
         this.lib = {
-            lecReq: new LecRequest(),
             auth: new Auth(),
             loginScreen: new LoginScreen(),
             windowManager: new WindowManager2(),
@@ -16,16 +71,19 @@ class Navigator {
         // Init variables
         this.urlCallbacks = [
             // Liste af URL-callbacks
-            {
-                callback: function () {},
-                matches: ["*"],
-                priority: 0,
-            },
         ];
 
         // PageData
         this.currentPage = window.location.href; // Nuværende side
-        this.pageData = this.lib.lecReq.parseLink(this.currentPage);
+        this.pageData = LecRequest.parseLink(this.currentPage);
+    }
+
+    /**
+     *
+     * @param {NavCallback} callback
+     */
+    addCallback(callback) {
+        this.urlCallbacks.splice(0, 0, callback);
     }
 
     async init(args) {
@@ -41,21 +99,19 @@ class Navigator {
         var loginState;
         var localPath = this.pageData.localPath || "";
 
-        if (
+        /* if (
             localPath.substring(0, 10).includes("login.aspx") ||
             this.pageData.url == "https://www.lectio.dk/"
         ) {
             loginState = await this.showLogin(this.pageData?.inst);
 
             this.userInit();
-        }
+        } */
 
         windowManager2.headerState = 2;
-        this.load({
-            url: loginState?.newUrl || this.currentPage,
-        });
+        this.load(loginState.lecRes.path);
 
-        console.log(new LecGroup("elev", "100"))
+        console.log(new LecGroup("elev", "100"));
     }
 
     userInit() {
@@ -98,11 +154,24 @@ class Navigator {
         return loginScreen.waitForLogin();
     }
 
-    async load(args) {
-        var _lecRes = await lecCompat.load(args, this.update);
+    async load(_lecPath) {
+        // Find callBACK
+        const callbacks = this.urlCallbacks;
+        let filteredCallbacks = callbacks.filter((_callback) => {
+            return _callback.checkMatch(_lecPath.url);
+        });
 
-        this.update(_lecRes);
-        return _lecRes;
+        console.log(filteredCallbacks);
+
+        const callback = filteredCallbacks[0].callback;
+        if (callback instanceof Function) {
+            const _lecRes = await callback(_lecPath, this.update);
+
+            this.update(_lecRes);
+            return _lecRes;
+        } else {
+            alert("Ingen callback fundet!")
+        }
     }
 
     /**
@@ -182,18 +251,26 @@ class Navigator {
         var navLinks = [];
         try {
             var navArray =
-                parsedData.getElementsByClassName("ls-subnav1")[0].childNodes;
+                parsedData.getElementsByClassName("ls-subnav1")[0].children;
         } catch (e) {
             return { error: "Ingen links fundet" };
         }
 
-        var navTitle = parsedData.getElementById("s_m_HeaderContent_MainTitle");
-        var navCtxId = navTitle.getAttribute("data-lectiocontextcard");
+        let navTitle, navCtxId;
+
+        try {
+            navTitle = parsedData.getElementById("s_m_HeaderContent_MainTitle");
+            // @ts-ignore
+            navCtxId = navTitle.getAttribute("data-lectiocontextcard");
+        } catch (e) {
+            return { error: "" };
+        }
 
         for (var i = 0; i < navArray.length; i++) {
             // Kører gennem alle links og tilføjer til array
             try {
-                var navLink = navArray[i].childNodes[0].getAttribute("href");
+                var navLink = navArray[i].children[0].getAttribute("href");
+                // @ts-ignore
                 var navActive = navArray[i]
                     .getAttribute("class")
                     .includes("ls-subnav-active");

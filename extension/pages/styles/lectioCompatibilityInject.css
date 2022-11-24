@@ -91,3 +91,7 @@ A.s2bgbox {
 .s2skema .s2infoHeader A.s2skemabrik[href]:hover, A.s2skemabrik[href]:hover {
     color: unset !important;
 }
+
+.ls-tocContainer-inner {
+    height: fit-content !important;
+}
