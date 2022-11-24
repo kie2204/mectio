@@ -5,21 +5,28 @@ var browser = browser || chrome;
 
 const _LECTIO_BASE_URL = "https://www.lectio.dk";
 
-const lecRequest = new LecRequest();
 const auth = new Auth();
 const loginScreen = new LoginScreen();
 const windowManager2 = new WindowManager2();
 const lecCompat = new LecCompat();
 
-const mNavigator = new Navigator(); // variable navn "navigator" er reserveret
+const mNavigator = new MNavigator(); // variable navn "navigator" er reserveret
 
-const currentUrlData = lecRequest.parseLink(window.location.href);
+const currentUrlData = LecRequest.parseLink(window.location.href);
 
 const init = async function () {
     console.log("mectio er i ALPHA. Der kan være fejl og mangler");
 
     await windowManager2.init();
     await lecCompat.init();
+
+    mNavigator.addCallback(
+        new NavCallback(lecCompat.load, {
+            regex: [/./],
+            includes: [],
+            equal: [],
+        })
+    );
 
     await mNavigator.init({
         navElement: document.querySelector("nav"),

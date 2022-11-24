@@ -1,10 +1,10 @@
 // lecRequest: Henter data fra Lectio og behandler til brug andre steder
 class LecRequest {
     constructor() {
-        this.defaultHost = "www.lectio.dk"; // Midlertidig
+        
     }
 
-    async getPage(_url) {
+    static async getPage(_url) {
         // Henter lectio-side
         var path = new LecPath(_url);
         console.log(path);
@@ -44,13 +44,18 @@ class LecRequest {
         return resText;
     }
 
-    parseLink(_url) {
+    static parseLink(_url) {
         // Behandler link
         return new LecPath(_url);
     }
 
     // Lokale sider
-    async getLocalPage(link) {
+    /**
+     * 
+     * @param {string} link 
+     * @returns {Promise<string>}
+     */
+    static async getLocalPage(link) {
         // link til siden, fra rod af mectio (f.eks. "pages/login-screen/index.html")
         var localUrl = browser.runtime.getURL(link); // Finder link til siden
 
@@ -119,28 +124,8 @@ class LecResponse {
 
     get auth() {
         const _rawData = this.rawData;
-        let _auth = {};
-        // Tjek sidens login status med querySelector(`[name=msapplication-starturl]`)
-        const parser = new DOMParser();
-        const parsedData = parser.parseFromString(_rawData, "text/html");
-        const metaEl = parsedData.querySelector(
-            `[name=msapplication-starturl]`
-        );
-
-        if (metaEl instanceof Element) {
-            const metaContent = metaEl.getAttribute("content");
-
-            if (metaContent.includes("forside.aspx")) {
-                // Personlig forside, derfor authenticated
-                _auth.authenticated = true;
-            } else if (metaContent.includes("default.aspx")) {
-                _auth.authenticated = false;
-            }
-        }
-
-        if (_auth.authenticated == null) {
-            _auth.authenticated = null;
-        }
+        let _auth = Auth.getPageAuthentication(_rawData);
+        
 
         return _auth;
     }
