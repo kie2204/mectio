@@ -5,8 +5,6 @@ var browser = browser || chrome;
 
 const _LECTIO_BASE_URL = "https://www.lectio.dk";
 
-const auth = new Auth();
-const loginScreen = new LoginScreen();
 const windowManager2 = new WindowManager2();
 const lecCompat = new LecCompat();
 
@@ -28,9 +26,7 @@ const init = async function () {
         })
     );
 
-    await mNavigator.init({
-        navElement: document.querySelector("nav"),
-    });
+    await mNavigator.init(currentUrlData);
 };
 
 browser.storage.local.get(["config"], async function (config) {

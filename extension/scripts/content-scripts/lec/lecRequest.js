@@ -4,7 +4,22 @@ class LecRequest {
         
     }
 
-    static async getPage(_url) {
+    async #fetchText(link) {
+        // fetch().text() wrapper, bruges internt
+        var res = await fetch(link);
+
+        if (res.ok !== true) {
+            console.error(
+                `Kunne ikke hente side, fejl ${res.status}: ${res.statusText}`
+            );
+            return false;
+        }
+
+        var resText = await res.text();
+        return resText;
+    }
+
+    async getPage(_url) {
         // Henter lectio-side
         var path = new LecPath(_url);
         console.log(path);
@@ -29,21 +44,6 @@ class LecRequest {
          */
     }
 
-    async fetchText(link) {
-        // fetch().text() wrapper, bruges internt
-        var res = await fetch(link);
-
-        if (res.ok !== true) {
-            console.error(
-                `Kunne ikke hente side, fejl ${res.status}: ${res.statusText}`
-            );
-            return false;
-        }
-
-        var resText = await res.text();
-        return resText;
-    }
-
     static parseLink(_url) {
         // Behandler link
         return new LecPath(_url);
@@ -55,11 +55,12 @@ class LecRequest {
      * @param {string} link 
      * @returns {Promise<string>}
      */
-    static async getLocalPage(link) {
+    async getLocalPage(link) {
         // link til siden, fra rod af mectio (f.eks. "pages/login-screen/index.html")
         var localUrl = browser.runtime.getURL(link); // Finder link til siden
 
-        var resText = await this.fetchText(localUrl);
+        console.log(this)
+        var resText = await this.#fetchText(localUrl);
         var curDir = localUrl.substring(0, localUrl.lastIndexOf("/"));
 
         resText = resText.replaceAll("{_MECTIO_CURDIR}", curDir);

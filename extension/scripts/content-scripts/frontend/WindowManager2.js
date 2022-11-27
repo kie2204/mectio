@@ -9,6 +9,7 @@ class WindowManager2 {
          *
          *  }
          */
+        this.lecRequest = new LecRequest();
         this.openWindows = {};
     }
 
@@ -17,7 +18,7 @@ class WindowManager2 {
         document.body.style.opacity = "0";
 
         // Indsæt html for dok-struktur
-        await LecRequest.getLocalPage("pages/main.html").then((text) => {
+        await this.lecRequest.getLocalPage("pages/main.html").then((text) => {
             document.body.innerHTML = text;
 
             this.hostElement = document.getElementById("window-container");

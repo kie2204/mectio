@@ -58,13 +58,22 @@ class NavCallback {
 }
 
 class MNavigator {
-    constructor(args) {
+    constructor(_lecPath) {
         // Init libs
         this.parser = new DOMParser();
 
+        // PageData
+        if (_lecPath instanceof LecPath) {
+            this.path = _lecPath
+        } else {
+            this.path = LecRequest.parseLink(window.location.href)
+        }
+
+        const _auth = new Auth(this.path.inst)
+
         this.lib = {
-            auth: new Auth(),
-            loginScreen: new LoginScreen(),
+            auth: _auth,
+            loginScreen: new LoginScreen(_auth, NaN),
             windowManager: new WindowManager2(),
         };
 
@@ -72,10 +81,6 @@ class MNavigator {
         this.urlCallbacks = [
             // Liste af URL-callbacks
         ];
-
-        // PageData
-        this.currentPage = window.location.href; // Nuværende side
-        this.pageData = LecRequest.parseLink(this.currentPage);
     }
 
     /**
@@ -92,24 +97,10 @@ class MNavigator {
         this.applyIcon();
 
         // Type checks
-        this.navElement = args?.navElement ? args?.navElement : false; // typisk document.getElementById("nav")
-        if (this.navElement instanceof Element == false)
-            throw "Intet nav-element valgt!!";
-
-        var loginState;
-        var localPath = this.pageData.localPath || "";
-
-        /* if (
-            localPath.substring(0, 10).includes("login.aspx") ||
-            this.pageData.url == "https://www.lectio.dk/"
-        ) {
-            loginState = await this.showLogin(this.pageData?.inst);
-
-            this.userInit();
-        } */
+        this.navElement = document.getElementById("nav")
+        var localPath = this.path.localPath;
 
         windowManager2.headerState = 2;
-        this.load(loginState.lecRes.path);
 
         console.log(new LecGroup("elev", "100"));
     }

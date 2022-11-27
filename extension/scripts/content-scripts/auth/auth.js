@@ -65,12 +65,13 @@ class Auth {
         return this.#inst;
     }
 
+    /* Internal */
+
     /**
      *
      * @param {number} inst
      * @returns
      */
-
     async #genLoginPrep(inst) {
         var lecRes = await LecRequest.getPage(
             `${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`
@@ -96,13 +97,8 @@ class Auth {
      * @param {LecLoginPrep} _lecLoginPrep
      * @returns
      */
-
     login = async (args, _lecLoginPrep) => {
-        var ok = args.username
-            ? true
-            : false && args.password
-            ? true
-            : false;
+        var ok = args.username ? true : false && args.password ? true : false;
         if (ok == false) {
             console.error("Auth: kan ikke logge ind, mangler info!!!");
             return false;
@@ -249,13 +245,12 @@ class Auth {
     }
 
     /**
-     * 
-     * @param {LecResponse} _lecRes 
+     *
+     * @param {LecResponse} _lecRes
      */
     getPageAuthentication(_lecRes) {
         // Tjek sidens login status med querySelector(`[name=msapplication-starturl]`)
-        const parser = new DOMParser();
-        const parsedData = parser.parseFromString(_lecRes.rawData, "text/html");
+        const parsedData = this.#parser.parseFromString(_lecRes.rawData, "text/html");
         const metaEl = parsedData.querySelector(
             `[name=msapplication-starturl]`
         );

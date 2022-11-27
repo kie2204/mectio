@@ -1,23 +1,19 @@
 class LoginScreen {
     #inst = NaN;
     #loginStep = 1;
+    #onSuccessfulLogin = function () {};
 
     /**
-     * 
-     * @param {number} inst 
-     * @param {Auth} auth 
+     *
+     * @param {number} inst
+     * @param {Auth} auth
      */
-    constructor(auth, inst) {
-        this.#inst = inst ? inst : NaN;
+    constructor(auth) {
+        this.auth = auth;
         this.windowState = false;
-
-        this.submitCallback = args?.submitCallback || this.authLib.login; // callback når der klikkes log ind
-        this.successCallback = (a, b) => {};
     }
 
-    async requestLogin(_inst) {
-
-    }
+    async requestLogin(_inst) {}
 
     async waitForLogin() {
         return new Promise((resolve, reject) => {
@@ -205,7 +201,8 @@ class LoginScreen {
             .removeAttribute("disabled");
         this.#loginStep = 2;
 
-        await new Promise((resolve) => { // async wait 300ms
+        await new Promise((resolve) => {
+            // async wait 300ms
             setTimeout(() => {
                 resolve(true);
             }, 300);
@@ -279,14 +276,13 @@ class LoginScreen {
     }
 
     submit(args) {
-        return this.submitCallback(args).then((loginRes) => {
-            console.debug(loginRes.loginStatus);
-            var ok = loginRes.loginStatus ? true : false;
+        return this.auth.login(args).then((loginRes) => {
+            console.debug(loginRes.loginState);
+            var ok = loginRes.loginState;
 
             if (ok == false) return loginRes;
 
-            this.successCallback(loginRes);
-            this.closeWindow();
+            this.#onSuccessfulLogin(loginRes);
             return loginRes;
         });
     }
