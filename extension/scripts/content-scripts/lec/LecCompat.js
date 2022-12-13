@@ -25,7 +25,7 @@ class LecCompat {
         frame.setAttribute("scrolling", "no");
         frame.setAttribute(
             "sandbox",
-            "allow-same-origin allow-scripts allow-forms allow-popups allow-downloads"
+            "allow-same-origin allow-scripts allow-forms allow-popups allow-downloads allow-modals"
         );
 
         // Decorate iframe

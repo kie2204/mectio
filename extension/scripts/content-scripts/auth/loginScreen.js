@@ -5,10 +5,10 @@ class LoginScreen {
 
     /**
      *
-     * @param {number} inst
-     * @param {Auth} auth
+     * @param {number | undefined} [inst] Sæt denne hvis skole-id skal skiftes under konstruktion
+     * @param {Auth} auth Auth-klasse
      */
-    constructor(auth) {
+    constructor(auth, inst) {
         this.auth = auth;
         this.windowState = false;
     }

@@ -122,12 +122,4 @@ class LecResponse {
         // Sæt timestamp
         this.timestamp = new Date();
     }
-
-    get auth() {
-        const _rawData = this.rawData;
-        let _auth = Auth.getPageAuthentication(_rawData);
-        
-
-        return _auth;
-    }
 }

@@ -57,6 +57,35 @@ class NavCallback {
     }
 }
 
+class NavPageMeta {
+    /**
+     * 
+     * @param {string} title 
+     * @param {LecGroup | string} group - 
+     * @param {boolean} [forceMeta] - Tving brug af oplyst titel, ellers brug titel fra NavBarGroup hvis muligt
+     * @param {LecResponse} res - Sidste respons, skal bruges til navbar og logintjek
+     */
+    constructor(title, group, res, forceMeta) {
+        this.title = title
+        this.group = group
+        this.forceMeta = forceMeta ? true : false // tving bool med ternary
+        this.res = res
+    }
+}
+
+class NavBarGroup {
+    /**
+     * 
+     * @param {LecGroup | string} group - Gruppen, som navigationsbarren tilhører
+     * @param {Object[]} links - Samling af navigationslinks
+     * @param {string} links[].name
+     * @param {LecPath} links[].path
+     */
+    constructor(group, links) {
+
+    }
+}
+
 class MNavigator {
     constructor(_lecPath) {
         // Init libs
@@ -69,11 +98,13 @@ class MNavigator {
             this.path = LecRequest.parseLink(window.location.href)
         }
 
-        const _auth = new Auth(this.path.inst)
+        let inst = this.path.inst;
+
+        const _auth = new Auth(inst)
 
         this.lib = {
             auth: _auth,
-            loginScreen: new LoginScreen(_auth, NaN),
+            loginScreen: new LoginScreen(_auth),
             windowManager: new WindowManager2(),
         };
 
@@ -100,9 +131,11 @@ class MNavigator {
         this.navElement = document.getElementById("nav")
         var localPath = this.path.localPath;
 
-        windowManager2.headerState = 2;
+        // Real init
+        const initialPath = this.path;
 
-        console.log(new LecGroup("elev", "100"));
+        windowManager2.headerState = 2;
+        this.load(initialPath)
     }
 
     userInit() {
@@ -138,11 +171,6 @@ class MNavigator {
         link.href = browser.runtime.getURL("icons/icon-48.ico");
 
         document.title = "mectio";
-    }
-
-    async showLogin(inst) {
-        loginScreen.inst = inst;
-        return loginScreen.waitForLogin();
     }
 
     async load(_lecPath) {
@@ -181,12 +209,8 @@ class MNavigator {
 
         this.updateNavBar(_lecRes);
 
-        document.title = `${this.currentPage} - mectio`;
+        document.title = `${_lecRes.path.localPath} - mectio`;
         window.history.replaceState("", "", this.currentPage);
-
-        console.log(_lecRes.auth);
-
-        return auth.updateLoginStatus(_lecRes);
     }
 
     /**

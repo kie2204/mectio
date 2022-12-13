@@ -1,6 +1,10 @@
 class LecLoginState {}
 
 class LecLoginPrep {
+    /**
+     * 
+     * @param {LecResponse} _lecRes 
+     */
     constructor(_lecRes) {
         var parser = new DOMParser();
 
@@ -24,7 +28,7 @@ class LecLoginPrep {
         var aspExtended = {};
 
         for (var el of aspHidden) {
-            var _children = el.childNodes;
+            var _children = el.children;
             for (var child of _children) {
                 if (child.nodeName == "INPUT") {
                     console.log(child.name, child.value);
@@ -34,6 +38,7 @@ class LecLoginPrep {
             }
         }
 
+        this.inst = _lecRes.path.inst;
         this.loginService = _loginService;
         this.asp = {
             _extended: aspExtended,
@@ -45,24 +50,20 @@ class LecLoginPrep {
 
 class Auth {
     #parser = new DOMParser();
-    #inst;
-
-    constructor(inst) {
-        if (inst) {
-            this.#inst = inst;
-        } else {
-            console.warn("Auth: inst ikke valgt under konstruktion!");
-        }
-    }
 
     static instList = false;
 
-    set inst(inst) {
-        this.#inst = inst;
+    constructor(inst) {
+        if (inst) {
+            this.inst = inst;
+        } else {
+            console.warn("Auth: inst ikke valgt under konstruktion!");
+            this.inst = NaN;
+        }
     }
 
-    get inst() {
-        return this.#inst;
+    resetInst() {
+        this.inst = NaN;
     }
 
     /* Internal */
@@ -98,7 +99,9 @@ class Auth {
      * @returns
      */
     login = async (args, _lecLoginPrep) => {
-        var ok = args.username ? true : false && args.password ? true : false;
+        let inst = this.inst;
+        let ok = args.username ? true : false && args.password ? true : false;
+
         if (ok == false) {
             console.error("Auth: kan ikke logge ind, mangler info!!!");
             return false;
@@ -148,7 +151,7 @@ class Auth {
 
         // Send login til Lectio
         var submitPost = await fetch(
-            `${_LECTIO_BASE_URL}/lectio/${this.#inst}/login.aspx`,
+            `${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`,
             {
                 // Send post request med data
                 method: "POST",
@@ -248,7 +251,9 @@ class Auth {
      *
      * @param {LecResponse} _lecRes
      */
-    getPageAuthentication(_lecRes) {
+    getPageAuthentication(_lecRes) { // Få oplysninger om aktiv bruger for enkelt Lectio-side
+        let authenticated;
+
         // Tjek sidens login status med querySelector(`[name=msapplication-starturl]`)
         const parsedData = this.#parser.parseFromString(_lecRes.rawData, "text/html");
         const metaEl = parsedData.querySelector(
@@ -260,14 +265,14 @@ class Auth {
 
             if (metaContent.includes("forside.aspx")) {
                 // Personlig forside, derfor authenticated
-                _auth.authenticated = true;
+                authenticated = true;
             } else if (metaContent.includes("default.aspx")) {
-                _auth.authenticated = false;
+                authenticated = false;
             }
         }
 
-        if (_auth.authenticated == null) {
-            _auth.authenticated = null;
+        return {
+            authenticated
         }
     }
 
