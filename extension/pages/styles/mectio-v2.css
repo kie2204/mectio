@@ -1,0 +1,93 @@
+:root {
+    --outline: #0006;
+    --button-default-height: 1.75rem;
+    --button-large-height: 2.5rem;
+}
+
+/* Header */
+header > * {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+header > .center {
+    justify-content: center;
+    flex-grow: 2;
+}
+
+header > .right {
+    justify-content: flex-end;
+}
+
+/* Buttons */
+.outlined-button {
+    background-color: #fff0;
+    height: var(--button-default-height);
+    padding: 0 0.75rem;
+    margin: 0 0.33rem;
+    font-size: 1rem;
+
+    display: flex;
+    align-items: center;
+
+    border: 0.05rem solid var(--outline);
+    border-radius: 100vmax;
+}
+
+.outlined-button img {
+    height: 1rem;
+}
+
+.outlined-button:first-child {
+    margin-left: 0;
+}
+
+.outlined-button:last-child {
+    margin-right: 0;
+}
+
+.outlined-button.large {
+    height: var(--button-large-height);
+    font-size: 1.33rem;
+}
+
+.outlined-button.large img {
+    height: 1.25rem;
+}
+
+.outlined-button.circular {
+    width: var(--button-default-height);
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.outlined-button.large.circular {
+    width: var(--button-large-height);
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Navigation */
+#mectio-nav-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    margin-inline: .33rem;
+}
+#mectio-nav-meta p {
+    margin: 0;
+}
+
+#mectio-nav-title {
+    font-size: .8rem;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+#mectio-nav-description {
+    font-size: .6rem;
+}

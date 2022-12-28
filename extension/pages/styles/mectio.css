@@ -1,7 +1,7 @@
 body {
     margin: 0;
     opacity: 1 !important;
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: scroll;
 }
 
@@ -184,7 +184,7 @@ main.collapse2 #sidebar {
 }
 
 .mectio-window {
-    width: 100%;
+    min-width: 100%;
     min-height: 100vh;
     box-sizing: border-box;
     transition: var(--full-speed);

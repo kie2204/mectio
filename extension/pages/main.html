@@ -1,44 +1,40 @@
 <link rel="stylesheet" id="style-general" href="{_MECTIO_ROOTDIR}pages/styles/general.css">
 <link rel="stylesheet" id="style-general" href="{_MECTIO_ROOTDIR}pages/styles/mectio.css">
+<link rel="stylesheet" id="style-general" href="{_MECTIO_ROOTDIR}pages/styles/mectio-v2.css">
 <link rel="stylesheet" id="style-general" href="{_MECTIO_ROOTDIR}pages/styles/nav.css">
 
 <div id="header-container" class="hidden">
     <header>
-        <div id="mectio-left-wrapper" class="wrapper">
-            <a href="#" id="mectio-open-primnav"><span class="material-symbols-rounded">menu</span></a>
-            <a id="mectio-logo-wrapper" href="#">
-                <img id="mectio-logo" src="{_MECTIO_ROOTDIR}icons/logo-dark.svg" alt="mectio">
-                <div id="mectio-text-wrapper">
-                    <img id="mectio-logo-text" src="{_MECTIO_ROOTDIR}icons/logo-textonly-dark.svg">
-                    <p id="mectio-inst-text"></p>
+        <div class="left">
+            <button class="outlined-button large circular">
+                <span class="material-symbols-rounded">list</span>
+            </button>
+            <button class="outlined-button large">
+                <span class="material-symbols-rounded">folder</span>
+                <div id="mectio-nav-meta">
+                    <p id="mectio-nav-title">Henter titel...</p>
+                    <p id="mectio-nav-description">Henter gruppe...</p>
                 </div>
-            </a>
-            <div id="mectio-nav-selector" class="nav-box">
-                <div id="mectio-nav-dropdown" class="hidden">
-                    <a href="#">Opt 1</a>
-                    <a href="#">Opt 2</a>
-                    <a href="#">Longer longer longest option</a>
-                </div>
-                <div id="mectio-nav-title" data-icon="link">
-                    Henter titel...
-                </div>
-            </div>
+            </button>
         </div>
-        <div id="mectio-header-center-wrapper" class="wrapper"> 
-            <div id="mectio-header-bookmarks">
-
-            </div>
+        <div class="center">
+            <button class="outlined-button large circular">
+                <img src="{_MECTIO_ROOTDIR}icons/logo-dark.svg" alt="" srcset="">
+            </button>
+            <button class="outlined-button large" style="width: 400px; font-size: 1rem; margin-left:.5rem">
+                <p>Søg</p>
+            </button>
         </div>
-        <div id="mectio-right-wrapper">
-            <a href="#" id="mectio-profile">
-                <span id="mectio-profile-picture">
-            </a>
-            <a href="#" id="notifications">
+        <div class="right">
+            <button class="outlined-button circular">
                 <span class="material-symbols-rounded">notifications</span>
-            </a>
-            <a href="#" id="settings">
+            </button>
+            <button class="outlined-button circular">
                 <span class="material-symbols-rounded">settings</span>
-            </a>
+            </button>
+            <button class="outlined-button large circular">
+                <span class="material-symbols-rounded">person</span>
+            </button>
         </div>
     </header>
     <div id="nav-wrapper">

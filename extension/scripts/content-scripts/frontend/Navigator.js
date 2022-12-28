@@ -57,18 +57,18 @@ class NavCallback {
     }
 }
 
-class NavPageMeta {
+class NavPageMeta { 
     /**
      * 
      * @param {string} title 
-     * @param {LecGroup | string} group - 
-     * @param {boolean} [forceMeta] - Tving brug af oplyst titel, ellers brug titel fra NavBarGroup hvis muligt
+     * @param {LecGroup | string} group - Gruppe som siden tilhører
+     * @param {boolean} [useInternalMeta] - Tving brug af oplyst titel, ellers brug titel fra NavBarGroup hvis muligt
      * @param {LecResponse} res - Sidste respons, skal bruges til navbar og logintjek
      */
-    constructor(title, group, res, forceMeta) {
+    constructor(title, group, res, useInternalMeta = false) {
         this.title = title
         this.group = group
-        this.forceMeta = forceMeta ? true : false // tving bool med ternary
+        this.useInternalMeta = !!useInternalMeta // tving bool
         this.res = res
     }
 }
@@ -230,9 +230,12 @@ class MNavigator {
         }
 
         var navLinks = document.getElementById("mectio-nav-links");
-
         var navTitle = document.getElementById("mectio-nav-title");
-        navTitle.innerText = "id: " + nav.navCtxId; // todo
+        var navDesc = document.getElementById("mectio-nav-description");
+
+        navTitle.innerText = _lecRes.path.localPath; // todo
+        navDesc.innerText = "id: " + nav.navCtxId; // todo
+
 
         if (typeof nav.links != "object") return;
 
