@@ -156,6 +156,9 @@ class LecCompat {
 
             // console.log(frame.contentDocument.body, body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
 
+            frame.style.height = "initial";
+            frame.style.width = "initial";
+
             var height = Math.max(
                 body.scrollHeight,
                 body.offsetHeight,
@@ -164,14 +167,27 @@ class LecCompat {
                 html.offsetHeight
             );
 
+            var width = Math.max(
+                body.scrollWidth,
+                body.offsetWidth,
+                html.clientWidth,
+                html.scrollWidth,
+                html.offsetWidth
+            );
+
             // console.log(frame, "Height: ", height)
 
             frame.style.height = `${height}px`;
+            frame.style.width = `max(${width}px, 100%)`;
             frame.style.filter = "";
         };
 
         setTimeout(function () {
             setHeight(frame);
+
+            window.addEventListener("resize", function () {
+                setHeight(frame);
+            })
         }, 500);
 
         if (update) {
