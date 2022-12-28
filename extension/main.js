@@ -32,36 +32,36 @@ const init = async function () {
 browser.storage.local.get(["config"], async function (config) {
     console.log(currentUrlData);
 
-    let c = config.config;
+    let configObject = config.config;
 
     // Check if config valid
-    if (typeof c != "object") {
+    if (!(configObject instanceof Object)) {
         logs.info("Config invalid, resetting to default");
         var fetched = await fetch(browser.runtime.getURL("/config.mectio"));
-        var defaultConfig = await fetched.json();
+        configObject = await fetched.json();
 
-        await browser.storage.local.set({ config: defaultConfig });
-        c = (await browser.storage.local.get(["config"])).config;
+        await browser.storage.local.set({ config: configObject });
     }
 
     // check if enabled
-    if (c.enabled == 1) {
-        if (
-            document.documentElement instanceof HTMLHtmlElement &&
-            document.body.childElementCount != 1
-        ) {
-            // Her afbrydes lectio
-            document.open();
-            document.close();
+    if (configObject.enabled != 1) return
 
-            browser.runtime.sendMessage({
-                action: "kill",
-            });
+    // run the real
+    if (
+        document.documentElement instanceof HTMLHtmlElement &&
+        document.contentType == "text/html"
+    ) {
+        // Her afbrydes lectio
+        document.open();
+        document.close();
 
-            init();
-        } else {
-            console.log("mectio: Ikke et html-dokument, indlæser ikke");
-        }
+        browser.runtime.sendMessage({
+            action: "kill",
+        });
+
+        init();
+    } else {
+        console.log("mectio: Ikke et html-dokument, indlæser ikke");
     }
 });
 

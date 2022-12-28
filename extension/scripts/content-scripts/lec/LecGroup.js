@@ -47,7 +47,7 @@ class LecGroup {
     
     get contextId() {
         if (this.type.ctxable == false)
-            console.warn("Gruppe", this.type, "kan ikke bruges til ctx.!");
+            console.warn("Gruppe", this.type, "kan ikke bruges til context menu!");
         return this.type.ctxType + this.id;
     }
 }

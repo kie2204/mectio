@@ -8,23 +8,23 @@ class LecLoginPrep {
     constructor(_lecRes) {
         var parser = new DOMParser();
 
-        var parsedData = parser.parseFromString(_lecRes.rawData, "text/html");
-        console.debug(parsedData);
+        var parsedformData = parser.parseFromString(_lecRes.rawformData, "text/html");
+        console.debug(parsedformData);
 
-        var _loginService = parsedData.getElementById(
+        var _loginService = parsedformData.getElementById(
             "m_Content_schoolnametd"
         ).innerText;
 
         // Find vigtigste ASP felter
-        var VSX = parsedData
+        var VSX = parsedformData
             .getElementById("__VIEWSTATEX")
             .getAttribute("value");
-        var EVV = parsedData
+        var EVV = parsedformData
             .getElementById("__EVENTVALIDATION")
             .getAttribute("value");
 
         // Find resten af ASP felter
-        var aspHidden = parsedData.querySelectorAll(".aspNetHidden");
+        var aspHidden = parsedformData.querySelectorAll(".aspNetHidden");
         var aspExtended = {};
 
         for (var el of aspHidden) {
@@ -88,41 +88,41 @@ class Auth {
         // Fungerer ikke, da fejl er gemt i script tag
         //var parsed = this.parser.parseFromString(res, "text/html");
 
-        //return parsed.querySelector("[data-title=Fejl]").innerText;
+        //return parsed.querySelector("[formData-title=Fejl]").innerText;
         return false;
     }
 
     /**
      *
      * @param {object Object} args
-     * @param {LecLoginPrep} _lecLoginPrep
+     * @param {LecLoginPrep} loginPrep
      * @returns
      */
-    login = async (args, _lecLoginPrep) => {
+    login = async (args, loginPrep) => {
         let inst = this.inst;
-        let ok = args.username ? true : false && args.password ? true : false;
+        let credentialsPresent = args.username ? true : false && args.password ? true : false;
 
-        if (ok == false) {
-            console.error("Auth: kan ikke logge ind, mangler info!!!");
+        if (credentialsPresent == false) {
+            console.loginError("Auth: kan ikke logge ind, mangler info!!!");
             return false;
         }
 
         // Get VIEWSTATE og EVENTVALIDATION (kræves af ASP.NET)
-        if (_lecLoginPrep instanceof LecLoginPrep) {
-            // OK
+        if (loginPrep instanceof LecLoginPrep) {
+            // credentialsPresent
         } else {
-            _lecLoginPrep = await this.#genLoginPrep(args.inst);
+            loginPrep = await this.#genLoginPrep(args.inst);
         }
 
         /*
-        var data = { // ALLE felter her skal sendes til Lectio
+        var formData = { // ALLE felter her skal sendes til Lectio
             '__EVENTTARGET': 'm$Content$submitbtn2',
             '__EVENTARGUMENT': "",
             '__SCROLLPOSITION': "",
-            '__VIEWSTATEX': _lecLoginPrep.asp.VSX,
+            '__VIEWSTATEX': loginPrep.asp.VSX,
             '__VIEWSTATEY_KEY': "",
             '__VIEWSTATE': "",
-            '__EVENTVALIDATION': _lecLoginPrep.asp.EVV,
+            '__EVENTVALIDATION': loginPrep.asp.EVV,
             'masterfootervalue': 'X1!ÆØÅ',
             'LectioPostbackId': "",
             'm$Content$username': args.username,
@@ -130,30 +130,30 @@ class Auth {
         }
         */
 
-        var data = _lecLoginPrep.asp._extended;
+        var formData = loginPrep.asp._extended;
 
-        delete data["time"], data["__LASTFOCUS"];
+        delete formData["time"], formData["__LASTFOCUS"];
 
-        data["__EVENTTARGET"] = "m$Content$submitbtn2";
-        data["m$Content$username"] = args.username;
-        data["m$Content$password"] = args.password;
-        data["LectioPostbackId"] = "";
-        data["masterfootervalue"] = "X1!ÆØÅ";
+        formData["__EVENTTARGET"] = "m$Content$submitbtn2";
+        formData["m$Content$username"] = args.username;
+        formData["m$Content$password"] = args.password;
+        formData["LectioPostbackId"] = "";
+        formData["masterfootervalue"] = "X1!ÆØÅ";
 
         // Generer POST url
         var formBody = [];
-        for (var property in data) {
+        for (var property in formData) {
             var encodedKey = encodeURIComponent(property);
-            var encodedValue = encodeURIComponent(data[property]);
+            var encodedValue = encodeURIComponent(formData[property]);
             formBody.push(encodedKey + "=" + encodedValue);
         }
         formBody = formBody.join("&");
 
         // Send login til Lectio
-        var submitPost = await fetch(
+        var loginResponse = await fetch(
             `${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`,
             {
-                // Send post request med data
+                // Send post request med formData
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -162,26 +162,26 @@ class Auth {
             }
         );
 
-        var response = submitPost.text();
-        var newUrl = submitPost.url;
+        var loginResponseText = loginResponse.text();
+        var redirectedUrl = loginResponse.url;
 
-        var _lecRes = new LecResponse(newUrl, response);
+        var _lecRes = new LecResponse(redirectedUrl, loginResponseText);
 
         // Vent på godkendt login
 
-        if (submitPost.redirected) {
+        if (loginResponse.redirected) {
             console.debug("Login succes");
             return {
                 loginStatus: 1,
                 lecRes: _lecRes,
             };
         } else {
-            console.warn("Login fejl ", response);
-            var error = this.#parseLoginError(response);
+            console.warn("Login fejl ", loginResponseText);
+            var loginError = this.#parseLoginError(loginResponseText);
             return {
                 loginStatus: 0,
                 lecRes: _lecRes,
-                error,
+                loginError,
             };
         }
     };
@@ -211,13 +211,13 @@ class Auth {
             ); // Henter skole-liste
             console.debug("Response: ", res);
 
-            var parsedInstData = parser.parseFromString(
-                res.rawData,
+            var parsedInstformData = parser.parseFromString(
+                res.rawformData,
                 "text/html"
             );
 
             var instsUnparsed =
-                parsedInstData.getElementById("schoolsdiv").childNodes;
+                parsedInstformData.getElementById("schoolsdiv").childNodes;
 
             var count = 0;
             var instList = [];
@@ -255,8 +255,8 @@ class Auth {
         let authenticated;
 
         // Tjek sidens login status med querySelector(`[name=msapplication-starturl]`)
-        const parsedData = this.#parser.parseFromString(_lecRes.rawData, "text/html");
-        const metaEl = parsedData.querySelector(
+        const parsedformData = this.#parser.parseFromString(_lecRes.rawformData, "text/html");
+        const metaEl = parsedformData.querySelector(
             `[name=msapplication-starturl]`
         );
 
@@ -276,16 +276,16 @@ class Auth {
         }
     }
 
-    parseCurrentUserId(data) {
-        // Finder id på bruger, der er logget ind ud fra rå HTML data
+    parseCurrentUserId(formData) {
+        // Finder id på bruger, der er logget ind ud fra rå HTML formData
         try {
-            var parsedData = this.parser.parseFromString(data, "text/html");
+            var parsedformData = this.parser.parseFromString(formData, "text/html");
 
             var username =
-                parsedData.getElementsByClassName("ls-user-name")[0]
+                parsedformData.getElementsByClassName("ls-user-name")[0]
                     .textContent;
             var usernameHref =
-                parsedData.getElementsByClassName("ls-user-name")[0].href;
+                parsedformData.getElementsByClassName("ls-user-name")[0].href;
 
             var parsedHref = new URL(usernameHref);
             var parsedLink = LecRequest.parseLink(usernameHref);
@@ -308,7 +308,7 @@ class Auth {
                     break;
             }
         } catch (e) {
-            console.error("User id parse fejl! ", e);
+            console.loginError("User id parse fejl! ", e);
             return false;
         }
 

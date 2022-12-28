@@ -3,12 +3,11 @@
 class WindowManager2 {
     #activeWindow = "";
 
+    /**
+     * 
+     * @param {*} args 
+     */
     constructor(args) {
-        /** Args:
-         *  {
-         *
-         *  }
-         */
         this.lecRequest = new LecRequest();
         this.openWindows = {};
     }
