@@ -5,35 +5,35 @@ class LecCompat {
          *  }
          */
         this.updateCallback = () => {};
+        this.frame = null; // iframe
+        this.wmWindow = null; // WMWindow
+
         console.log(this.updateCallback);
     }
 
     init(args) {
         if (typeof args?.window == "object") {
-            this.window = args.window;
+            this.wmWindow = args.window;
         } else {
-            this.window = windowManager2.createWindow();
+            this.wmWindow = windowManager2.createWindow();
         }
 
-        this.window.data.lecCompat = true;
+        this.wmWindow.data.lecCompat = true;
 
         this.frame = document.createElement("iframe");
         this.prepIFrame(this.frame);
     }
 
-    prepIFrame(frame) {
+    prepIFrame(frame, utils) { // Kører en gang under oprettelse af iframe
+        // Frame sandbox settings
         frame.setAttribute("scrolling", "no");
-        frame.setAttribute(
-            "sandbox",
-            "allow-same-origin allow-scripts allow-forms allow-popups allow-downloads allow-modals"
-        );
 
         // Decorate iframe
         frame.style.width = "100%";
         frame.style.border = "none";
         frame.style.minHeight = "100vh";
 
-        this.window.windowElement.appendChild(frame);
+        this.wmWindow.windowElement.appendChild(frame);
 
         // Loading transition
         frame.classList.add("loading");
@@ -66,17 +66,70 @@ class LecCompat {
             });
         });
 
+        window.addEventListener("resize", this.setHeight);
+
         frame.contentWindow.location.replace("about:blank");
     }
 
-    load = async (_lecPath, callback, update = false) => {
+    setHeight = () => {
+        const frame = this.frame;
+
+        console.log("height calculating");
+        var prevScrollPosition = [window.scrollX, window.scrollY];
+        var body = frame.contentDocument.body;
+        var html = frame.contentDocument.documentElement;
+
+        // console.log(frame.contentDocument.body, body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+        frame.style.height = "initial";
+        frame.style.width = "initial";
+
+        var height = Math.max(
+            body.scrollHeight,
+            body.offsetHeight,
+            html.clientHeight,
+            html.scrollHeight,
+            html.offsetHeight
+        );
+
+        var width = Math.max(
+            body.scrollWidth,
+            body.offsetWidth,
+            html.clientWidth,
+            html.scrollWidth,
+            html.offsetWidth
+        );
+
+        // console.log(frame, "Height: ", height)
+        frame.style.height = `${height}px`;
+        frame.style.width = `max(${width}px, 100%)`;
+        frame.style.filter = "";
+        window.scrollTo(prevScrollPosition[0], prevScrollPosition[1]);
+    };
+
+    /**
+     * 
+     * @param {LecPath} _lecPath 
+     * @param {object} utils 
+     * @param {boolean} update 
+     * @returns 
+     */
+    load = async (_lecPath, utils, update = false) => {
         /** {
          *      url: Url der loades
          *  }
          */
-        this.updateCallback = callback;
+        this.updateCallback = utils.update;
 
         var url = _lecPath.url;
+
+        if (_lecPath.localPath == "login.aspx") {
+            let login = await utils.requestLogin(_lecPath.inst)
+
+            if (login.loginStatus == 1) {
+                this.load(login.lecRes.path, utils)
+                return true;
+            }
+        }
 
         var frame = this.frame;
 
@@ -139,7 +192,7 @@ class LecCompat {
         doc.head.appendChild(injScript);
     }
 
-    applyPatches(frame, update = false) {
+    applyPatches = (frame, update = false) => {
         console.debug("Aktiverer link patch", frame);
         // Patch links (bruges ikke)
         for (var x of frame.contentWindow.document.getElementsByTagName("a")) {
@@ -148,45 +201,9 @@ class LecCompat {
             var dataCommand = x.getAttribute("data-command");
         }
 
-        // Sæt højde
-        const setHeight = () => {
-            console.log("height calculating");
-            var prevScrollPosition = [window.scrollX, window.scrollY];
-            var body = frame.contentDocument.body;
-            var html = frame.contentDocument.documentElement;
-
-            // console.log(frame.contentDocument.body, body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-            frame.style.height = "initial";
-            frame.style.width = "initial";
-
-            var height = Math.max(
-                body.scrollHeight,
-                body.offsetHeight,
-                html.clientHeight,
-                html.scrollHeight,
-                html.offsetHeight
-            );
-
-            var width = Math.max(
-                body.scrollWidth,
-                body.offsetWidth,
-                html.clientWidth,
-                html.scrollWidth,
-                html.offsetWidth
-            );
-
-            // console.log(frame, "Height: ", height)
-            frame.style.height = `${height}px`;
-            frame.style.width = `max(${width}px, 100%)`;
-            frame.style.filter = "";
-            window.scrollTo(prevScrollPosition[0], prevScrollPosition[1]);
-        };
-
-        setTimeout(function () {
-            setHeight(frame);
+        setTimeout(() => {
+            this.setHeight();
         }, 500);
-
-        window.addEventListener("resize", setHeight)
 
         if (update) {
             // get frame content

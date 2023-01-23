@@ -8,23 +8,23 @@ class LecLoginPrep {
     constructor(_lecRes) {
         var parser = new DOMParser();
 
-        var parsedformData = parser.parseFromString(_lecRes.rawformData, "text/html");
-        console.debug(parsedformData);
+        var parsedData = parser.parseFromString(_lecRes.rawData, "text/html");
+        console.debug(parsedData);
 
-        var _loginService = parsedformData.getElementById(
+        var _loginService = parsedData.getElementById(
             "m_Content_schoolnametd"
         ).innerText;
 
         // Find vigtigste ASP felter
-        var VSX = parsedformData
+        var VSX = parsedData
             .getElementById("__VIEWSTATEX")
             .getAttribute("value");
-        var EVV = parsedformData
+        var EVV = parsedData
             .getElementById("__EVENTVALIDATION")
             .getAttribute("value");
 
         // Find resten af ASP felter
-        var aspHidden = parsedformData.querySelectorAll(".aspNetHidden");
+        var aspHidden = parsedData.querySelectorAll(".aspNetHidden");
         var aspExtended = {};
 
         for (var el of aspHidden) {
@@ -54,6 +54,8 @@ class Auth {
     static instList = false;
 
     constructor(inst) {
+        this.lecRequest = new LecRequest()
+
         if (inst) {
             this.inst = inst;
         } else {
@@ -74,7 +76,7 @@ class Auth {
      * @returns
      */
     async #genLoginPrep(inst) {
-        var lecRes = await LecRequest.getPage(
+        var lecRes = await this.lecRequest.getPage(
             `${_LECTIO_BASE_URL}/lectio/${inst}/login.aspx`
         );
 
@@ -88,7 +90,7 @@ class Auth {
         // Fungerer ikke, da fejl er gemt i script tag
         //var parsed = this.parser.parseFromString(res, "text/html");
 
-        //return parsed.querySelector("[formData-title=Fejl]").innerText;
+        //return parsed.querySelector("[data-title=Fejl]").innerText;
         return false;
     }
 
@@ -177,6 +179,7 @@ class Auth {
             };
         } else {
             console.warn("Login fejl ", loginResponseText);
+            alert("Der opstod en fejl under login. Forkert brugernavn/password?")
             var loginError = this.#parseLoginError(loginResponseText);
             return {
                 loginStatus: 0,
@@ -206,18 +209,18 @@ class Auth {
         Auth.instList = new Promise(async (resolve, reject) => {
             var parser = new DOMParser();
 
-            var res = await lecRequest.getPage(
+            var res = await this.lecRequest.getPage(
                 `${_LECTIO_BASE_URL}/lectio/login_list.aspx`
             ); // Henter skole-liste
             console.debug("Response: ", res);
 
-            var parsedInstformData = parser.parseFromString(
-                res.rawformData,
+            var parsedInstData = parser.parseFromString(
+                res.rawData,
                 "text/html"
             );
 
             var instsUnparsed =
-                parsedInstformData.getElementById("schoolsdiv").childNodes;
+                parsedInstData.getElementById("schoolsdiv").childNodes;
 
             var count = 0;
             var instList = [];
@@ -255,8 +258,8 @@ class Auth {
         let authenticated;
 
         // Tjek sidens login status med querySelector(`[name=msapplication-starturl]`)
-        const parsedformData = this.#parser.parseFromString(_lecRes.rawformData, "text/html");
-        const metaEl = parsedformData.querySelector(
+        const parsedData = this.#parser.parseFromString(_lecRes.rawData, "text/html");
+        const metaEl = parsedData.querySelector(
             `[name=msapplication-starturl]`
         );
 
@@ -276,16 +279,16 @@ class Auth {
         }
     }
 
-    parseCurrentUserId(formData) {
-        // Finder id på bruger, der er logget ind ud fra rå HTML formData
+    parseCurrentUserId(data) {
+        // Finder id på bruger, der er logget ind ud fra rå HTML data
         try {
-            var parsedformData = this.parser.parseFromString(formData, "text/html");
+            var parsedData = this.parser.parseFromString(formData, "text/html");
 
             var username =
-                parsedformData.getElementsByClassName("ls-user-name")[0]
+                parsedData.getElementsByClassName("ls-user-name")[0]
                     .textContent;
             var usernameHref =
-                parsedformData.getElementsByClassName("ls-user-name")[0].href;
+                parsedData.getElementsByClassName("ls-user-name")[0].href;
 
             var parsedHref = new URL(usernameHref);
             var parsedLink = LecRequest.parseLink(usernameHref);

@@ -11,9 +11,25 @@ class LoginScreen {
     constructor(auth, inst) {
         this.auth = auth;
         this.windowState = false;
+        this.lecReqLib = new LecRequest();
     }
 
-    async requestLogin(_inst) {}
+    async requestLogin(_inst = NaN) {
+        if (!isNaN(_inst)) {
+            this.#inst = _inst;
+        }
+
+        return new Promise((resolve, reject) => {
+            this.#onSuccessfulLogin = (res) => {
+                console.log("Success");
+
+                this.closeWindow();
+                resolve(res);
+            };
+
+            this.openWindow();
+        });
+    }
 
     async waitForLogin() {
         return new Promise((resolve, reject) => {
@@ -26,22 +42,21 @@ class LoginScreen {
         });
     }
 
-    async openWindow() {
+    async openWindow() { // Åbner loginvindue
         this.loginPage = windowManager2.createWindow({
             exclusive: true,
         });
 
         this.lecReqLib
             .getLocalPage("/pages/login-screen/index.html")
-            .then(async (page) => {
-                windowManager2.headerState = 0;
+            .then(async (page) => { // Pre
                 return page;
             })
-            .then((page) => {
+            .then((page) => { // Injicer HTML
                 this.loginPage.windowElement.innerHTML = page;
                 return this.prepWindow();
             })
-            .then(() => {
+            .then(() => { //
                 this.windowState = true;
 
                 if (!isNaN(this.#inst)) {
@@ -77,7 +92,7 @@ class LoginScreen {
         });
     }
 
-    async prepWindow() {
+    async prepWindow() { // Forbereder knapper til input
         // Forbered login-vindue
         await this.getInstList();
 
@@ -172,7 +187,7 @@ class LoginScreen {
     async toStep2() {
         console.debug("LoginScreen: Går til trin 2, inst", this.#inst);
 
-        var instName = await Promise.resolve(this.authLib.instList).then(
+        var instName = await Promise.resolve(this.auth.instList).then(
             (list) => {
                 var matchedInst = list.instList.filter((obj) => {
                     return obj.id == this.#inst; // Tjekker om ID fra liste matcher valgt ID
@@ -232,7 +247,7 @@ class LoginScreen {
 
     async getInstList() {
         var listElement = document.querySelector(".login-list");
-        await Promise.resolve(this.authLib.instList).then((list) => {
+        await Promise.resolve(this.auth.instList).then((list) => {
             // Tilføj til loginskærm
             listElement.innerHTML = "";
 
@@ -277,8 +292,8 @@ class LoginScreen {
 
     submit(args) {
         return this.auth.login(args).then((loginRes) => {
-            console.debug(loginRes.loginState);
-            var ok = loginRes.loginState;
+            console.debug(loginRes.loginStatus);
+            var ok = loginRes.loginStatus;
 
             if (ok == false) return loginRes;
 

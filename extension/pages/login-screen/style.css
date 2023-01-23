@@ -1,5 +1,9 @@
 /* General */
 
+[data-step]:is(var(--login-step)) {
+    opacity: 0;
+}
+
 
 /**/
 #login-screen-container {

@@ -142,6 +142,15 @@ class MNavigator {
         // Forbered nuværende bruger
     }
 
+    utils = {
+        requestLogin: (_inst) => {
+            return this.lib.loginScreen.requestLogin(_inst)
+        },
+        update: (_lecRes) => {
+            return this.update(_lecRes)
+        }
+    }
+
     setIconListeners() {
         // Listeners for aktiv/inaktiv tab
         window.addEventListener("focus", function () {
@@ -184,7 +193,7 @@ class MNavigator {
 
         const callback = filteredCallbacks[0].callback;
         if (callback instanceof Function) {
-            const _lecRes = await callback(_lecPath, this.update);
+            const _lecRes = await callback(_lecPath, this.utils);
 
             this.update(_lecRes);
             return _lecRes;

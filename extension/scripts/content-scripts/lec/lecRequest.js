@@ -31,7 +31,7 @@ class LecRequest {
 
         console.debug("Henter side " + _url);
 
-        var resText = await this.fetchText(_url);
+        var resText = await this.#fetchText(_url);
 
         return new LecResponse(path.url, resText);
         /** PageData:
