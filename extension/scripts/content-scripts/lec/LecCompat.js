@@ -149,13 +149,13 @@ class LecCompat {
         }
 
         // Sæt højde
-        const setHeight = function (frame) {
-            console.log("HEIHGT", frame);
+        const setHeight = () => {
+            console.log("height calculating");
+            var prevScrollPosition = [window.scrollX, window.scrollY];
             var body = frame.contentDocument.body;
             var html = frame.contentDocument.documentElement;
 
             // console.log(frame.contentDocument.body, body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-
             frame.style.height = "initial";
             frame.style.width = "initial";
 
@@ -176,19 +176,17 @@ class LecCompat {
             );
 
             // console.log(frame, "Height: ", height)
-
             frame.style.height = `${height}px`;
             frame.style.width = `max(${width}px, 100%)`;
             frame.style.filter = "";
+            window.scrollTo(prevScrollPosition[0], prevScrollPosition[1]);
         };
 
         setTimeout(function () {
             setHeight(frame);
-
-            window.addEventListener("resize", function () {
-                setHeight(frame);
-            })
         }, 500);
+
+        window.addEventListener("resize", setHeight)
 
         if (update) {
             // get frame content

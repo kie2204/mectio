@@ -25,14 +25,11 @@ SECTION.island {
 }
 
 SECTION.island .islandHeader {
-    background-color: var(--main-color-light);
-    margin-left: .5rem;
-    padding: .5rem 1rem;
-    border-radius: .3rem .3rem 0 0;
     font-family: "Inter", sans-serif;
-    color: white;
+    color: black;
     font-weight: 500;
-    font-size: 1rem;
+    font-size: 1.2rem;
+    padding: 1rem 0.1rem;
 }
 
 SECTION.island .islandHeader::after {
@@ -42,6 +39,7 @@ SECTION.island .islandHeader::after {
 SECTION.island .islandHeaderContainer {
     border: none;
     background-image: none;
+    height: auto;
 }
 
 .s2dayHeaderSimple {

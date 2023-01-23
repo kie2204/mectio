@@ -22,7 +22,7 @@ header > .right {
 }
 
 /* Buttons */
-.outlined-button {
+.outlined-chip {
     background-color: #fff0;
     height: var(--button-default-height);
     padding: 0 0.75rem;
@@ -36,47 +36,66 @@ header > .right {
     border-radius: 100vmax;
 }
 
-.outlined-button img {
+.outlined-chip img {
     height: 1rem;
 }
 
-.outlined-button:first-child {
+.outlined-chip:first-child {
     margin-left: 0;
 }
 
-.outlined-button:last-child {
+.outlined-chip:last-child {
     margin-right: 0;
 }
 
-.outlined-button.large {
+.outlined-chip.large {
     height: var(--button-large-height);
     font-size: 1.33rem;
 }
 
-.outlined-button.large img {
+.outlined-chip.large img {
     height: 1.25rem;
 }
 
-.outlined-button.circular {
+.outlined-chip.circular {
     width: var(--button-default-height);
     padding: 0;
     align-items: center;
     justify-content: center;
 }
 
-.outlined-button.large.circular {
+.outlined-chip.large.circular {
     width: var(--button-large-height);
     padding: 0;
     align-items: center;
     justify-content: center;
 }
 
+/* Clickable chips */
+.outlined-chip.clickable, a.outlined-chip, button.outlined-chip {
+    cursor: pointer;
+    transition-property: background-color, border-color, transform;
+    transition-duration: 0.1s;
+}
+
+.outlined-chip.clickable:hover, a.outlined-chip:hover, button.outlined-chip:hover {
+    background-color: #0001;
+    border-color: #0008;
+} 
+
+.outlined-chip.clickable:active, a.outlined-chip:active, button.outlined-chip:active {
+    background-color: #0003;
+    border-color: #000A;
+    transition-duration: 0s;
+}
+
+
 /* Navigation */
 #mectio-nav-meta {
     display: flex;
     flex-direction: column;
     align-items: baseline;
-    margin-inline: .33rem;
+    margin-inline: .5rem;
 }
 #mectio-nav-meta p {
     margin: 0;
@@ -84,10 +103,9 @@ header > .right {
 
 #mectio-nav-title {
     font-size: .8rem;
-    font-weight: bold;
-    line-height: 1.5;
+    padding-bottom: .1rem;
 }
 
 #mectio-nav-description {
-    font-size: .6rem;
+    font-size: .55rem;
 }

@@ -7,7 +7,6 @@ const _LECTIO_BASE_URL = "https://www.lectio.dk";
 
 const windowManager2 = new WindowManager2();
 const lecCompat = new LecCompat();
-
 const mNavigator = new MNavigator(); // variable navn "navigator" er reserveret
 
 const currentUrlData = LecRequest.parseLink(window.location.href);
@@ -30,8 +29,6 @@ const init = async function () {
 };
 
 browser.storage.local.get(["config"], async function (config) {
-    console.log(currentUrlData);
-
     let configObject = config.config;
 
     // Check if config valid
