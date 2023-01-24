@@ -2,6 +2,7 @@ class LoginScreen {
     #inst = NaN;
     #loginStep = 1;
     #onSuccessfulLogin = function () {};
+    #loginPrep = null;
 
     /**
      *
@@ -14,7 +15,13 @@ class LoginScreen {
         this.lecReqLib = new LecRequest();
     }
 
-    async requestLogin(_inst = NaN) {
+    async requestLogin(_inst = NaN, loginPrep = null) {
+        if (loginPrep) {
+            this.#loginPrep = loginPrep;
+        } else {
+            this.#loginPrep = null;
+        }
+
         if (!isNaN(_inst)) {
             this.#inst = _inst;
         }
@@ -290,8 +297,11 @@ class LoginScreen {
         }
     }
 
-    submit(args) {
-        return this.auth.login(args).then((loginRes) => {
+    submit(args, loginPrep) {
+        if (this.#inst != this.#loginPrep.inst) {
+            loginPrep == null
+        }
+        return this.auth.login(args, loginPrep).then((loginRes) => {
             console.debug(loginRes.loginStatus);
             var ok = loginRes.loginStatus;
 

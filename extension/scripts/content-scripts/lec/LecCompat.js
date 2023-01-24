@@ -5,6 +5,7 @@ class LecCompat {
          *  }
          */
         this.updateCallback = () => {};
+        this.navUtils = () => {}; // fra navigator
         this.frame = null; // iframe
         this.wmWindow = null; // WMWindow
 
@@ -12,7 +13,7 @@ class LecCompat {
     }
 
     init(args) {
-        if (typeof args?.window == "object") {
+        if (typeof args ? .window == "object") {
             this.wmWindow = args.window;
         } else {
             this.wmWindow = windowManager2.createWindow();
@@ -56,7 +57,23 @@ class LecCompat {
                 frame.classList.add("loading");
                 console.log("Unload event");
 
-                setTimeout(() => {
+                setTimeout(async () => {
+                    generatedLecRes = new LecResponse(
+                        frame.contentWindow.location.href, 
+                        document.documentElement.outerHTML
+                    );
+
+                    let _lecPath = generatedLecRes.path;
+
+                    if (_lecPath.localPath == "login.aspx") {
+                        let login = await this.navUtils.requestLogin(_lecPath.inst, new LecLoginPrep(generatedLecRes))
+
+                        if (login.loginStatus == 1) {
+                            this.load(login.lecRes.path, this.navUtils)
+                            return true;
+                        }
+                    }
+
                     this.iFrameDOMLoad(frame).then(() => {
                         this.injectCSS(frame);
                         this.injectScripts(frame);
@@ -118,15 +135,15 @@ class LecCompat {
          *      url: Url der loades
          *  }
          */
-        this.updateCallback = utils.update;
+        this.navUtils = utils;
 
         var url = _lecPath.url;
 
         if (_lecPath.localPath == "login.aspx") {
-            let login = await utils.requestLogin(_lecPath.inst)
+            let login = await this.navUtils.requestLogin(_lecPath.inst)
 
             if (login.loginStatus == 1) {
-                this.load(login.lecRes.path, utils)
+                this.load(login.lecRes.path, this.navUtils)
                 return true;
             }
         }
