@@ -51,6 +51,7 @@ class LoginScreen {
 
     async openWindow() { // Åbner loginvindue
         this.loginPage = windowManager2.createWindow({
+            hidden: true,
             exclusive: true,
         });
 
@@ -61,7 +62,7 @@ class LoginScreen {
             })
             .then((page) => { // Injicer HTML
                 this.loginPage.windowElement.innerHTML = page;
-                return this.prepWindow();
+                return this.prepWindow(this.loginPage);
             })
             .then(() => { //
                 this.windowState = true;
@@ -99,7 +100,7 @@ class LoginScreen {
         });
     }
 
-    async prepWindow() { // Forbereder knapper til input
+    prepWindow = async (w) => { // Forbereder knapper til input
         // Forbered login-vindue
         await this.getInstList();
 
@@ -143,7 +144,8 @@ class LoginScreen {
                     });
             });
 
-        window.requestAnimationFrame(function () {
+        w.hidden = false;
+        setTimeout(function () {
             var container = document.querySelector("#login-screen-container");
             var box = document.querySelector("#login-screen-box");
 
@@ -154,7 +156,7 @@ class LoginScreen {
             box.style.transitionDuration = "0.2s";
 
             container.classList.remove("hidden");
-        });
+        }, 1);
 
         return;
     }
@@ -298,9 +300,6 @@ class LoginScreen {
     }
 
     submit(args, loginPrep) {
-        if (this.#inst != this.#loginPrep.inst) {
-            loginPrep == null
-        }
         return this.auth.login(args, loginPrep).then((loginRes) => {
             console.debug(loginRes.loginStatus);
             var ok = loginRes.loginStatus;

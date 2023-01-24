@@ -1,11 +1,34 @@
 // @ts-check
 
+class WM2Window {
+    constructor(id, windowElement, hidden, exclusive, persistent, data) {
+        this.id = id;
+        this.windowElement = windowElement;
+        this._hidden = hidden;
+        this._exclusive = exclusive;
+        this.persistent = persistent;
+        this.data = data;
+    }
+
+    get hidden() { return this._hidden; }
+
+    set hidden(value) { 
+        if (value) {
+            windowManager2.hideWindow(this.id)
+        } else {
+            windowManager2.showWindow(this.id)
+        }
+
+        this._hidden = !!value
+    }
+}
+
 class WindowManager2 {
     #activeWindow = "";
 
     /**
-     * 
-     * @param {*} args 
+     *
+     * @param {*} args
      */
     constructor(args) {
         this.lecRequest = new LecRequest();
@@ -66,13 +89,13 @@ class WindowManager2 {
                 }
             });
         } else {
-            return
+            return;
         }
     }
     /**
-     * 
-     * @param {number} len 
-     * @returns 
+     *
+     * @param {number} len
+     * @returns
      */
     genRandomId(len) {
         const charset =
@@ -93,19 +116,28 @@ class WindowManager2 {
     /**
      *
      * @param {object} args
+     * @param {string?} args.id - Vindue-id. Genereres automatisk.
      * @param {boolean} args.exclusive - Vindue i fuld skærm.
      * @param {boolean} args.persistent - Lukkes ikke under closeAll.
      * @param {boolean} args.hidden - Skjult når oprettet.
      * @param {object} args.data - Info tilhørende vinduet, bruges af andre funktioner
      * @returns
      */
-    createWindow(args) {
+    createWindow(
+        args = {
+            id: "",
+            hidden: false,
+            exclusive: false,
+            persistent: false,
+            data: {},
+        }
+    ) {
         console.debug("WindowManager2: Nyt vindue");
         var id = this.genRandomId(32);
-        var hidden = args?.hidden ? true : false;
-        var exclusive = args?.exclusive ? true : false;
-        var persistent = args?.persistent ? true : false;
-        var data = args?.data ? args.data : {};
+        var hidden = !!args.hidden;
+        var exclusive = !!args.exclusive;
+        var persistent = !!args.persistent;
+        var data = args.data;
 
         var windowElement = document.createElement("div");
         windowElement.setAttribute("id", id);
@@ -128,14 +160,14 @@ class WindowManager2 {
             data,
         };
         console.debug(this.openWindows);
-        return {
+        return new WM2Window(
             id,
             windowElement,
             hidden,
             exclusive,
             persistent,
-            data,
-        };
+            data
+        );
     }
     destroyWindow(id) {
         var win = this.openWindows[id];

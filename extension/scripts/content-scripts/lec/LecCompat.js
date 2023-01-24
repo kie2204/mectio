@@ -13,7 +13,7 @@ class LecCompat {
     }
 
     init(args) {
-        if (typeof args ? .window == "object") {
+        if (typeof args?.window == "object") {
             this.wmWindow = args.window;
         } else {
             this.wmWindow = windowManager2.createWindow();
@@ -25,7 +25,8 @@ class LecCompat {
         this.prepIFrame(this.frame);
     }
 
-    prepIFrame(frame, utils) { // Kører en gang under oprettelse af iframe
+    prepIFrame(frame, utils) {
+        // Kører en gang under oprettelse af iframe
         // Frame sandbox settings
         frame.setAttribute("scrolling", "no");
 
@@ -58,23 +59,26 @@ class LecCompat {
                 console.log("Unload event");
 
                 setTimeout(async () => {
-                    generatedLecRes = new LecResponse(
-                        frame.contentWindow.location.href, 
-                        document.documentElement.outerHTML
-                    );
-
-                    let _lecPath = generatedLecRes.path;
-
-                    if (_lecPath.localPath == "login.aspx") {
-                        let login = await this.navUtils.requestLogin(_lecPath.inst, new LecLoginPrep(generatedLecRes))
-
-                        if (login.loginStatus == 1) {
-                            this.load(login.lecRes.path, this.navUtils)
-                            return true;
+                    this.iFrameDOMLoad(frame).then(async () => {
+                        const generatedLecRes = new LecResponse(
+                            frame.contentWindow.location.href,
+                            frame.contentDocument.documentElement.outerHTML
+                        );
+    
+                        let _lecPath = generatedLecRes.path;
+    
+                        if (_lecPath.localPath == "login.aspx") {
+                            let login = await this.navUtils.requestLogin(
+                                _lecPath.inst,
+                                new LecLoginPrep(generatedLecRes)
+                            );
+    
+                            if (login.loginStatus == 1) {
+                                this.load(login.lecRes.path, this.navUtils, true);
+                                return true;
+                            }
                         }
-                    }
 
-                    this.iFrameDOMLoad(frame).then(() => {
                         this.injectCSS(frame);
                         this.injectScripts(frame);
                         this.applyPatches(frame, true);
@@ -124,11 +128,11 @@ class LecCompat {
     };
 
     /**
-     * 
-     * @param {LecPath} _lecPath 
-     * @param {object} utils 
-     * @param {boolean} update 
-     * @returns 
+     *
+     * @param {LecPath} _lecPath
+     * @param {object} utils
+     * @param {boolean} update
+     * @returns
      */
     load = async (_lecPath, utils, update = false) => {
         /** {
@@ -140,10 +144,10 @@ class LecCompat {
         var url = _lecPath.url;
 
         if (_lecPath.localPath == "login.aspx") {
-            let login = await this.navUtils.requestLogin(_lecPath.inst)
+            let login = await this.navUtils.requestLogin(_lecPath.inst);
 
             if (login.loginStatus == 1) {
-                this.load(login.lecRes.path, this.navUtils)
+                this.load(login.lecRes.path, this.navUtils, true);
                 return true;
             }
         }
@@ -160,7 +164,7 @@ class LecCompat {
 
         this.injectCSS(frame);
         this.injectScripts(frame);
-        this.applyPatches(frame);
+        this.applyPatches(frame, update);
 
         var pageData = this.frame.contentDocument.documentElement.innerHTML;
 
@@ -231,7 +235,7 @@ class LecCompat {
 
             mNavigator.update(_lecRes);
         }
-    }
+    };
 
     async iFrameDOMLoad(frame) {
         return new Promise((resolve) => {
