@@ -25,16 +25,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="100.67875"
-     inkscape:cy="11.492314"
+     inkscape:zoom="5.6"
+     inkscape:cx="28.526044"
+     inkscape:cy="21.808556"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1001"
-     inkscape:window-x="-9"
-     inkscape:window-y="41"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="32"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata951">
@@ -53,6 +53,11 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(221.66978,-159.67156)">
+    <path
+       inkscape:connector-curvature="0"
+       style="opacity:1;fill:#172c46;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m -213.42072,159.67157 -3.20807,1.85208 3.20859,1.8526 z m -3.20755,9.75186 v 3.70417 l 3.20807,-1.85209 z"
+       id="path4526-7-5-57-8-3-2" />
     <g
        aria-label="mectio"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:21.16666603px;line-height:1.25;font-family:Merriweather;-inkscape-font-specification:Merriweather;letter-spacing:0px;word-spacing:0px;fill:#203e60;fill-opacity:1;stroke:none;stroke-width:0.26458332"
@@ -89,11 +94,6 @@
          inkscape:connector-curvature="0"
          id="path4526-7-5-57-8"
          d="m 44.767239,40.190961 -3.208074,1.852084 5.16e-4,11.603941 3.208073,-1.852083 z"
-         style="opacity:1;fill:#172c46;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path4526-7-5-57-8-3"
-         d="m 49.808229,37.280544 -3.208074,1.852084 5.16e-4,11.603941 3.208073,-1.852083 z"
          style="opacity:1;fill:#172c46;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <path
          inkscape:connector-curvature="0"
