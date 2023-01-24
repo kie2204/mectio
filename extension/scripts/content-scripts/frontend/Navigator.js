@@ -230,7 +230,11 @@ class MNavigator {
 
         this.updateNavBar(_lecRes);
 
+<<<<<<< HEAD
         document.title = `${_lecRes.path.localPath} - mectio`;
+=======
+        document.title = `${_lecRes.path?.localPath || "."} - mectio`;
+>>>>>>> 224d3231022ea6ad240bad8e339305aca98a659c
         window.history.replaceState("", "", this.currentPage);
     }
 
