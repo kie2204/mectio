@@ -101,6 +101,7 @@ class Auth {
      * @returns
      */
     login = async (args, loginPrep) => {
+        this.inst = args.inst;
         let inst = this.inst;
         let credentialsPresent = args.username ? true : false && args.password ? true : false;
 

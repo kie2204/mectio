@@ -8,6 +8,8 @@ class WM2Window {
         this._exclusive = exclusive;
         this.persistent = persistent;
         this.data = data;
+
+        console.debug("Window Created: ", {id, windowElement, hidden, exclusive, persistent, data});
     }
 
     get hidden() { return this._hidden; }

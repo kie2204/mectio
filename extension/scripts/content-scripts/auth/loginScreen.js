@@ -15,7 +15,7 @@ class LoginScreen {
         this.lecReqLib = new LecRequest();
     }
 
-    async requestLogin(_inst = NaN, loginPrep = null) {
+    async requestLogin(_inst = NaN, loginPrep = null) { // Kan bruges eksternt hvis bruger ikke er logget ind
         if (loginPrep) {
             this.#loginPrep = loginPrep;
         } else {
@@ -38,7 +38,7 @@ class LoginScreen {
         });
     }
 
-    async waitForLogin() {
+    async waitForLogin() { // Forældet
         return new Promise((resolve, reject) => {
             this.successCallback = (res) => {
                 console.log("Succ");
@@ -74,7 +74,7 @@ class LoginScreen {
             });
     }
 
-    async closeWindow() {
+    async closeWindow() { // Lukker vindue
         console.debug("Lukker...");
 
         if (typeof this.loginPage != "object") return false;
