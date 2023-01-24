@@ -75,7 +75,7 @@ class LecCompat {
     
                             if (login.loginStatus == 1) {
                                 this.load(login.lecRes.path, this.navUtils, true);
-                                return true;
+                                return false;
                             }
                         }
 
@@ -148,7 +148,7 @@ class LecCompat {
 
             if (login.loginStatus == 1) {
                 this.load(login.lecRes.path, this.navUtils, true);
-                return true;
+                return false;
             }
         }
 

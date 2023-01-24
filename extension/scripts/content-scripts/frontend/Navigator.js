@@ -136,6 +136,18 @@ class MNavigator {
 
         windowManager2.headerState = 2;
         this.load(initialPath)
+        this.setTempButtons()
+    }
+
+    setTempButtons() {
+        var buttons = document.querySelectorAll("[data-goto-local]")
+
+        for (var x of buttons) { 
+            let attr = x.getAttribute("data-goto-local")
+            x.addEventListener("click", () => {
+                this.load(new LecPath(`${_LECTIO_BASE_URL}/lectio/${this.path.inst}/${attr}`))
+            })
+        }
     }
 
     userInit() {
